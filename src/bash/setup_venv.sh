@@ -21,3 +21,6 @@ if [ -f "requirements.txt" ]; then
 else
     echo "requirements.txt not found."
 fi
+
+# Install wrds without prerequisites
+pip install wrds==3.2.0 --no-deps
