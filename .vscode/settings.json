@@ -1,0 +1,18 @@
+{
+    "python.envFile": "${workspaceFolder}/.env",
+    
+    "jupyter.notebookFileRoot": "${workspaceFolder}",
+
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+
+    "python.pythonPath": "${workspaceFolder}/venv/bin/python",
+    "python.terminal.activateEnvironment": true
+}
