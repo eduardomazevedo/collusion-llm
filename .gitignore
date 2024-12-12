@@ -6,6 +6,8 @@
 *.pyo
 *.pyd
 __pycache__/
+.ipynb_checkpoints/
 
 # Ignore the virtual environment
 venv/
+
