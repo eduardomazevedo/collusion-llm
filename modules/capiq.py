@@ -30,36 +30,15 @@ _conn = None  # Global variable to manage WRDS connection
 _ciqtranscriptcomponenttype = None # Global for the component type descriptions
 
 
-def is_connection_open():
-    """
-    Checks if the WRDS connection is active.
-
-    Returns:
-        bool: True if the connection is active, False otherwise.
-    """
+def get_connection():
     global _conn
-    if _conn is None:
-        return False
-    try:
-        _conn.list_tables(library='ciq')
-        return True
-    except Exception:
-        return False
-
-
-def connect():
-    """
-    Establishes a WRDS connection if not already open.
-    """
-    global _conn
-    if not is_connection_open():
+    if _conn is None:  # Check if connection is open
         try:
             _conn = wrds.Connection(wrds_username=config.WRDS_USERNAME, password=config.WRDS_PASSWORD)
             print("WRDS connection established.")
         except Exception as e:
             print(f"Failed to establish WRDS connection: {e}")
-    else:
-        print("Already connected")
+    return _conn
 
 
 def disconnect():
@@ -83,7 +62,7 @@ def ciqtranscriptcomponenttype():
     global _ciqtranscriptcomponenttype
     if _ciqtranscriptcomponenttype is None:
         query = "SELECT * FROM ciq.ciqtranscriptcomponenttype"
-        _ciqtranscriptcomponenttype = _conn.raw_sql(query)
+        _ciqtranscriptcomponenttype = get_connection().raw_sql(query)
     return _ciqtranscriptcomponenttype
 
 
@@ -109,7 +88,7 @@ def dl_transcripts(transcriptids, limit=1000):
     SELECT DISTINCT transcriptid FROM ciq.ciqtranscriptcomponent
     WHERE transcriptid IN ({id_list})
     """
-    existing_ids_df = _conn.raw_sql(check_query)
+    existing_ids_df = get_connection().raw_sql(check_query)
     existing_ids = set(existing_ids_df['transcriptid'])
 
     # Check if any IDs are missing
@@ -123,7 +102,7 @@ def dl_transcripts(transcriptids, limit=1000):
     WHERE transcriptid IN ({id_list})
     LIMIT {limit}
     """
-    transcript_df = _conn.raw_sql(transcript_query)
+    transcript_df = get_connection().raw_sql(transcript_query)
 
     # Query to fetch person data for the valid IDs
     person_query = f"""
@@ -132,7 +111,7 @@ def dl_transcripts(transcriptids, limit=1000):
     WHERE transcriptid IN ({id_list})
     LIMIT {limit}
     """
-    person_df = _conn.raw_sql(person_query)
+    person_df = get_connection().raw_sql(person_query)
 
     # Sort transcript data by transcriptid and componentorder
     transcript_df = transcript_df.sort_values(by=['transcriptid', 'componentorder'])
@@ -141,6 +120,16 @@ def dl_transcripts(transcriptids, limit=1000):
 
 
 def format_transcript(transcript_df, person_df):
+    """
+    Formats a transcript DataFrame by merging it with component type and person data,
+    and then generates a JSON representation of the transcript text for each unique transcript ID.
+    Args:
+        transcript_df (pd.DataFrame): DataFrame containing transcript data.
+        person_df (pd.DataFrame): DataFrame containing person data.
+    Returns:
+        dict: A dictionary where keys are transcript IDs and values are JSON strings
+              representing the formatted transcript text.
+    """
     # Merge ciqtranscriptcomponenttype_df to get component name instead of id.
     transcript_df = transcript_df.merge(ciqtranscriptcomponenttype(), on='transcriptcomponenttypeid', how='left')
     transcript_df = transcript_df.drop(columns=['transcriptcomponenttypeid'])
@@ -165,7 +154,48 @@ def format_transcript(transcript_df, person_df):
 
     return transcript_texts
 
+
 def get_transcripts(transcriptids, limit=1000):
+    """
+    Fetches and formats transcripts based on given transcript IDs.
+
+    Args:
+        transcriptids (list): A list of transcript IDs to fetch.
+        limit (int, optional): The maximum number of transcripts to fetch. Defaults to 1000.
+
+    Returns:
+        dict: A dictionary where keys are transcript IDs and values are JSON strings
+              representing the formatted transcript text.
+    """
     transcript_df, person_df = dl_transcripts(transcriptids, limit)
     formatted_transcripts = format_transcript(transcript_df, person_df)
     return formatted_transcripts
+
+
+def find_text(string):
+    """
+    Searches for a given string in the componenttext column of the ciq.ciqtranscriptcomponent table
+    and returns a list of matching transcript IDs.
+
+    Args:
+        string (str): The text to search for.
+
+    Returns:
+        list: A list of transcript IDs where the text is found.
+    """
+
+    # Prepare the SQL query with parameterized input
+    query = """
+    SELECT DISTINCT transcriptid 
+    FROM ciq.ciqtranscriptcomponent
+    WHERE componenttext ILIKE %(search_text)s
+    """
+    try:
+        # Execute the query with the parameterized search term
+        results = get_connection().raw_sql(query, params={"search_text": f"%{string}%"})
+        # Extract transcript IDs into a list
+        transcript_ids = results['transcriptid'].tolist()
+        return transcript_ids
+    except Exception as e:
+        print(f"Error executing query: {e}")
+        return []
