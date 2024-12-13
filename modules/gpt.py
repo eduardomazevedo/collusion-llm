@@ -3,6 +3,7 @@ Module to make Chat GPT queries
 """
 
 import config
+import json
 from openai import OpenAI
 from pydantic import BaseModel
 import modules.capiq as capiq
@@ -39,7 +40,7 @@ prompts = {
 }
 
 
-def get_response(prompt_name, transcript_text):
+def run_completion(prompt_name, transcript_text):
     completion = get_client().beta.chat.completions.parse(
         model = _model,
         messages=[
@@ -48,4 +49,12 @@ def get_response(prompt_name, transcript_text):
         ],
         response_format = prompts[prompt_name]['response_format']
     )
-    return completion
+    return json.loads(completion.choices[0].message.content)
+
+
+def get_responses(prompt_name, transcript_ids):
+    transcript_text = capiq.get_transcripts(transcript_ids)
+    results = {}
+    for transcript_id in transcript_ids:
+        results[transcript_id] = run_completion(prompt_name, transcript_text[transcript_id])
+    return results
