@@ -66,7 +66,7 @@ def ciqtranscriptcomponenttype():
     return _ciqtranscriptcomponenttype
 
 
-def dl_transcripts(transcriptids, limit=1000):
+def dl_transcripts(transcriptids, limit=1e5):
     """
     Fetch transcript data and associated person data based on a list of IDs.
 
@@ -155,7 +155,7 @@ def format_transcript(transcript_df, person_df):
     return transcript_texts
 
 
-def get_transcripts(transcriptids, limit=1000):
+def get_transcripts(transcriptids, limit=1e5):
     """
     Fetches and formats transcripts based on given transcript IDs.
 

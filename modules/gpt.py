@@ -47,7 +47,12 @@ def run_completion(prompt_name, transcript_text):
             {"role": "system", "content": prompts[prompt_name]['system_message']},
             {"role": "user", "content": transcript_text}
         ],
-        response_format = prompts[prompt_name]['response_format']
+        response_format = prompts[prompt_name]['response_format'],
+        temperature=0,
+        max_completion_tokens=1024,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
     )
     return json.loads(completion.choices[0].message.content)
 
