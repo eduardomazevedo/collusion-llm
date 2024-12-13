@@ -64,7 +64,7 @@ nbstripout==0.8.1
 nest-asyncio==1.6.0
 notebook==7.3.1
 notebook_shim==0.2.4
-numpy==2.0.2
+numpy==2.2.0
 overrides==7.7.0
 packaging==24.2
 pandas==2.2.3
@@ -94,7 +94,7 @@ requests==2.32.3
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.22.3
-scipy==1.13.1
+scipy==1.14.1
 seaborn==0.13.2
 Send2Trash==1.8.3
 six==1.17.0
@@ -117,5 +117,4 @@ webcolors==24.11.1
 webencodings==0.5.1
 websocket-client==1.8.0
 widgetsnbextension==4.0.13
-# wrds==3.2.0
 zipp==3.21.0
