@@ -1,3 +1,4 @@
+#%%
 import config
 import wrds
 import pandas as pd
@@ -38,5 +39,11 @@ df['companyid'] = df['companyid'].astype('Int64')
 df['transcriptid'] = df['transcriptid'].astype('Int64')
 df['keydevid'] = df['keydevid'].astype('Int64')
 
+#%%
+from modules.utils import eliminate_duplicate_transcripts
+df = eliminate_duplicate_transcripts(df)
+
+
+#%%
 # Save
 df.to_feather('./data/transcript-detail.feather')

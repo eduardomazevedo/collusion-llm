@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 
-def keep_most_recent_transcripts(df):
+def eliminate_duplicate_transcripts(df):
     """
     Given a DataFrame of transcripts that may include multiple revisions
     for the same event (same keydevid), keep only the most recent version
