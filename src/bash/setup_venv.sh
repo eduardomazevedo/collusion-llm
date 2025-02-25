@@ -24,3 +24,6 @@ fi
 
 # Install wrds without prerequisites
 pip install wrds==3.2.0 --no-deps
+
+# Install openai
+pip install openai
