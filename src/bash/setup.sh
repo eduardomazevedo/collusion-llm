@@ -4,7 +4,7 @@
 SCRIPT_DIR="./src/bash"
 
 # List of scripts to run
-SCRIPTS=("setup_venv.sh" "download_credentials.sh" "download_capiq.sh")
+SCRIPTS=("setup_venv.sh" "download_credentials.sh" "download_capiq.sh" "download_human_ratings.sh")
 
 # Iterate over the scripts and execute each one
 for script in "${SCRIPTS[@]}"; do
