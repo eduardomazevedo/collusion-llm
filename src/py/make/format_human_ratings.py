@@ -1,11 +1,13 @@
 #%%
+import config
 import pandas as pd
 
+
 # Load the human rating scores
-acl_scores = pd.read_csv('./data/raw/acl_scores.csv')
+acl_scores = pd.read_csv(config.ACL_SCORES_PATH)
 
 # Load data/transcript-detail.feather
-transcript_detail = pd.read_feather('./data/transcript-detail.feather')
+transcript_detail = pd.read_feather(config.TRANSCRIPT_DETAIL_PATH)
 
 
 #%%
@@ -102,7 +104,7 @@ acl_scores = acl_scores.dropna()
 
 # %%
 # Load Joe's manual ratings
-joe_scores = pd.read_csv('./data/raw/joe_scores.csv')
+joe_scores = pd.read_csv(config.JOE_SCORES_PATH)
 
 
 # %%
@@ -119,6 +121,6 @@ combined_scores = pd.concat([joe_scores, acl_scores], axis=0, ignore_index=True)
 
 # %%
 # Save to CSV
-combined_scores.to_csv('./data/human-ratings.csv', index=False)
+combined_scores.to_csv(config.HUMAN_RATINGS_PATH, index=False)
 
 

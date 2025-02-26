@@ -34,7 +34,7 @@ class LLMQuery:
         """
         self.provider = provider.lower()
         self.model = model or getattr(config, "OPENAI_MODEL", "gpt-4o-mini")
-        self.prompts_path = prompts_path or f"{config.ROOT}/assets/prompts.json"
+        self.prompts_path = prompts_path or config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
 
