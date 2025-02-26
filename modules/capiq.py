@@ -8,7 +8,7 @@ User-facing functions:
 ----------------------
 - `get_transcripts(transcriptids, limit=1e5)`: Fetches and formats transcripts based on given transcript IDs. Returns a dictionary of transcript IDs and JSON strings.
 - `get_single_transcript(transcriptid, limit=1e5)`: Fetches and formats a single transcript based on a given transcript ID. Returns a JSON string.
-- `find_text(string)`: Searches for a given string in the transcript text and returns matching transcript IDs.
+- `find_text(string)` (SLOW): Searches for a given string in the transcript text and returns matching transcript IDs.
 
 Internal functions:
 -------------------
