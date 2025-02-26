@@ -19,6 +19,7 @@ from pydantic import BaseModel
 import json
 import config
 import modules.capiq as capiq
+from modules.queries_db import insert_query_result
 
 
 class LLMQuery:
@@ -82,7 +83,7 @@ class LLMQuery:
 
         return completion.choices[0].message.parsed.model_dump_json()  # Automatically parsed into Pydantic model
 
-    def apply_prompt_to_transcripts(self, prompt_name, transcript_ids):
+    def apply_prompt_to_transcripts(self, prompt_name, transcript_ids, save_to_db=False):
         """
         Applies a prompt to a list of transcripts.
 
@@ -95,6 +96,8 @@ class LLMQuery:
 
         for transcript_id in transcript_ids:
             results[transcript_id] = self.generate_response(prompt_name, transcript_texts[transcript_id])
+            if save_to_db:
+                insert_query_result(prompt_name, transcript_id, results[transcript_id])
 
         return results
 
