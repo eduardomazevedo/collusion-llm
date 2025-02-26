@@ -9,4 +9,6 @@ WRDS_PASSWORD = mordor123
 ROOT=/Users/sauron/projects/collusion-llm
 
 # Pipeline
-  - `bash ./src/bash/run.sh` runs the pipeline.
+  - Setup: `bash ./src/bash/setup.sh`
+  - Format human ratings: `python ./src/py/make/format_human_ratings.py`
+  - Either create or download prompt database.

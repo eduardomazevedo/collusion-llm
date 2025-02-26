@@ -15,20 +15,6 @@ transcript_detail = pd.read_feather(config.TRANSCRIPT_DETAIL_PATH)
 acl_scores = acl_scores.drop(['call quarter', 'call year'], axis=1)
 
 
-
-#%%
-print("ACL Scores:")
-print(acl_scores)
-
-
-#%%
-print("\nACL Scores columns:")
-print(acl_scores.columns)
-
-# %%
-print("\nCarrier values:")
-print(acl_scores['carrier'].value_counts())
-
 # %%
 # Create a mapping dictionary for carrier to company name
 carrier_to_company = {
@@ -50,7 +36,6 @@ carrier_to_company = {
 list_of_companies = [company for company in carrier_to_company.values() if company is not None]
 
 
-
 #%%
 # Map carrier codes to company names in acl_scores
 acl_scores['companyname'] = acl_scores['carrier'].map(carrier_to_company)
@@ -61,7 +46,7 @@ acl_scores['companyname'] = acl_scores['carrier'].map(carrier_to_company)
 filtered_transcripts = transcript_detail[
     (transcript_detail['companyname'].isin(list_of_companies)) &
     (transcript_detail['keydeveventtypename'] == 'Earnings Calls')
-]
+].copy()
 
 
 # %%
@@ -122,5 +107,3 @@ combined_scores = pd.concat([joe_scores, acl_scores], axis=0, ignore_index=True)
 # %%
 # Save to CSV
 combined_scores.to_csv(config.HUMAN_RATINGS_PATH, index=False)
-
-
