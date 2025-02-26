@@ -10,8 +10,11 @@ Example usage:
     # Define transcript IDs
     transcript_ids = [23993]
     
-    # Apply a prompt to transcripts
+    # Apply a prompt to transcripts and return responses
     responses = llm_query.apply_prompt_to_transcripts("SimpleCapacityV8", transcript_ids)
+
+    # Save responses to database
+    responses = llm_query.apply_prompt_to_transcripts("SimpleCapacityV8", transcript_ids, save_to_db=True)
 """
 
 from openai import OpenAI
