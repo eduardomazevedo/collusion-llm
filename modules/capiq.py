@@ -1,25 +1,24 @@
 """
 Module to load Capital IQ transcripts from WRDS.
 
-Functions:
-    load_transcripts(file_path: str) -> pd.DataFrame
-        Loads Capital IQ transcripts from the specified file path and returns a pandas DataFrame.
+This module provides functions to retrieve, process, and format 
+Capital IQ transcripts from WRDS. 
 
-    process_transcripts(df: pd.DataFrame) -> pd.DataFrame
-        Processes the loaded transcripts DataFrame by cleaning and structuring the data.
+User-facing functions:
+----------------------
+- `get_transcripts(transcriptids, limit=1e5)`: Fetches and formats transcripts based on given transcript IDs. Returns a dictionary of transcript IDs and JSON strings.
+- `get_single_transcript(transcriptid, limit=1e5)`: Fetches and formats a single transcript based on a given transcript ID. Returns a JSON string.
+- `find_text(string)`: Searches for a given string in the transcript text and returns matching transcript IDs.
 
-    save_transcripts(df: pd.DataFrame, output_path: str) -> None
-        Saves the processed transcripts DataFrame to the specified output path.
-
-    connect() -> None
-        Establishes a WRDS connection if not already open.
-
-    disconnect() -> None
-        Closes the WRDS connection if open.
-
-    is_connection_open() -> bool
-        Checks if the WRDS connection is active.
+Internal functions:
+-------------------
+- `get_connection()`: Establishes and manages a WRDS connection.
+- `disconnect()`: Closes the WRDS connection.
+- `ciqtranscriptcomponenttype()`: Retrieves the ciqtranscriptcomponenttype table.
+- `dl_transcripts(transcriptids, limit)`: Downloads transcript data and associated person data.
+- `format_transcript(transcript_df, person_df)`: Merges and formats transcript data into JSON.
 """
+
 
 import config
 import wrds
@@ -72,7 +71,7 @@ def dl_transcripts(transcriptids, limit=1e5):
 
     Args:
         transcriptids (list of int): A list of transcript IDs.
-        limit (int): Maximum number of rows to fetch. Defaults to 1000.
+        limit (int): Maximum number of rows to fetch. Defaults to 1e5.
 
     Returns:
         tuple: A tuple containing two pandas.DataFrames:
@@ -170,6 +169,21 @@ def get_transcripts(transcriptids, limit=1e5):
     transcript_df, person_df = dl_transcripts(transcriptids, limit)
     formatted_transcripts = format_transcript(transcript_df, person_df)
     return formatted_transcripts
+
+
+def get_single_transcript(transcriptid, limit=1e5):
+    """
+    Fetches and formats a single transcript based on a given transcript ID.
+
+    Args:
+        transcriptid (int): The ID of the transcript to fetch.  
+    
+    Returns:
+        string: A JSON string representing the formatted transcript text.
+    """
+    transcript_df, person_df = dl_transcripts([transcriptid], limit)
+    formatted_transcripts = format_transcript(transcript_df, person_df)
+    return formatted_transcripts[transcriptid]
 
 
 def find_text(string):
