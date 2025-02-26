@@ -46,4 +46,4 @@ df = eliminate_duplicate_transcripts(df)
 
 #%%
 # Save
-df.to_feather('./data/transcript-detail.feather')
+df.to_feather(config.TRANSCRIPT_DETAIL_PATH)
