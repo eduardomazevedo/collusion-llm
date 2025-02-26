@@ -1,7 +1,7 @@
 import config
 import pandas as pd
 import modules.capiq as capiq
-import modules.gpt as gpt
+import modules.llm as llm
 import textwrap
 import modules.sql as sql
 import modules.utils as utils
