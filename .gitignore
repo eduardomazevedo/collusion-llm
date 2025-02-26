@@ -13,3 +13,6 @@ venv/
 
 # Ignore macOS system files
 .DS_Store
+
+# Ignore scratch.py
+scratch.py

@@ -38,7 +38,6 @@ class LLMQuery:
         self.prompts = self._load_prompts()
         self.client = OpenAI()
 
-
     def _load_prompts(self):
         """Loads the prompts from the JSON file."""
         try:
@@ -46,7 +45,15 @@ class LLMQuery:
                 return json.load(file)
         except FileNotFoundError:
             raise FileNotFoundError(f"Prompt file not found at {self.prompts_path}")
-        
+        except json.JSONDecodeError:
+            raise ValueError(f"Error decoding JSON in {self.prompts_path}")
+
+    def _get_prompt(self, prompt_name):
+        """Fetches a prompt configuration from stored prompts."""
+        prompt_config = self.prompts.get(prompt_name)
+        if not prompt_config:
+            raise ValueError(f"Prompt '{prompt_name}' not found in prompts.json")
+        return prompt_config
 
     def generate_response(self, prompt_name, user_input):
         """
@@ -56,15 +63,13 @@ class LLMQuery:
         :param user_input: The user-provided text input.
         :return: JSON string from the parsed response from OpenAI using a Pydantic model.
         """
-        if prompt_name not in self.prompts:
-            raise ValueError(f"Prompt '{prompt_name}' not found in prompts.json")
-
-        response_model = RESPONSE_FORMAT_CLASSES.get(self.prompts[prompt_name]["response_format"])
+        prompt_config = self._get_prompt(prompt_name)
+        response_model = RESPONSE_FORMAT_CLASSES.get(prompt_config["response_format"])
         if response_model is None:
-            raise ValueError(f"Invalid response format: {self.prompts[prompt_name]['response_format']}")
+            raise ValueError(f"Invalid response format: {prompt_config['response_format']}")
 
         messages = [
-            {"role": "system", "content": self.prompts[prompt_name]["system_message"]},
+            {"role": "system", "content": prompt_config["system_message"]},
             {"role": "user", "content": user_input},
         ]
 
