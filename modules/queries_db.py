@@ -1,6 +1,5 @@
 import config
 import sqlite3
-import json
 from datetime import datetime, timezone
 import subprocess
 import pandas as pd
