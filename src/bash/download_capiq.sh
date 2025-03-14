@@ -13,4 +13,4 @@ source venv311/bin/activate
 echo "Virtual environment activated."
 
 # Run the Python script
-python3 src/py/download_capiq_details.py
+python3 src/py/make/download_capiq_details.py
