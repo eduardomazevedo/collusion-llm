@@ -70,11 +70,11 @@ nbstripout==0.8.1
 nest-asyncio==1.6.0
 notebook==7.3.1
 notebook_shim==0.2.4
-numpy==2.2.0
+numpy==1.26.0
 openai==1.64.0
 openpyxl==3.1.5
 overrides==7.7.0
-packaging==24.2
+packaging<23.3,>=22.0
 pandas==2.2.3
 pandocfilters==1.5.1
 parso==0.8.4
@@ -107,7 +107,7 @@ requests==2.32.3
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.22.3
-scipy==1.14.1
+scipy>=1.12,<1.13
 seaborn==0.13.2
 Send2Trash==1.8.3
 setuptools==75.8.1
