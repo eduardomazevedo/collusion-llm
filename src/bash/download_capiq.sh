@@ -12,5 +12,8 @@ cd "$PROJECT_ROOT"
 source .venv/bin/activate
 echo "Virtual environment activated."
 
+# Set PYTHONPATH to the current directory
+export PYTHONPATH="$PROJECT_ROOT"
+
 # Run the Python script
 python3 src/py/make/download_capiq_details.py
