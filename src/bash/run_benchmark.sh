@@ -22,6 +22,9 @@ fi
 PROMPT_NAME=$1
 shift
 
+# Set PYTHONPATH to the current directory
+export PYTHONPATH="$PROJECT_ROOT"
+
 # Run the Python script
 python src/py/populate_benchmarking_data.py "$PROMPT_NAME" "$@"
 
