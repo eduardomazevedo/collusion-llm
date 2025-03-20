@@ -10,24 +10,23 @@ cd "$PROJECT_ROOT"
 
 # Check if prompt name is provided
 if [ -z "$1" ]; then
-    echo "Usage: ./run_benchmark.sh <prompt_name> [options]"
-    echo "Options:"
-    echo "  --source <joe|acl>     Filter transcripts by source"
-    echo "  --balanced <size>      Run on balanced random subset of specified size"
-    echo "  --no-save             Do not save responses to database"
-    echo ""
-    echo "Examples:"
-    echo "  ./run_benchmark.sh SimpleCapacityV8"
-    echo "  ./run_benchmark.sh SimpleCapacityV8 --source joe"
-    echo "  ./run_benchmark.sh SimpleCapacityV8 --balanced 10"
-    echo "  ./run_benchmark.sh SimpleCapacityV8 --source joe --balanced 10"
-    echo "  ./run_benchmark.sh SimpleCapacityV8 --no-save"
+    echo "Usage: $0 <prompt_name> [--source <source>] [--balanced <n>] [--no-save]"
+    echo "  prompt_name: Name of the prompt to run"
+    echo "  --source: Source of transcripts (joe or acl)"
+    echo "  --balanced: Number of balanced transcripts to select"
+    echo "  --no-save: Don't save responses to database"
     exit 1
 fi
 
-# Get the prompt name
+# Get prompt name from first argument
 PROMPT_NAME=$1
-shift  # Remove the prompt name from arguments
+shift
 
-# Run the Python script with all remaining arguments
-python src/py/populate_benchmarking_data.py "$PROMPT_NAME" "$@" 
+# Run the Python script
+python src/populate_benchmarking_data.py "$PROMPT_NAME" "$@"
+
+# Update the leaderboard
+echo "Updating leaderboard..."
+python src/py/make/create_leaderboard.py
+
+echo "Benchmark complete and leaderboard updated!" 
