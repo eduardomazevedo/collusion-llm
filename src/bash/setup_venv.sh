@@ -9,29 +9,23 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
 cd "$PROJECT_ROOT"
 
 # Check if virtual environment directory exists
-if [ ! -d "venv311" ]; then
-    # Create virtual environment with Python 3.11
-    /opt/homebrew/bin/python3.11 -m venv venv311
+if [ ! -d ".venv" ]; then
+    # Create virtual environment with Python 3
+    python3 -m venv .venv
     echo "Virtual environment created."
 else
     echo "Virtual environment already exists."
 fi
 
 # Activate virtual environment
-source venv311/bin/activate
+source .venv/bin/activate
 echo "Virtual environment activated."
 
-# Check if requirements.txt exists
-if [ -f "requirements.txt" ]; then
-    # Install requirements
-    pip install -r requirements.txt
-    echo "Requirements installed."
-else
-    echo "requirements.txt not found."
-fi
+# Install requirements
+pip install --upgrade pip
+pip install uv
+uv sync
+echo "Requirements installed."
 
 # Install wrds without prerequisites
-pip install wrds==3.2.0 --no-deps
-
-# Install openai
-pip install openai
+uv pip install wrds==3.3.0

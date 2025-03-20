@@ -1,8 +1,5 @@
 # Virtual Environment
-venv/
-venv311/
-env/
-ENV/
+.venv/
 
 # Python
 __pycache__/
