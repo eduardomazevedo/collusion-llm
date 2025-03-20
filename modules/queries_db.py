@@ -9,9 +9,19 @@ conn = sqlite3.connect(config.DATABASE_PATH)
 cursor = conn.cursor()
 
 def insert_query_result(prompt_name: str, transcript_id: int, response: str):
-    """Insert a new query result into the database using an open connection."""
+    """
+    Insert a new query result into the database using an open connection.
+    
+    Args:
+        prompt_name: Name of the prompt used
+        transcript_id: ID of the transcript
+        response: The LLM response
+    """
     cursor.execute(
-        "INSERT INTO queries (prompt_name, transcript_id, date, response) VALUES (?, ?, ?, ?)",
+        """
+        INSERT INTO queries (prompt_name, transcript_id, date, response)
+        VALUES (?, ?, ?, ?)
+        """,
         (prompt_name, transcript_id, datetime.now(timezone.utc).isoformat(), response),
     )
     conn.commit()

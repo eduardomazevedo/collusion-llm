@@ -14,3 +14,6 @@ ROOT=/Users/sauron/projects/collusion-llm
   - Either create or download prompt database:
     - Create: `python ./src/py/make/initialize_db.py`
     - Download: `python ./src/py/make/download_db.py`
+  - Run prompts on transcripts: `bash ./src/bash/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>] [--no-save]`
+  
+

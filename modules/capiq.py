@@ -33,10 +33,20 @@ def get_connection():
     global _conn
     if _conn is None:  # Check if connection is open
         try:
+            if not config.WRDS_USERNAME or not config.WRDS_PASSWORD:
+                raise ValueError(
+                    "WRDS credentials not found in environment variables. "
+                    "Please ensure WRDS_USERNAME and WRDS_PASSWORD are set in your .env file."
+                )
+            print(f"Attempting to connect to WRDS with username: {config.WRDS_USERNAME}")
             _conn = wrds.Connection(wrds_username=config.WRDS_USERNAME, password=config.WRDS_PASSWORD)
             print("WRDS connection established.")
+        except ValueError as e:
+            print(f"Configuration error: {e}")
+            raise
         except Exception as e:
             print(f"Failed to establish WRDS connection: {e}")
+            raise
     return _conn
 
 
