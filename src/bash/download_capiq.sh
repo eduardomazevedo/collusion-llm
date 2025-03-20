@@ -9,7 +9,7 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
 cd "$PROJECT_ROOT"
 
 # Activate virtual environment
-source venv311/bin/activate
+source .venv/bin/activate
 echo "Virtual environment activated."
 
 # Run the Python script

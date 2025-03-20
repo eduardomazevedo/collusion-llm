@@ -2,7 +2,6 @@
 import config
 import pandas as pd
 
-
 # Load the human rating scores
 acl_scores = pd.read_csv(config.ACL_SCORES_PATH)
 
