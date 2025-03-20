@@ -23,7 +23,7 @@ PROMPT_NAME=$1
 shift
 
 # Run the Python script
-python src/populate_benchmarking_data.py "$PROMPT_NAME" "$@"
+python src/py/populate_benchmarking_data.py "$PROMPT_NAME" "$@"
 
 # Update the leaderboard
 echo "Updating leaderboard..."

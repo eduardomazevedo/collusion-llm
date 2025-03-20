@@ -4,14 +4,18 @@ from typing import List, Dict, Optional
 import config
 import sqlite3
 from datetime import datetime
+import json
 
 def load_human_ratings() -> pd.DataFrame:
     """Load human ratings from CSV file."""
-    return pd.read_csv(config.HUMAN_RATINGS_PATH)
+    df = pd.read_csv("data/human-ratings.csv")
+    # Rename column to match database
+    df = df.rename(columns={'transcriptid': 'transcript_id'})
+    return df
 
 def load_llm_responses(prompt_name: str) -> pd.DataFrame:
     """Load LLM responses for a specific prompt from the database."""
-    conn = sqlite3.connect(config.DATABASE_PATH)
+    conn = sqlite3.connect("data/queries.sqlite")
     query = """
     SELECT transcript_id, response, date
     FROM queries
@@ -22,7 +26,16 @@ def load_llm_responses(prompt_name: str) -> pd.DataFrame:
     conn.close()
     
     # Parse JSON response to get scores
-    df['score'] = df['response'].apply(lambda x: pd.json_normalize(x)['score'].iloc[0])
+    def extract_score(response):
+        try:
+            response_dict = json.loads(response)
+            if isinstance(response_dict, dict):
+                return response_dict.get('score', np.nan)
+            return np.nan
+        except:
+            return np.nan
+    
+    df['score'] = df['response'].apply(extract_score)
     return df
 
 def calculate_binary_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -136,17 +149,15 @@ def save_leaderboard(leaderboard: pd.DataFrame, output_path: str = "data/leaderb
     """Save leaderboard to CSV file."""
     leaderboard.to_csv(output_path, index=False)
     print(f"Leaderboard saved to {output_path}")
+    print("\nPrompt Leaderboard:")
+    print(leaderboard.to_string(index=False))
 
 if __name__ == "__main__":
     # Get all unique prompt names from the database
-    conn = sqlite3.connect(config.DATABASE_PATH)
+    conn = sqlite3.connect("data/queries.sqlite")
     prompt_names = pd.read_sql_query("SELECT DISTINCT prompt_name FROM queries", conn)['prompt_name'].tolist()
     conn.close()
     
     # Create and save leaderboard
     leaderboard = create_leaderboard(prompt_names)
-    save_leaderboard(leaderboard)
-    
-    # Display results
-    print("\nPrompt Leaderboard:")
-    print(leaderboard.to_string(index=False)) 
+    save_leaderboard(leaderboard) 
