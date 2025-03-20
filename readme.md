@@ -1,6 +1,6 @@
 # Setup
   - `rclone config` to set rclone remote `collusion-llm` pointing to Google drive folder.
-  - `bash ./src/bash/setup.sh` sets up Python environment, downloads credentials, wrds data, raw data.
+  - `bash ./src/bash/setup.sh` sets up Python environment (NOTE: Python 3.11 venv due to wrds requirements linkages), downloads credentials, wrds data, raw data.
 
 # Example .env file
 OPENAI_API_KEY = abc123
@@ -15,5 +15,5 @@ ROOT=/Users/sauron/projects/collusion-llm
     - Create: `python ./src/py/make/initialize_db.py`
     - Download: `python ./src/py/make/download_db.py`
   - Run prompts on transcripts: `bash ./src/bash/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>] [--no-save]`
-  
+    - Assess prompt performance: "data/leaderboard.csv" updates every time `run_benchmark.sh` runs
 
