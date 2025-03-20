@@ -10,7 +10,6 @@ ROOT=/Users/sauron/projects/collusion-llm
 
 # Pipeline
   - Setup: `bash ./src/bash/setup.sh`
-  - Format human ratings: `python ./src/py/make/format_human_ratings.py`
   - Either create or download prompt database:
     - Create: `python ./src/py/make/initialize_db.py`
     - Download: `python ./src/py/make/download_db.py`
