@@ -1,8 +1,8 @@
 import config
 import sqlite3
 from datetime import datetime, timezone
-import subprocess
 import pandas as pd
+from modules.db_manager import download_database, upload_database
 
 # Open a persistent connection when the module loads
 conn = sqlite3.connect(config.DATABASE_PATH)
@@ -39,19 +39,9 @@ def close_db():
     conn.close()
 
 def upload_db():
-    """Uploads the database to Google Drive using rclone."""
-    remote_path = f"{config.RCLONE_REMOTE}:{config.RCLONE_REMOTE_DATABASE_PATH}"
-    try:
-        subprocess.run(["rclone", "copy", config.DATABASE_PATH, remote_path], check=True)
-        print("Database uploaded successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error uploading database: {e}")
+    """Uploads the database to Google Drive using rclone with safety checks."""
+    return upload_database()
 
 def download_db():
-    """Downloads the latest database from Google Drive using rclone."""
-    remote_path = f"{config.RCLONE_REMOTE}:{config.RCLONE_REMOTE_DATABASE_PATH}"
-    try:
-        subprocess.run(["rclone", "copy", remote_path, './data/'], check=True)
-        print("Database downloaded successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error downloading database: {e}")
+    """Downloads the latest database from Google Drive using rclone with safety checks."""
+    return download_database()
