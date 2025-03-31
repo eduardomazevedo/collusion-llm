@@ -39,6 +39,21 @@ def verify_database(db_path: str) -> bool:
     except sqlite3.Error:
         return False
 
+def check_remote_database_exists() -> bool:
+    """
+    Check if the database exists in Google Drive.
+    
+    Returns:
+        bool: True if database exists, False otherwise
+    """
+    remote_path = f"{config.RCLONE_REMOTE}:{config.RCLONE_REMOTE_DATABASE_PATH}"
+    try:
+        # Use rclone ls to check if file exists
+        result = subprocess.run(["rclone", "ls", remote_path], capture_output=True, text=True)
+        return result.returncode == 0 and config.DATABASE_PATH.split('/')[-1] in result.stdout
+    except subprocess.CalledProcessError:
+        return False
+
 def download_database() -> bool:
     """
     Download the database from Google Drive with safety checks.
@@ -47,6 +62,14 @@ def download_database() -> bool:
         bool: True if download was successful, False otherwise
     """
     remote_path = f"{config.RCLONE_REMOTE}:{config.RCLONE_REMOTE_DATABASE_PATH}"
+    
+    # Check if database exists in Google Drive
+    if not check_remote_database_exists():
+        print("\nDatabase not found in Google Drive!")
+        print("You have two options:")
+        print("1. Create a new database: python ./src/py/make/initialize_db.py")
+        print("2. Get the database from another team member")
+        return False
     
     try:
         # Download the database
