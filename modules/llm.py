@@ -94,14 +94,18 @@ class LLMQuery:
         :param transcript_ids: List of transcript IDs to process.
         :return: Dictionary mapping transcript IDs to their JSON string responses.
         """
+        print(f"\nStarting to process {len(transcript_ids)} transcripts with prompt '{prompt_name}'...")
         transcript_texts = capiq.get_transcripts(transcript_ids)
         results = {}
 
-        for transcript_id in transcript_ids:
+        for i, transcript_id in enumerate(transcript_ids, 1):
+            print(f"\nProcessing transcript {i}/{len(transcript_ids)} (ID: {transcript_id})...")
             results[transcript_id] = self.generate_response(prompt_name, transcript_texts[transcript_id])
             if save_to_db:
                 insert_query_result(prompt_name, transcript_id, results[transcript_id])
+                print(f"✓ Saved response to database")
 
+        print(f"\nCompleted processing all {len(transcript_ids)} transcripts!")
         return results
 
 
