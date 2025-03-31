@@ -2,7 +2,7 @@ import config
 import sqlite3
 from datetime import datetime, timezone
 import pandas as pd
-from modules.db_manager import download_database, upload_database
+from modules.db_manager import download_database as download_db, upload_database as upload_db
 
 # Open a persistent connection when the module loads
 conn = sqlite3.connect(config.DATABASE_PATH)
@@ -40,8 +40,8 @@ def close_db():
 
 def upload_db():
     """Uploads the database to Google Drive using rclone with safety checks."""
-    return upload_database()
+    return upload_db()
 
 def download_db():
     """Downloads the latest database from Google Drive using rclone with safety checks."""
-    return download_database()
+    return download_db()
