@@ -18,6 +18,7 @@ export PYTHONPATH="$PROJECT_ROOT"
 show_usage() {
     echo "Usage: $0 <command>"
     echo "Commands:"
+    echo "  init      - Initialize a new database (if none exists in Google Drive)"
     echo "  download  - Download the latest database from Google Drive"
     echo "  upload    - Upload the current database to Google Drive"
     echo "  status    - Show the current database status"
@@ -65,22 +66,26 @@ except Exception as e:
 "
 }
 
-# Main script logic
+# Main command handling
 case "$1" in
+    "init")
+        echo "Initializing new database..."
+        python3 ./src/py/make/initialize_db.py
+        ;;
     "download")
         echo "Downloading database from Google Drive..."
-        python3 -c "from modules.queries_db import download_db; download_db()"
+        python3 -c "from modules.db_manager import download_database; download_database()"
         show_status
         ;;
     "upload")
         echo "Uploading database to Google Drive..."
-        python3 -c "from modules.queries_db import upload_db; upload_db()"
+        python3 -c "from modules.db_manager import upload_database; upload_database()"
         show_status
         ;;
     "status")
         show_status
         ;;
-    "help"|"")
+    "help"|"--help"|"-h")
         show_usage
         ;;
     *)
