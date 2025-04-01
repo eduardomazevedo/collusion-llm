@@ -11,10 +11,12 @@ ROOT=/Users/sauron/projects/collusion-llm
 # Pipeline
   - Setup: `bash ./src/bash/setup.sh`
   - Database management:
-    - Start fresh: `python ./src/py/make/initialize_db.py`
+    - Initialize new database: `bash ./src/bash/manage_db.sh init`
     - Or get latest: `bash ./src/bash/manage_db.sh download`
+    - Check status: `bash ./src/bash/manage_db.sh status`
   - Run prompts on transcripts: `bash ./src/bash/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>] [--no-save]`
     - Assess prompt performance: "data/leaderboard.csv" updates every time `run_benchmark.sh` runs
   - Upload database: `bash ./src/bash/manage_db.sh upload`
-    - Check database status anytime: `bash ./src/bash/manage_db.sh status`
+
+### Running Prompts
 
