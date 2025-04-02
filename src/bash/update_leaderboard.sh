@@ -17,27 +17,11 @@ else
     exit 1
 fi
 
-# Check if prompt name is provided
-if [ -z "$1" ]; then
-    echo "Usage: $0 <prompt_name> [--source <source>] [--balanced <n>]"
-    echo "  prompt_name: Name of the prompt to run"
-    echo "  --source: Source of transcripts (joe or acl)"
-    echo "  --balanced: Number of balanced transcripts to select"
-    exit 1
-fi
-
-# Get prompt name from first argument
-PROMPT_NAME=$1
-shift
-
 # Set PYTHONPATH to the current directory
 export PYTHONPATH="$PROJECT_ROOT"
-
-# Run the Python script
-python src/py/populate_benchmarking_data.py "$PROMPT_NAME" "$@"
 
 # Update the leaderboard
 echo "Updating leaderboard..."
 python src/py/make/create_leaderboard.py
 
-echo "Benchmark complete and leaderboard updated!" 
+echo "Leaderboard updated!" 
