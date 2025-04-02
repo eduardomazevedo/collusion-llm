@@ -5,6 +5,10 @@ import config
 import sqlite3
 from datetime import datetime
 import json
+import argparse
+import os
+import sys
+
 
 def load_human_ratings() -> pd.DataFrame:
     """Load human ratings from CSV file."""
@@ -53,7 +57,7 @@ def calculate_score_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 def performance_score(
     prompt_name: str,
     test_set: str = 'all',
-    binary_threshold: float = 65.0
+    binary_threshold: float = 50.0
 ) -> Dict[str, float]:
     """
     Calculate performance scores for a prompt.
@@ -158,6 +162,5 @@ if __name__ == "__main__":
     prompt_names = pd.read_sql_query("SELECT DISTINCT prompt_name FROM queries", conn)['prompt_name'].tolist()
     conn.close()
     
-    # Create and save leaderboard
     leaderboard = create_leaderboard(prompt_names)
     save_leaderboard(leaderboard) 

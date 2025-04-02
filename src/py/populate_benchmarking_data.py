@@ -106,7 +106,6 @@ def main():
     parser.add_argument('prompt_name', help='Name of the prompt to run (must exist in prompts.json)')
     parser.add_argument('--source', choices=['joe', 'acl'], help='Filter transcripts by source of human rating')
     parser.add_argument('--balanced-subset', type=int, help='Run on a balanced random subset of this size')
-    parser.add_argument('--no-save', action='store_true', help='Do not save responses to database (default: save to database)')
     
     args = parser.parse_args()
     
@@ -125,18 +124,11 @@ def main():
     responses = llm_query.apply_prompt_to_transcripts(
         args.prompt_name,
         transcript_ids,
-        save_to_db=not args.no_save  # Save by default unless --no-save is specified
+        save_to_db=True  # Always save to database
     )
     
     print(f"Successfully processed {len(responses)} transcripts")
-    
-    if args.no_save:
-        print("\nResponses (not saved to database):")
-        for transcript_id, response in responses.items():
-            print(f"\nTranscript {transcript_id}:")
-            print(response)
-    else:
-        print("Responses have been saved to the database")
+    print("Responses have been saved to the database")
 
 if __name__ == '__main__':
     main() 
