@@ -22,3 +22,48 @@ ROOT=/Users/sauron/projects/collusion-llm
 To update the leaderboard with a new threshold value:
 1. Change the `binary_threshold` default value in `src/py/make/create_leaderboard.py`
 2. Run: `bash ./src/bash/update_leaderboard.sh`
+
+You can also sort the leaderboard by any available metric using the `--sort` option:
+```bash
+bash ./src/bash/update_leaderboard.sh --sort <metric>
+```
+
+Available metrics for sorting:
+- `combined_accuracy` (default)
+- `joe_accuracy`
+- `acl_accuracy`
+- `joe_pos_precision`
+- `joe_pos_recall`
+- `joe_neg_precision`
+- `joe_neg_recall`
+- `acl_pos_precision`
+- `acl_pos_recall`
+- `acl_neg_precision`
+- `acl_neg_recall`
+
+For example, to sort by ACL positive precision:
+```bash
+bash ./src/bash/update_leaderboard.sh --sort acl_pos_precision
+```
+
+## Leaderboard Interpretation
+
+### Overall Metrics
+- `combined_accuracy`: Weighted average of Joe's accuracy (50%) and ACL accuracy (50%)
+- `joe_accuracy`: Accuracy on Joe's dataset (continuous scores 0-100)
+- `acl_accuracy`: Accuracy on ACL dataset (binary classification)
+
+### Dataset Metrics
+- `_pos_precision`: How many of the predicted positive cases (score ≥ threshold) are actually positive
+- `_pos_recall`: How many of the actual positive cases were correctly identified
+- `_neg_precision`: How many of the predicted negative cases (score < threshold) are actually negative
+- `_neg_recall`: How many of the actual negative cases were correctly identified
+
+### Interpreting the Metrics
+- High precision means the prompt is very confident when it makes a prediction
+- High recall means the prompt is good at finding all instances of a category
+- A prompt with high positive precision but low positive recall is conservative in identifying collusion
+- A prompt with high positive recall but low positive precision tends to over-predict collusion
+- The same principles apply to negative cases (non-collusion)
+
+The leaderboard is sorted by `combined_accuracy` in descending order by default, but you can sort by any other metric using the `--sort` option. For example, if false positives are more costly than false negatives, you might want to sort by precision metrics.
