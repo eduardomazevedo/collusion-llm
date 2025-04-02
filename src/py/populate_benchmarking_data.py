@@ -77,26 +77,35 @@ def get_test_transcripts(
         # If no source specified, include all transcripts with any human rating
         df = df[df['joe_score'].notna() | df['acl_manual_flag'].notna()]
         if balanced_subset_size:
-            # For mixed source, balance between zero and positive scores using Joe's scores
-            positive_scores = df[df['joe_score'] > 0]['transcriptid'].tolist()
-            zero_scores = df[df['joe_score'] == 0]['transcriptid'].tolist()
+            # For mixed source, consider both Joe's scores and ACL flags
+            # Get positive cases from both sources
+            joe_positives = df[df['joe_score'] > 0]['transcriptid'].tolist()
+            acl_positives = df[df['acl_manual_flag'] == 1]['transcriptid'].tolist()
+            # Combine and remove duplicates
+            positive_cases = list(set(joe_positives + acl_positives))
+            
+            # Get negative cases from both sources
+            joe_negatives = df[df['joe_score'] == 0]['transcriptid'].tolist()
+            acl_negatives = df[df['acl_manual_flag'] == 0]['transcriptid'].tolist()
+            # Combine and remove duplicates
+            negative_cases = list(set(joe_negatives + acl_negatives))
             
             # Calculate how many of each we need
             n_positive = balanced_subset_size // 2
-            n_zero = balanced_subset_size - n_positive
+            n_negative = balanced_subset_size - n_positive
             
             # Check if we have enough samples
-            if len(positive_scores) < n_positive or len(zero_scores) < n_zero:
+            if len(positive_cases) < n_positive or len(negative_cases) < n_negative:
                 raise ValueError(
                     f"Not enough samples for balanced subset of size {balanced_subset_size}. "
-                    f"Available: {len(positive_scores)} positive, {len(zero_scores)} zero scores"
+                    f"Available: {len(positive_cases)} positive cases, {len(negative_cases)} negative cases"
                 )
             
             # Randomly sample from each group
-            selected_positive = np.random.choice(positive_scores, size=n_positive, replace=False)
-            selected_zero = np.random.choice(zero_scores, size=n_zero, replace=False)
+            selected_positive = np.random.choice(positive_cases, size=n_positive, replace=False)
+            selected_negative = np.random.choice(negative_cases, size=n_negative, replace=False)
             
-            return np.concatenate([selected_positive, selected_zero]).tolist()
+            return np.concatenate([selected_positive, selected_negative]).tolist()
     
     # If no balanced subset requested, return all filtered transcripts
     return df['transcriptid'].tolist()
