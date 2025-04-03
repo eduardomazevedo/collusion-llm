@@ -172,6 +172,12 @@ class PriceCapacity(BaseModel):
     score: int
     reasoning: str
 
+class ScoreReasonExcerpts(BaseModel):
+    score: int
+    reasoning: str
+    excerpts: list[str]
+
+
 # Map response format names to Pydantic models
 RESPONSE_FORMAT_CLASSES = {
     "ResponseBinary": ResponseBinary,
@@ -188,4 +194,5 @@ RESPONSE_FORMAT_CLASSES = {
     "CapacityScore": CapacityScore,
     "CapacityScoreReasoning": CapacityScoreReasoning,
     "PriceCapacity": PriceCapacity,
+    "ScoreReasonExcerpts": ScoreReasonExcerpts,
 }
