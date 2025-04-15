@@ -1,5 +1,5 @@
 """
-Module for processing transcripts with LLMs
+Module for processing transcripts with LLMs using synchronous response API calls.
 
 Example usage:
     from modules.llm import LLMQuery
@@ -13,8 +13,8 @@ Example usage:
     # Apply a prompt to transcripts and return responses
     responses = llm_query.apply_prompt_to_transcripts("SimpleCapacityV8", transcript_ids)
 
-    # Process transcripts in batch
-    batch_responses = llm_query.process_batch("SimpleCapacityV8", transcript_ids)
+    # Save responses to database
+    responses = llm_query.apply_prompt_to_transcripts("SimpleCapacityV8", transcript_ids, save_to_db=True)
 """
 
 from openai import OpenAI
@@ -23,7 +23,6 @@ import json
 import config
 import modules.capiq as capiq
 from modules.queries_db import insert_query_result
-from modules.batch_processor import BatchProcessor
 
 
 class LLMQuery:
@@ -42,7 +41,6 @@ class LLMQuery:
         self.prompts_path = prompts_path or config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
-        self.batch_processor = BatchProcessor(client=self.client, model=self.model, prompts=self.prompts)
 
     def _load_prompts(self):
         """Loads the prompts from the JSON file."""
@@ -107,33 +105,6 @@ class LLMQuery:
             print(f"✓ Saved response to database")
 
         print(f"\nCompleted processing all {len(transcript_ids)} transcripts!")
-        return results
-
-    def process_batch(self, prompt_name, transcript_ids, metadata=None):
-        """
-        Process transcripts in batch using OpenAI's Batch API.
-
-        :param prompt_name: The key of the prompt in the JSON file.
-        :param transcript_ids: List of transcript IDs to process.
-        :param metadata: Optional metadata for the batch job.
-        :return: Dictionary mapping transcript IDs to their responses.
-        """
-        print(f"\nStarting batch processing of {len(transcript_ids)} transcripts with prompt '{prompt_name}'...")
-        
-        # Create batch input file
-        input_file = self.batch_processor.create_batch_input_file(prompt_name, transcript_ids)
-        
-        # Submit batch job
-        batch_id = self.batch_processor.submit_batch(input_file, metadata)
-        print(f"Batch job submitted with ID: {batch_id}")
-        
-        # Wait for completion
-        self.batch_processor.wait_for_batch_completion(batch_id)
-        
-        # Process results
-        results = self.batch_processor.process_batch_results(batch_id)
-        
-        print(f"\nCompleted batch processing of {len(transcript_ids)} transcripts!")
         return results
 
 
@@ -204,7 +175,6 @@ class ScoreReasonExcerpts(BaseModel):
     score: int
     reasoning: str
     excerpts: list[str]
-
 
 # Map response format names to Pydantic models
 RESPONSE_FORMAT_CLASSES = {

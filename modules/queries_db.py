@@ -34,6 +34,34 @@ def fetch_all_queries():
     columns = ['query_id', 'prompt_name', 'transcript_id', 'date', 'response']
     return pd.DataFrame(rows, columns=columns)
 
+def export_to_csv(output_path: str = None):
+    """
+    Export the queries database to a CSV file.
+    
+    Args:
+        output_path: Path where to save the CSV file. If None, uses a default path
+                    in the output directory with timestamp.
+    
+    Returns:
+        Path to the exported CSV file
+    """
+    if output_path is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = f"output/queries_export_{timestamp}.csv"
+    
+    # Fetch all queries
+    df = fetch_all_queries()
+    
+    # Create output directory if it doesn't exist
+    import os
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
+    # Save to CSV
+    df.to_csv(output_path, index=False)
+    print(f"Exported {len(df)} queries to {output_path}")
+    
+    return output_path
+
 def close_db():
     """Close the database connection. Call this when shutting down."""
     conn.close()

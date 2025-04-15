@@ -132,8 +132,7 @@ def main():
     # Run prompt on transcripts
     responses = llm_query.apply_prompt_to_transcripts(
         args.prompt_name,
-        transcript_ids,
-        save_to_db=True  # Always save to database
+        transcript_ids
     )
     
     print(f"Successfully processed {len(responses)} transcripts")

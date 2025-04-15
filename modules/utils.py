@@ -1,5 +1,7 @@
 import pandas as pd
 import re
+import json
+from typing import List, Dict
 
 def eliminate_duplicate_transcripts(df):
     """
@@ -47,3 +49,27 @@ def get_quarter_year_from_headline(headline: str):
         return (quarter, year)
     else:
         return (None, None)
+    
+def prep_transcript_for_review(transcript: List[Dict]) -> str:
+    """
+    Takes one transcript (from JSON object from capiq) and formats it for human review.
+    e.g. Answers from Executives: Text of answer.
+    """
+    formatted_components = []
+    for entry in transcript:
+        component_type = entry.get("transcriptcomponenttypename", "Comment")
+        speaker_type = entry.get("speakertypename", "Call Participant")
+        component_text = entry.get("componenttext", "")
+        formatted = f"{component_type} from {speaker_type}: {component_text.strip()}"
+        formatted_components.append(formatted + "\n")
+
+    formatted_transcript = "\n".join(formatted_components)
+
+    # Replace double backslashes with a single backslash in case of escaped characters
+    formatted_transcript = formatted_transcript.replace('\\\\', '\\')
+
+    # Remove control characters except newline (\n) and tab (\t)
+    formatted_transcript = re.sub(r'[^\x20-\x7E\n\t\u00A0-\uFFFF]', '', formatted_transcript)
+
+    return formatted_transcript
+
