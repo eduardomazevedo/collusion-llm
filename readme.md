@@ -73,3 +73,7 @@ The project uses SQLite for storing query results. The database is stored in `da
 ./src/bash/export_db.sh [output_path]
 ```
 If no output path is specified, it will create a timestamped file in the `output` directory.
+
+## Batch Processing
+TO BE COMPLETED
+
