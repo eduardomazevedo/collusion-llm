@@ -60,10 +60,16 @@ bash ./src/bash/update_leaderboard.sh --sort acl_pos_precision
 - `_neg_recall`: How many of the actual negative cases were correctly identified
 
 ### Interpreting the Metrics
-- High precision means the prompt is very confident when it makes a prediction
-- High recall means the prompt is good at finding all instances of a category
 - A prompt with high positive precision but low positive recall is conservative in identifying collusion
 - A prompt with high positive recall but low positive precision tends to over-predict collusion
 - The same principles apply to negative cases (non-collusion)
 
 The leaderboard is sorted by `combined_accuracy` in descending order by default, but you can sort by any other metric using the `--sort` option. For example, if false positives are more costly than false negatives, you might want to sort by precision metrics.
+
+## Database Export (for review)
+The project uses SQLite for storing query results. The database is stored in `data/queries.db`. To export the database to CSV:
+
+```bash
+./src/bash/export_db.sh [output_path]
+```
+If no output path is specified, it will create a timestamped file in the `output` directory.

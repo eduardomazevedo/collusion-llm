@@ -17,24 +17,26 @@ else
     exit 1
 fi
 
-# Check if prompt name is provided
-if [ -z "$1" ]; then
-    echo "Usage: $0 <prompt_name> [--source <source>] [--balanced <n>] [--metadata <json>]"
-    echo "  prompt_name: Name of the prompt to run"
-    echo "  --source: Source of transcripts (joe or acl)"
-    echo "  --balanced: Number of balanced transcripts to select"
-    echo "  --metadata: Optional JSON string with metadata for the batch job"
+# Check if company IDs and prompt name are provided
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Usage: $0 <company_ids> <prompt_name> [--operation <operation>] [--batch-id <batch_id>] [--input-file <input_file>]"
+    echo "  company_ids: Company ID(s) to process (comma-separated if multiple)"
+    echo "  prompt_name: Name of the prompt to use"
+    echo "  --operation: Operation to perform (create, submit, status, process, all)"
+    echo "  --batch-id: Batch ID for status/process operations"
+    echo "  --input-file: Input file path for submit operation"
     exit 1
 fi
 
-# Get prompt name from first argument
-PROMPT_NAME=$1
-shift
+# Get company IDs and prompt name from arguments
+COMPANY_IDS=$1
+PROMPT_NAME=$2
+shift 2
 
 # Set PYTHONPATH to the current directory
 export PYTHONPATH="$PROJECT_ROOT"
 
 # Run the Python script
-python src/py/run_batch.py "$PROMPT_NAME" "$@"
+python src/py/batch_processor_runner.py "$COMPANY_IDS" "$PROMPT_NAME" "$@"
 
-echo "Batch job submitted successfully!" 
+echo "Batch processing complete!" 
