@@ -1,19 +1,18 @@
 FIGURING OUT BATCHES
 
 In llm module add separate batch related functions:
-- put together batch (given prompt and given transcripts as arguments)
-- upload batch file to openai (given batch as argument)
-- check for updates for a given batch job (manual, not automated on time interval)
-- download and save batch responses of a given batch job
-- put the batch responses of a given completed batch job into big queries db
+- DONE! put together batch (given prompt and given transcripts as arguments)
+- DONE! upload batch file to openai (given batch as argument)
+- DONE! check for updates for a given batch job (manual, not automated on time interval)
+- DONE! retrieve and save batch responses of a given batch job AND put the batch responses of a given completed batch job into big queries db
 
-Create a new .sh type script to be able to call the batch related functions in intuitive way.
+DONE! Create a new .sh type script to be able to call the batch related functions in intuitive way.
 What I want to be able to do with that wrapper .sh script for batches:
 --> all the individual batch related steps for:
 - a list of companies (could be one, or many), meaning all their transcripts
 - a given prompt name
 
-Extra checks to put in place:
+**Extra checks to put in place:**
 
 1. Need a batch size check function that checks if a batch falls within openai limits
 OpenAI limits for model gpt-4o-mini:
@@ -28,12 +27,12 @@ Prices:
 
 Helper functionalities:
 - DONE! output from the capiq feather all individual companies (with names) and their respective transcript ids (with headlines, only most recent)
-- prepare the transcripts retrieved with capiq.get_transcripts(transcript_ids) to be passed to LLM; They are initially in a JSON schema; We want them as a text that shows all call contributions separated by new lines
+- DONE! prepare the transcripts retrieved with capiq.get_transcripts(transcript_ids) to be passed to LLM; They are initially in a JSON schema; We want them as a text that shows all call contributions separated by new lines
 transcriptcomponenttypename from speakertypename: componenttext
 
 
 ----
-LATER (i.e. once the above works well)
+**LATER (i.e. once the above works well)**
 Workflow to process ALL available comapnies and transcripts from capiq, given a prompt:
 - add companies to batches one by one to stay within limit (i.e. using limit check function)
 - a function creates a small separate file to keep track of these batches
