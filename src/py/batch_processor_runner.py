@@ -9,15 +9,15 @@ Operations:
     submit: Submit batch job
     status: Check batch status
     process: Process batch results
-    error: Check batch error information
-    models: List available models
     all: Run all operations in sequence
 """
 
 import argparse
 import os
+import sys
 import pandas as pd
 from modules.batch_processor import BatchProcessor
+from modules.capiq import get_transcripts
 import config
 
 def get_transcript_ids(company_ids):
@@ -40,7 +40,7 @@ def get_transcript_ids(company_ids):
     # Read the companies-transcripts.csv file
     csv_path = os.path.join(config.DATA_DIR, 'companies-transcripts.csv')
     try:
-        df = pd.read_csv(csv_path, names=['companyid', 'companyname', 'transcriptid', 'headline'])
+        df = pd.read_csv(csv_path)
     except FileNotFoundError:
         print(f"Error: Could not find companies-transcripts.csv at {csv_path}")
         return []
@@ -90,57 +90,19 @@ def process_batch_results(batch_id):
     """Process batch results."""
     processor = BatchProcessor()
     print(f"Processing results for batch {batch_id}...")
-    results = processor.process_batch_results(batch_id)
-    if not results:
-        print("No results to process yet. The batch is still in progress.")
-        return
-    print(f"Processed {len(results)} results")
-    return results
-
-def check_batch_error(batch_id):
-    """Check batch error information."""
-    processor = BatchProcessor()
-    print(f"Checking error information for batch {batch_id}...")
-    error_info = processor.check_batch_error(batch_id)
-    
-    print(f"\nBatch Status: {error_info['status']}")
-    
-    if error_info["error_message"]:
-        print(f"Error Message: {error_info['error_message']}")
-    
-    if error_info["error_file_id"]:
-        print(f"Error File ID: {error_info['error_file_id']}")
-        if error_info["error_content"]:
-            print("\nError File Content:")
-            print(error_info["error_content"])
-    
-    return error_info
-
-def list_models():
-    """List available models."""
-    processor = BatchProcessor()
-    print("\nListing available models...")
-    models = processor.list_available_models()
-    print("\nAvailable models:")
-    for model in sorted(models):
-        print(f"- {model}")
-    return models
+    return processor.process_batch_results(batch_id)
 
 def main():
     parser = argparse.ArgumentParser(description='Run batch processing operations for company IDs')
     parser.add_argument('company_ids', help='Company ID(s) to process (comma-separated if multiple)')
     parser.add_argument('prompt_name', help='Name of the prompt to use')
-    parser.add_argument('--operation', choices=['create', 'submit', 'status', 'process', 'error', 'models', 'all'],
+    parser.add_argument('--operation', choices=['create', 'submit', 'status', 'process', 'all'],
                       default='all', help='Operation to perform')
-    parser.add_argument('--batch-id', help='Batch ID for status/process/error operations')
-    parser.add_argument('--input-file', help='Input file path (relative) for submit operation')
+    parser.add_argument('--batch-id', help='Batch ID for status/process operations')
+    parser.add_argument('--input-file', help='Input file path for submit operation')
     
     args = parser.parse_args()
     
-    if args.operation == 'models':
-        list_models()
-        return
-        
     # Parse company IDs and convert to integers
     try:
         company_ids = [int(cid.strip()) for cid in args.company_ids.split(',')]
@@ -149,7 +111,7 @@ def main():
         return
     
     # Set up output directory
-    output_dir = os.path.join(config.OUTPUT_DIR, 'batch_inputs')
+    output_dir = os.path.join(config.OUTPUT_DIR, 'batches', '_'.join(str(cid) for cid in company_ids))
     os.makedirs(output_dir, exist_ok=True)
     
     if args.operation == 'create' or args.operation == 'all':
@@ -197,15 +159,6 @@ def main():
         
         if args.operation == 'process':
             return
-
-    if args.operation == 'error':
-        batch_id = args.batch_id
-        if not batch_id:
-            print("Batch ID is required for checking errors")
-            return
-        
-        error_info = check_batch_error(batch_id)
-        return
 
 if __name__ == "__main__":
     main() 

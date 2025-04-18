@@ -20,8 +20,6 @@ TRANSCRIPT_DETAIL_PATH = os.path.join(ROOT, "data/transcript-detail.feather")
 ACL_SCORES_PATH = os.path.join(ROOT, "data/raw/acl_scores.csv")
 JOE_SCORES_PATH = os.path.join(ROOT, "data/raw/joe_scores.csv")
 HUMAN_RATINGS_PATH = os.path.join(ROOT, "data/human-ratings.csv")
-OUTPUT_DIR = os.path.join(ROOT, "output")
-DATA_DIR = os.path.join(ROOT, "data")
 
 # rclone
 RCLONE_REMOTE = "collusion-llm"
