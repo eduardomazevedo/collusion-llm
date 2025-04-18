@@ -22,7 +22,7 @@ if [ -z "$1" ] || [ -z "$2" ]; then
     echo "Usage: $0 <company_ids> <prompt_name> [--operation <operation>] [--batch-id <batch_id>] [--input-file <input_file>]"
     echo "  company_ids: Company ID(s) to process (comma-separated if multiple)"
     echo "  prompt_name: Name of the prompt to use"
-    echo "  --operation: Operation to perform (create, submit, status, process, all)"
+    echo "  --operation: Operation to perform (create, submit, status, process, error, models)"
     echo "  --batch-id: Batch ID for status/process operations"
     echo "  --input-file: Input file path for submit operation"
     exit 1
