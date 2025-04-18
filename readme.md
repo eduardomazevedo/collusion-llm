@@ -74,6 +74,22 @@ The project uses SQLite for storing query results. The database is stored in `da
 ```
 If no output path is specified, it will create a timestamped file in the `output` directory.
 
-## Batch Processing
-TO BE COMPLETED
+## Running Batches
+`bash ./src/bash/run_batch.sh <company_ids> <prompt_name> [options]`
 
+### Required Arguments
+- `company_ids`: Single company ID or comma-separated list (e.g., "12345" or "12345,67890")
+- `prompt_name`: Name of the prompt from prompts config (e.g., "ComprehensiveV1")
+
+### Operations
+Use `--operation` flag with:
+- `create`: Generate batch input file
+- `submit`: Submit batch to OpenAI
+- `status`: Check batch progress
+- `process`: Save completed results to database
+- `error`: Check batch error information
+- `models`: List available OpenAI models
+
+### Optional Arguments
+- `--batch-id <id>`: Required for `status`, `process`, and `error` operations
+- `--input-file <path>`: Custom input (relative) file path for `submit` operation (default: `output/batch_inputs/<prompt_name>_input.jsonl`)
