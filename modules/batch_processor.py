@@ -9,6 +9,7 @@ Sources:
 2. Submit batch jobs
 3. Monitor batch progress
 4. Process batch results (i.e. save to database)
+5. Check batch error information
 """
 from openai import OpenAI
 import json
@@ -57,6 +58,17 @@ class BatchProcessor:
         self.prompts = self._load_prompts()
         self.client = OpenAI()
 
+    def _load_prompts(self):
+        """Load prompts from the prompts JSON file."""
+        try:
+            with open(self.prompts_path, 'r') as f:
+                prompts = json.load(f)
+            return prompts
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Prompts file not found at {self.prompts_path}")
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON in prompts file at {self.prompts_path}")
+
     def create_batch_input_file(self, prompt_name: str, transcript_ids: List[int], 
                               output_path: str = "batch_input.jsonl") -> str:
         """
@@ -71,6 +83,7 @@ class BatchProcessor:
             Path to the created JSONL file
         """
         prompt_config = self.prompts.get(prompt_name)
+        response_model = RESPONSE_FORMAT_CLASSES.get(prompt_config["response_format"])
         if not prompt_config:
             raise ValueError(f"Prompt '{prompt_name}' not found in prompts")
 
@@ -82,6 +95,8 @@ class BatchProcessor:
         print(f"Output path: {output_path}")
         with open(output_path, "w") as f:
             for transcript_id in transcript_ids:
+                # Parse the JSON string into a list of dictionaries
+                transcript_data = json.loads(transcript_texts[transcript_id])
                 request = {
                     "custom_id": f"request-{transcript_id}",
                     "method": "POST",
@@ -89,10 +104,10 @@ class BatchProcessor:
                     "body": {
                         "model": self.model,
                         "temperature": 1,
-                        "response_format": prompt_config["response_format"].model_json_schema(),
+                        "response_format": response_model.model_json_schema(),
                         "messages": [
                             {"role": "system", "content": prompt_config["system_message"]},
-                            {"role": "user", "content": prep_transcript_for_review(transcript_texts[transcript_id])}
+                            {"role": "user", "content": prep_transcript_for_review(transcript_data)}
                         ],
                         "max_tokens": 1000
                     }
@@ -139,13 +154,42 @@ class BatchProcessor:
     def check_batch_status(self, batch_id: str) -> Dict:
         """Check the status of a batch job."""
         batch = self.client.batches.retrieve(batch_id)
-        print(f"\nBatch status: {batch.status}")
-        if batch.status == "completed":
+        
+        # Create status dictionary
+        status_info = {
+            "status": batch.status,
+            "completed": 0,
+            "failed": 0,
+            "total": 0,
+            "success_rate": 0.0,
+            "error": None
+        }
+        
+        # Add detailed status information
+        if hasattr(batch, 'request_counts'):
             completed = batch.request_counts.completed
             failed = batch.request_counts.failed
             total = batch.request_counts.total
-            print(f"  Completed: {completed}, Failed: {failed}, Total: {total}")
-        return batch
+            
+            status_info.update({
+                "completed": completed,
+                "failed": failed,
+                "total": total,
+                "success_rate": (completed/(completed+failed))*100 if (completed+failed) > 0 else 0
+            })
+            
+            # Print only essential status information
+            if batch.status == "in_progress":
+                print(f"Status: {batch.status} ({completed}/{total} completed)")
+            elif batch.status == "completed":
+                print(f"Status: {batch.status} - {completed} successful, {failed} failed")
+            elif batch.status == "failed":
+                print(f"Status: {batch.status} - {failed} failed")
+                if hasattr(batch, 'error'):
+                    status_info["error"] = batch.error
+                    print(f"Error: {batch.error}")
+        
+        return status_info
 
     def process_batch_results(self, batch_id: str) -> Dict:
         """
@@ -157,11 +201,20 @@ class BatchProcessor:
         Returns:
             Dictionary mapping transcript IDs to their responses
         """
-        batch = self.check_batch_status(batch_id)
+        status_info = self.check_batch_status(batch_id)
         
-        if batch.status != "completed":
-            raise ValueError(f"Batch {batch_id} is not completed.")
-
+        if status_info["status"] != "completed":
+            print(f"\nBatch is still {status_info['status']}. Please wait for completion before processing results.")
+            if status_info["status"] == "in_progress":
+                completed = status_info["completed"]
+                failed = status_info["failed"]
+                total = status_info["total"]
+                print(f"Progress: {completed}/{total} completed, {failed} failed")
+            return {}
+        
+        # Get the batch object again to access output_file_id
+        batch = self.client.batches.retrieve(batch_id)
+        
         print("\n[1/3] Downloading batch results...")
         # Download and process results
         file_content = self.client.files.content(batch.output_file_id)
@@ -183,3 +236,38 @@ class BatchProcessor:
         print(f"✓ Processed {len(results)} responses")
         print("✓ All responses saved to database")
         return results
+
+    def check_batch_error(self, batch_id: str) -> Dict:
+        """
+        Check the error information for a batch job.
+        
+        Args:
+            batch_id: ID of the batch job
+            
+        Returns:
+            Dictionary containing error information
+        """
+        batch = self.client.batches.retrieve(batch_id)
+        
+        error_info = {
+            "status": batch.status,
+            "error_file_id": batch.error_file_id if hasattr(batch, 'error_file_id') else None,
+            "error_message": batch.error if hasattr(batch, 'error') else None,
+            "error_content": None
+        }
+        
+        if error_info["error_file_id"]:
+            error_content = self.client.files.content(error_info["error_file_id"])
+            error_info["error_content"] = error_content.text
+            
+        return error_info
+
+    def list_available_models(self) -> List[str]:
+        """
+        List all available models for the current project.
+        
+        Returns:
+            List of model names that are available to use
+        """
+        models = self.client.models.list()
+        return [model.id for model in models.data]

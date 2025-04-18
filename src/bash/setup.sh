@@ -28,6 +28,10 @@ for script in "${SCRIPTS[@]}"; do
     fi
 done
 
+# Create necessary directories
+echo "Creating output directories..."
+mkdir -p output/batch_inputs
+
 # Format human ratings
 echo "Formatting human ratings..."
 source .venv/bin/activate

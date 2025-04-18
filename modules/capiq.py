@@ -39,6 +39,7 @@ def get_connection():
                     "Please ensure WRDS_USERNAME and WRDS_PASSWORD are set in your .env file."
                 )
             print(f"Attempting to connect to WRDS with username: {config.WRDS_USERNAME}")
+            print(f"Attempting to connect to WRDS with password: {config.WRDS_PASSWORD}")
             _conn = wrds.Connection(wrds_username=config.WRDS_USERNAME, password=config.WRDS_PASSWORD)
             print("WRDS connection established.")
         except ValueError as e:

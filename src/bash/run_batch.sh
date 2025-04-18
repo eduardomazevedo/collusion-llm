@@ -39,4 +39,3 @@ export PYTHONPATH="$PROJECT_ROOT"
 # Run the Python script
 python src/py/batch_processor_runner.py "$COMPANY_IDS" "$PROMPT_NAME" "$@"
 
-echo "Batch processing complete!" 
