@@ -1,7 +1,9 @@
 import pandas as pd
 import re
 import json
+import tiktoken
 from typing import List, Dict
+import modules.capiq as capiq
 
 def eliminate_duplicate_transcripts(df):
     """
@@ -73,3 +75,28 @@ def prep_transcript_for_review(transcript: List[Dict]) -> str:
 
     return formatted_transcript
 
+def get_token_size(transcript_id: int) -> int:
+    """
+    Get the token size of a transcript after formatting it for review.
+    
+    Args:
+        transcript_id: The ID of the transcript to process
+        
+    Returns:
+        int: The number of tokens in the formatted transcript
+    """
+    # Get the raw transcript from capiq
+    transcript_dict = capiq.get_transcripts([transcript_id])
+    transcript_json = transcript_dict[transcript_id]
+    transcript_data = json.loads(transcript_json)
+    
+    # Format the transcript for review
+    formatted_transcript = prep_transcript_for_review(transcript_data)
+    
+    # Initialize tiktoken encoder for GPT-4
+    encoding = tiktoken.get_encoding("o200k_base")
+    
+    # Count tokens
+    num_tokens = len(encoding.encode(formatted_transcript))
+    
+    return num_tokens
