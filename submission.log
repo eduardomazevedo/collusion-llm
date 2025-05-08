@@ -1,0 +1,888 @@
+
+Submitting and monitoring batches...
+
+Prompt token size: 136
+
+Found 18749 batch files in /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/output/SimpleCapacityV8.1.1_batches
+
+Loaded existing tracking file with 18749 batches
+
+Progress: 3.5% (663/18749 batches)
+Status: 503 completed, 38 in progress, 160 failed, 18048 pending
+Queue: 10,647,719 tokens (35.5% of limit)
+Saved to DB: 503/503
+Checking in_progress batches...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ab59c34819092923fec93d5a943 "HTTP/1.1 200 OK"
+Status: completed - 51 successful, 0 failed
+  Batch batch_681c5ab59c34819092923fec93d5a943 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5b7e50e48190ae28beb3a9477677 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+  Batch batch_681c5b7e50e48190ae28beb3a9477677 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5bc9f97c81908a7160ab49d0b93c "HTTP/1.1 200 OK"
+Status: completed - 113 successful, 0 failed
+  Batch batch_681c5bc9f97c81908a7160ab49d0b93c -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5be3b75881908e752fb4ceefbe40 "HTTP/1.1 200 OK"
+Status: completed - 67 successful, 0 failed
+  Batch batch_681c5be3b75881908e752fb4ceefbe40 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c106af48190a21d686ff5a46ffa "HTTP/1.1 200 OK"
+Status: completed - 23 successful, 0 failed
+  Batch batch_681c5c106af48190a21d686ff5a46ffa -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c1f51708190920fa6a977b250f0 "HTTP/1.1 200 OK"
+Status: completed - 75 successful, 0 failed
+  Batch batch_681c5c1f51708190920fa6a977b250f0 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c3376188190ae12c656b3e33a86 "HTTP/1.1 200 OK"
+Status: completed - 3 successful, 0 failed
+  Batch batch_681c5c3376188190ae12c656b3e33a86 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c4417148190bbe2c0c952adcb86 "HTTP/1.1 200 OK"
+Status: completed - 31 successful, 0 failed
+  Batch batch_681c5c4417148190bbe2c0c952adcb86 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c4c71c48190ae6730fbf576636f "HTTP/1.1 200 OK"
+Status: completed - 14 successful, 0 failed
+  Batch batch_681c5c4c71c48190ae6730fbf576636f -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c58b4d88190a87b41157f95e9cf "HTTP/1.1 200 OK"
+Status: completed - 82 successful, 0 failed
+  Batch batch_681c5c58b4d88190a87b41157f95e9cf -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c7415e48190ad045f83fa592a9a "HTTP/1.1 200 OK"
+Status: completed - 11 successful, 0 failed
+  Batch batch_681c5c7415e48190ad045f83fa592a9a -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ccbf9448190a277301e2081023a "HTTP/1.1 200 OK"
+Status: completed - 14 successful, 0 failed
+  Batch batch_681c5ccbf9448190a277301e2081023a -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ce7b09c8190baf262e033735174 "HTTP/1.1 200 OK"
+Status: completed - 27 successful, 0 failed
+  Batch batch_681c5ce7b09c8190baf262e033735174 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5cf57ce08190a039cac54c0c5c46 "HTTP/1.1 200 OK"
+Status: completed - 2 successful, 0 failed
+  Batch batch_681c5cf57ce08190a039cac54c0c5c46 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d0874688190a216a63a1d4dd696 "HTTP/1.1 200 OK"
+Status: completed - 71 successful, 0 failed
+  Batch batch_681c5d0874688190a216a63a1d4dd696 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d17d0108190b3dcc71a2983aba0 "HTTP/1.1 200 OK"
+Status: completed - 70 successful, 0 failed
+  Batch batch_681c5d17d0108190b3dcc71a2983aba0 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d492bc081909b19f30c3bed0be1 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+  Batch batch_681c5d492bc081909b19f30c3bed0be1 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d5283e88190a55e60eed6d4da93 "HTTP/1.1 200 OK"
+Status: completed - 78 successful, 0 failed
+  Batch batch_681c5d5283e88190a55e60eed6d4da93 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d61f1ac819085a42d00a88907af "HTTP/1.1 200 OK"
+Status: completed - 16 successful, 0 failed
+  Batch batch_681c5d61f1ac819085a42d00a88907af -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d808b008190b9d3f81d77a5c503 "HTTP/1.1 200 OK"
+Status: completed - 49 successful, 0 failed
+  Batch batch_681c5d808b008190b9d3f81d77a5c503 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d920f6c819090cc0179755885ae "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+  Batch batch_681c5d920f6c819090cc0179755885ae -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dad88d08190a1b7b73a06050685 "HTTP/1.1 200 OK"
+Status: completed - 17 successful, 0 failed
+  Batch batch_681c5dad88d08190a1b7b73a06050685 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dc57fbc8190a465ff663034d96b "HTTP/1.1 200 OK"
+Status: completed - 6 successful, 0 failed
+  Batch batch_681c5dc57fbc8190a465ff663034d96b -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dda0b8c819088003a2e301047e1 "HTTP/1.1 200 OK"
+Status: completed - 40 successful, 0 failed
+  Batch batch_681c5dda0b8c819088003a2e301047e1 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5df0a0088190b019ccc165821742 "HTTP/1.1 200 OK"
+Status: completed - 3 successful, 0 failed
+  Batch batch_681c5df0a0088190b019ccc165821742 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e038f3c8190809f8a8f7477a400 "HTTP/1.1 200 OK"
+Status: completed - 68 successful, 0 failed
+  Batch batch_681c5e038f3c8190809f8a8f7477a400 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e2cb9588190a7f24273b2fd6623 "HTTP/1.1 200 OK"
+Status: completed - 36 successful, 0 failed
+  Batch batch_681c5e2cb9588190a7f24273b2fd6623 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e77496c81908b6ba82bba41fba7 "HTTP/1.1 200 OK"
+Status: completed - 63 successful, 0 failed
+  Batch batch_681c5e77496c81908b6ba82bba41fba7 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e8d4e848190ab41a0bb560279f3 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+  Batch batch_681c5e8d4e848190ab41a0bb560279f3 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ea2309481908abe4cfdafea026e "HTTP/1.1 200 OK"
+Status: completed - 30 successful, 0 failed
+  Batch batch_681c5ea2309481908abe4cfdafea026e -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f626a608190904787a03b867122 "HTTP/1.1 200 OK"
+Status: completed - 81 successful, 0 failed
+  Batch batch_681c5f626a608190904787a03b867122 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f6ff2c081908cdd46d314a91cf1 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+  Batch batch_681c5f6ff2c081908cdd46d314a91cf1 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f8e2b98819087f056984f1de7a0 "HTTP/1.1 200 OK"
+Status: completed - 30 successful, 0 failed
+  Batch batch_681c5f8e2b98819087f056984f1de7a0 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f9db8348190b97ae1534c30612b "HTTP/1.1 200 OK"
+Status: completed - 16 successful, 0 failed
+  Batch batch_681c5f9db8348190b97ae1534c30612b -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fb090208190997d92e75e98c15e "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+  Batch batch_681c5fb090208190997d92e75e98c15e -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fc0ed308190af0978b842cd1a15 "HTTP/1.1 200 OK"
+Status: completed - 5 successful, 0 failed
+  Batch batch_681c5fc0ed308190af0978b842cd1a15 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fd811f4819080681d974f66b6e3 "HTTP/1.1 200 OK"
+Status: completed - 32 successful, 0 failed
+  Batch batch_681c5fd811f4819080681d974f66b6e3 -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5feb2a3c8190a358c20ad966530c "HTTP/1.1 200 OK"
+Status: completed - 43 successful, 0 failed
+  Batch batch_681c5feb2a3c8190a358c20ad966530c -> completed
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+
+Saving 38 completed batches to database...
+Saving batch batch_681c5ab59c34819092923fec93d5a943 for Houston Wire & Cable Company...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ab59c34819092923fec93d5a943 "HTTP/1.1 200 OK"
+Status: completed - 51 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ab59c34819092923fec93d5a943 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-UTRGh5J6Ld9YPeKzBoUoZm/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 51 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5ab59c34819092923fec93d5a943 to database
+Saving batch batch_681c5b7e50e48190ae28beb3a9477677 for Prescribe Wellness, LLC...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5b7e50e48190ae28beb3a9477677 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5b7e50e48190ae28beb3a9477677 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-SWwoz7gvnryrbxjoeyrCrC/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 1 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5b7e50e48190ae28beb3a9477677 to database
+Saving batch batch_681c5bc9f97c81908a7160ab49d0b93c for Ovintiv Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5bc9f97c81908a7160ab49d0b93c "HTTP/1.1 200 OK"
+Status: completed - 113 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5bc9f97c81908a7160ab49d0b93c "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-WrZXRzunh2QyMuFM3bWrpi/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+  Processed 100/113 responses...
+
+[3/3] Results processing complete
+✓ Processed 113 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5bc9f97c81908a7160ab49d0b93c to database
+Saving batch batch_681c5be3b75881908e752fb4ceefbe40 for CrowdStrike Holdings, Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5be3b75881908e752fb4ceefbe40 "HTTP/1.1 200 OK"
+Status: completed - 67 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5be3b75881908e752fb4ceefbe40 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-5z6AWvGoSqR3HYKyqsBDGm/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 67 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5be3b75881908e752fb4ceefbe40 to database
+Saving batch batch_681c5c106af48190a21d686ff5a46ffa for Yunji Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c106af48190a21d686ff5a46ffa "HTTP/1.1 200 OK"
+Status: completed - 23 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c106af48190a21d686ff5a46ffa "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-Kn3hViuRsfJKKs3SkYawRW/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 23 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5c106af48190a21d686ff5a46ffa to database
+Saving batch batch_681c5c1f51708190920fa6a977b250f0 for Sky Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c1f51708190920fa6a977b250f0 "HTTP/1.1 200 OK"
+Status: completed - 75 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c1f51708190920fa6a977b250f0 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-HSMJNXqiM8fngT3sNF6TRR/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 75 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5c1f51708190920fa6a977b250f0 to database
+Saving batch batch_681c5c3376188190ae12c656b3e33a86 for GlaxoSmithKline Pharmaceuticals Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c3376188190ae12c656b3e33a86 "HTTP/1.1 200 OK"
+Status: completed - 3 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c3376188190ae12c656b3e33a86 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-Tit9L1n7Mth5B78fEu3Lo7/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 3 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5c3376188190ae12c656b3e33a86 to database
+Saving batch batch_681c5c4417148190bbe2c0c952adcb86 for Gentoo Media Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c4417148190bbe2c0c952adcb86 "HTTP/1.1 200 OK"
+Status: completed - 31 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c4417148190bbe2c0c952adcb86 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-ReNhcpybY1FJjP2vXyw6VY/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 31 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5c4417148190bbe2c0c952adcb86 to database
+Saving batch batch_681c5c4c71c48190ae6730fbf576636f for Chalice Brands Ltd....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c4c71c48190ae6730fbf576636f "HTTP/1.1 200 OK"
+Status: completed - 14 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c4c71c48190ae6730fbf576636f "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-7Ws8kTrWuYu67xB8e3uVJV/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 14 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5c4c71c48190ae6730fbf576636f to database
+Saving batch batch_681c5c58b4d88190a87b41157f95e9cf for Datadog, Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c58b4d88190a87b41157f95e9cf "HTTP/1.1 200 OK"
+Status: completed - 82 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c58b4d88190a87b41157f95e9cf "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-QcM6Cdz7o58CZK5Ao8cTbA/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 82 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5c58b4d88190a87b41157f95e9cf to database
+Saving batch batch_681c5c7415e48190ad045f83fa592a9a for Argo Blockchain plc...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c7415e48190ad045f83fa592a9a "HTTP/1.1 200 OK"
+Status: completed - 11 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5c7415e48190ad045f83fa592a9a "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-CoZha5gBEBTSfamKkmoMah/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 11 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5c7415e48190ad045f83fa592a9a to database
+Saving batch batch_681c5ccbf9448190a277301e2081023a for Nordic Paper Holding AB (publ)...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ccbf9448190a277301e2081023a "HTTP/1.1 200 OK"
+Status: completed - 14 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ccbf9448190a277301e2081023a "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-HoQamVjuU8YC6BFYWMBdyM/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 14 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5ccbf9448190a277301e2081023a to database
+Saving batch batch_681c5ce7b09c8190baf262e033735174 for voxeljet AG...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ce7b09c8190baf262e033735174 "HTTP/1.1 200 OK"
+Status: completed - 27 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ce7b09c8190baf262e033735174 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-B27sP4ukhaQCvv37pb3paf/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 27 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5ce7b09c8190baf262e033735174 to database
+Saving batch batch_681c5cf57ce08190a039cac54c0c5c46 for Benguet Corporation...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5cf57ce08190a039cac54c0c5c46 "HTTP/1.1 200 OK"
+Status: completed - 2 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5cf57ce08190a039cac54c0c5c46 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-AWH439ZDcev2j6vXwEJqVx/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 2 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5cf57ce08190a039cac54c0c5c46 to database
+Saving batch batch_681c5d0874688190a216a63a1d4dd696 for Dorel Industries Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d0874688190a216a63a1d4dd696 "HTTP/1.1 200 OK"
+Status: completed - 71 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d0874688190a216a63a1d4dd696 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-P2hrxKn4V9aTccgTaTy2kM/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 71 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5d0874688190a216a63a1d4dd696 to database
+Saving batch batch_681c5d17d0108190b3dcc71a2983aba0 for Veracyte, Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d17d0108190b3dcc71a2983aba0 "HTTP/1.1 200 OK"
+Status: completed - 70 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d17d0108190b3dcc71a2983aba0 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-KByAtMZo59bNtPk9UdqkvH/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 70 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5d17d0108190b3dcc71a2983aba0 to database
+Saving batch batch_681c5d492bc081909b19f30c3bed0be1 for NovaMed Pharmaceuticals Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d492bc081909b19f30c3bed0be1 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d492bc081909b19f30c3bed0be1 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-RCXdW6rUfJy2q48mng32Wm/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 1 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5d492bc081909b19f30c3bed0be1 to database
+Saving batch batch_681c5d5283e88190a55e60eed6d4da93 for Capri Holdings Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d5283e88190a55e60eed6d4da93 "HTTP/1.1 200 OK"
+Status: completed - 78 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d5283e88190a55e60eed6d4da93 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-NJ1GVQ8SpCZjnCWuGgBQf7/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 78 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5d5283e88190a55e60eed6d4da93 to database
+Saving batch batch_681c5d61f1ac819085a42d00a88907af for Allbirds, Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d61f1ac819085a42d00a88907af "HTTP/1.1 200 OK"
+Status: completed - 16 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d61f1ac819085a42d00a88907af "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-6B21hKSnkWvm3LsgoYDZTK/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 16 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5d61f1ac819085a42d00a88907af to database
+Saving batch batch_681c5d808b008190b9d3f81d77a5c503 for Ares Commercial Real Estate Corporation...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d808b008190b9d3f81d77a5c503 "HTTP/1.1 200 OK"
+Status: completed - 49 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d808b008190b9d3f81d77a5c503 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-6oL6sNT3ag87KybA37GbPP/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 49 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5d808b008190b9d3f81d77a5c503 to database
+Saving batch batch_681c5d920f6c819090cc0179755885ae for Northland Securities, Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d920f6c819090cc0179755885ae "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5d920f6c819090cc0179755885ae "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-Vetq1ZhMRE9fxiPbg6Ur5d/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 1 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5d920f6c819090cc0179755885ae to database
+Saving batch batch_681c5dad88d08190a1b7b73a06050685 for Cadence Capital Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dad88d08190a1b7b73a06050685 "HTTP/1.1 200 OK"
+Status: completed - 17 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dad88d08190a1b7b73a06050685 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-59g2ZcpQstucRBLJWCgHv4/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 17 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5dad88d08190a1b7b73a06050685 to database
+Saving batch batch_681c5dc57fbc8190a465ff663034d96b for APM Human Services International Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dc57fbc8190a465ff663034d96b "HTTP/1.1 200 OK"
+Status: completed - 6 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dc57fbc8190a465ff663034d96b "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-EfFrNGspNFVNpJKAyNRArm/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 6 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5dc57fbc8190a465ff663034d96b to database
+Saving batch batch_681c5dda0b8c819088003a2e301047e1 for StrongPoint ASA...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dda0b8c819088003a2e301047e1 "HTTP/1.1 200 OK"
+Status: completed - 40 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5dda0b8c819088003a2e301047e1 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-2rEgRjCFCLaAubYcFGn3mL/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 40 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5dda0b8c819088003a2e301047e1 to database
+Saving batch batch_681c5df0a0088190b019ccc165821742 for Fisher & Paykel Appliances Holdings Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5df0a0088190b019ccc165821742 "HTTP/1.1 200 OK"
+Status: completed - 3 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5df0a0088190b019ccc165821742 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-EEjiAhw3gvui1WioNiv3vQ/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 3 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5df0a0088190b019ccc165821742 to database
+Saving batch batch_681c5e038f3c8190809f8a8f7477a400 for Stepan Company...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e038f3c8190809f8a8f7477a400 "HTTP/1.1 200 OK"
+Status: completed - 68 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e038f3c8190809f8a8f7477a400 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-78U5gcM9VRbRfN2YcguSZx/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 68 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5e038f3c8190809f8a8f7477a400 to database
+Saving batch batch_681c5e2cb9588190a7f24273b2fd6623 for Aritzia Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e2cb9588190a7f24273b2fd6623 "HTTP/1.1 200 OK"
+Status: completed - 36 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e2cb9588190a7f24273b2fd6623 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-5vMohhywWyNZzrvzduirhm/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 36 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5e2cb9588190a7f24273b2fd6623 to database
+Saving batch batch_681c5e77496c81908b6ba82bba41fba7 for Storebrand ASA...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e77496c81908b6ba82bba41fba7 "HTTP/1.1 200 OK"
+Status: completed - 63 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e77496c81908b6ba82bba41fba7 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-U3xULyWF91YCXVyfx88cQi/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 63 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5e77496c81908b6ba82bba41fba7 to database
+Saving batch batch_681c5e8d4e848190ab41a0bb560279f3 for ITC DeltaCom Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e8d4e848190ab41a0bb560279f3 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5e8d4e848190ab41a0bb560279f3 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-LKP7cCgLypsbh51dAGpMre/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 1 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5e8d4e848190ab41a0bb560279f3 to database
+Saving batch batch_681c5ea2309481908abe4cfdafea026e for Bell MTS...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ea2309481908abe4cfdafea026e "HTTP/1.1 200 OK"
+Status: completed - 30 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5ea2309481908abe4cfdafea026e "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-VNTFCNi9BJRApMdhZdbkms/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 30 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5ea2309481908abe4cfdafea026e to database
+Saving batch batch_681c5f626a608190904787a03b867122 for Home Bancshares, Inc. (Conway, AR)...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f626a608190904787a03b867122 "HTTP/1.1 200 OK"
+Status: completed - 81 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f626a608190904787a03b867122 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-6XGz6oPVpoumMWCRTo6LNr/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 81 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5f626a608190904787a03b867122 to database
+Saving batch batch_681c5f6ff2c081908cdd46d314a91cf1 for Twin Restaurant Holding, LLC...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f6ff2c081908cdd46d314a91cf1 "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f6ff2c081908cdd46d314a91cf1 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-VkAEiDr1z5pLFbewgKEWQ7/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 1 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5f6ff2c081908cdd46d314a91cf1 to database
+Saving batch batch_681c5f8e2b98819087f056984f1de7a0 for Intralot S.A. Integrated Lottery Systems and Services...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f8e2b98819087f056984f1de7a0 "HTTP/1.1 200 OK"
+Status: completed - 30 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f8e2b98819087f056984f1de7a0 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-NGJ5W195Qy5Qtp1GckApYs/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 30 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5f8e2b98819087f056984f1de7a0 to database
+Saving batch batch_681c5f9db8348190b97ae1534c30612b for A.C.N. 004 410 833 Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f9db8348190b97ae1534c30612b "HTTP/1.1 200 OK"
+Status: completed - 16 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5f9db8348190b97ae1534c30612b "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-1eVZ3Mtzpf9wEzAgdBbnjZ/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 16 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5f9db8348190b97ae1534c30612b to database
+Saving batch batch_681c5fb090208190997d92e75e98c15e for Black Hills Estate Winery Inc....
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fb090208190997d92e75e98c15e "HTTP/1.1 200 OK"
+Status: completed - 1 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fb090208190997d92e75e98c15e "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-MqoAzfSGAYP3LRPLngdd5q/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 1 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5fb090208190997d92e75e98c15e to database
+Saving batch batch_681c5fc0ed308190af0978b842cd1a15 for Steelcast Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fc0ed308190af0978b842cd1a15 "HTTP/1.1 200 OK"
+Status: completed - 5 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fc0ed308190af0978b842cd1a15 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-Vf5RwPDPW7aHQAWqHVrQ9R/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 5 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5fc0ed308190af0978b842cd1a15 to database
+Saving batch batch_681c5fd811f4819080681d974f66b6e3 for Canadian Utilities Limited...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fd811f4819080681d974f66b6e3 "HTTP/1.1 200 OK"
+Status: completed - 32 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5fd811f4819080681d974f66b6e3 "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-228qXd2r1gY8p4auja6Kyr/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+
+[3/3] Results processing complete
+✓ Processed 32 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5fd811f4819080681d974f66b6e3 to database
+Saving batch batch_681c5feb2a3c8190a358c20ad966530c for Hydrogenics Corporation...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5feb2a3c8190a358c20ad966530c "HTTP/1.1 200 OK"
+Status: completed - 43 successful, 0 failed
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c5feb2a3c8190a358c20ad966530c "HTTP/1.1 200 OK"
+
+[1/3] Downloading batch results...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/files/file-DrUwisQ9YDPgY3u1UAm3ke/content "HTTP/1.1 200 OK"
+
+[2/3] Processing responses...
+Error parsing JSON for transcript 283530: Unterminated string starting at: line 1 column 872 (char 871)
+Content: {"score":10,"reasoning":"The transcript does not contain any explicit indications of collusive behavior such as discussions of capacity limitation or coordinated price increases. The focus is primarily on the company's own growth and opportunities in the market without any direct references to competitors. The mention of partnerships like with Commscope seems more about collaboration rather than collusion. Therefore, while there are collaborative elements, it lacks evidence of intent to coordinate with competitors in a collusive manner.","excerpts":["\"We continue to gather interest in custom integration opportunities similar to our work with Airbus and the German aerospace agency.\"","\"We're working together on proposals and projects in North America and elsewhere in the world...\"","\"In terms of the relationship with Commscope, can you add more color?\"","\"We think there are other things that we can do with our time that takes our resources and efforts and will lead to better overall success for our company.\"]}   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]  Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]  Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]  Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.   C]   Assistant has stopped speaking, and hands back control to the User.  Please provide your next instruction.  
+
+[3/3] Results processing complete
+✓ Processed 43 responses
+✓ All valid responses saved to database
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+Successfully saved batch batch_681c5feb2a3c8190a358c20ad966530c to database
+
+[1/2] Uploading input file to OpenAI...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/files "HTTP/1.1 200 OK"
+✓ File uploaded successfully
+  File ID: file-KGQaAU3jGBdyqNB5tNqyXA
+
+[2/2] Creating batch job...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/batches "HTTP/1.1 200 OK"
+✓ Batch job created successfully
+  Batch ID: batch_681c866dd3fc81909f9f18ea8ff7b078
+Submitted /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/output/SimpleCapacityV8.1.1_batches/input_companyid_557143394.jsonl -> batch_681c866dd3fc81909f9f18ea8ff7b078
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+
+Progress: 3.7% (701/18749 batches)
+Status: 541 completed, 1 in progress, 160 failed, 18047 pending
+Queue: 102,010 tokens (0.3% of limit)
+Saved to DB: 541/541
+Checking in_progress batches...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c866dd3fc81909f9f18ea8ff7b078 "HTTP/1.1 200 OK"
+Status: in_progress (0/15 completed)
+
+[1/2] Uploading input file to OpenAI...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/files "HTTP/1.1 200 OK"
+✓ File uploaded successfully
+  File ID: file-7Go5Umom2RYMCois2uGxVf
+
+[2/2] Creating batch job...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/batches "HTTP/1.1 200 OK"
+✓ Batch job created successfully
+  Batch ID: batch_681c8677808c81909e90916cae80dcd4
+Submitted /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/output/SimpleCapacityV8.1.1_batches/input_companyid_314568856.jsonl -> batch_681c8677808c81909e90916cae80dcd4
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+
+Progress: 3.7% (701/18749 batches)
+Status: 541 completed, 2 in progress, 160 failed, 18046 pending
+Queue: 408,283 tokens (1.4% of limit)
+Saved to DB: 541/541
+Checking in_progress batches...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c866dd3fc81909f9f18ea8ff7b078 "HTTP/1.1 200 OK"
+Status: in_progress (1/15 completed)
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c8677808c81909e90916cae80dcd4 "HTTP/1.1 200 OK"
+Status: in_progress (0/26 completed)
+
+[1/2] Uploading input file to OpenAI...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/files "HTTP/1.1 200 OK"
+✓ File uploaded successfully
+  File ID: file-VaK7U68wgotJ5NJ9HjxCiT
+
+[2/2] Creating batch job...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/batches "HTTP/1.1 200 OK"
+✓ Batch job created successfully
+  Batch ID: batch_681c867d9e448190889394589f9aaf7f
+Submitted /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/output/SimpleCapacityV8.1.1_batches/input_companyid_878388.jsonl -> batch_681c867d9e448190889394589f9aaf7f
+
+Saved tracking data to /Users/ioanrusu/Desktop/collusion prediction project/collusion-llm/data/batch-tracker.csv
+
+Progress: 3.7% (701/18749 batches)
+Status: 541 completed, 3 in progress, 160 failed, 18045 pending
+Queue: 429,790 tokens (1.4% of limit)
+Saved to DB: 541/541
+Checking in_progress batches...
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c866dd3fc81909f9f18ea8ff7b078 "HTTP/1.1 200 OK"
+Status: in_progress (2/15 completed)
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c8677808c81909e90916cae80dcd4 "HTTP/1.1 200 OK"
+Status: in_progress (2/26 completed)
+INFO:httpx:HTTP Request: GET https://api.openai.com/v1/batches/batch_681c867d9e448190889394589f9aaf7f "HTTP/1.1 200 OK"
+Status: in_progress (0/4 completed)
+
+[1/2] Uploading input file to OpenAI...

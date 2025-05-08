@@ -16,7 +16,7 @@ import json
 import config
 import modules.capiq as capiq
 from modules.queries_db import insert_query_result
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from tooldantic import ToolBaseModel, OpenAiResponseFormatGenerator
 from modules.utils import prep_transcript_for_review
 
@@ -80,42 +80,38 @@ class BatchProcessor:
             output_path: Path to save the JSONL file
 
         Returns:
-            Path to the created JSONL file
+            Path to the created batch input file
         """
         prompt_config = self.prompts.get(prompt_name)
         response_model = RESPONSE_FORMAT_CLASSES.get(prompt_config["response_format"])
         if not prompt_config:
             raise ValueError(f"Prompt '{prompt_name}' not found in prompts")
 
-        print("\n[1/3] Fetching transcript texts...")
+        # Get transcript texts
         transcript_texts = capiq.get_transcripts(transcript_ids)
-        print(f"✓ Retrieved {len(transcript_texts)} transcript texts")
-
-        print("\n[2/3] Creating batch input file...")
-        print(f"Output path: {output_path}")
+        
+        # Create batch input file
         with open(output_path, "w") as f:
             for transcript_id in transcript_ids:
-                # Parse the JSON string into a list of dictionaries
-                transcript_data = json.loads(transcript_texts[transcript_id])
-                request = {
-                    "custom_id": f"request-{transcript_id}",
-                    "method": "POST",
-                    "url": "/v1/chat/completions",
-                    "body": {
-                        "model": self.model,
-                        "temperature": 1,
-                        "response_format": response_model.model_json_schema(),
-                        "messages": [
-                            {"role": "system", "content": prompt_config["system_message"]},
-                            {"role": "user", "content": prep_transcript_for_review(transcript_data)}
-                        ],
-                        "max_tokens": 1000
+                if transcript_id in transcript_texts:
+                    transcript_data = json.loads(transcript_texts[transcript_id])
+                    request = {
+                        "custom_id": f"request-{transcript_id}",
+                        "method": "POST",
+                        "url": "/v1/chat/completions",
+                        "body": {
+                            "model": self.model,
+                            "temperature": 1,
+                            "response_format": response_model.model_json_schema(),
+                            "messages": [
+                                {"role": "system", "content": prompt_config["system_message"]},
+                                {"role": "user", "content": prep_transcript_for_review(transcript_data)}
+                            ],
+                            "max_tokens": 500
+                        }
                     }
-                }
-                f.write(json.dumps(request) + "\n")
+                    f.write(json.dumps(request) + "\n")
 
-        print("\n[3/3] Batch input file created successfully")
-        print(f"✓ File contains {len(transcript_ids)} requests")
         return output_path
 
     def submit_batch(self, input_file_path: str) -> str:
@@ -197,12 +193,15 @@ class BatchProcessor:
 
         Args:
             batch_id: ID of the batch job
+            prompt_name: name of the prompt (used for database insertion)
 
         Returns:
-            Dictionary mapping transcript IDs to their responses
+            Dictionary mapping transcript IDs to their raw response bodies
         """
+        import json
+        from json import JSONDecoder, JSONDecodeError
+
         status_info = self.check_batch_status(batch_id)
-        
         if status_info["status"] != "completed":
             print(f"\nBatch is still {status_info['status']}. Please wait for completion before processing results.")
             if status_info["status"] == "in_progress":
@@ -211,31 +210,53 @@ class BatchProcessor:
                 total = status_info["total"]
                 print(f"Progress: {completed}/{total} completed, {failed} failed")
             return {}
-        
-        # Get the batch object again to access output_file_id
+
+        # Retrieve the batch to get the output file ID
         batch = self.client.batches.retrieve(batch_id)
-        
+
         print("\n[1/3] Downloading batch results...")
-        # Download and process results
         file_content = self.client.files.content(batch.output_file_id)
         results = {}
-        
+
         print("\n[2/3] Processing responses...")
-        total_lines = len(file_content.text.splitlines())
-        for i, line in enumerate(file_content.text.splitlines(), 1):
+        lines = file_content.text.splitlines()
+        total_lines = len(lines)
+        for i, line in enumerate(lines, start=1):
             if i % 100 == 0:
                 print(f"  Processed {i}/{total_lines} responses...")
-            response = json.loads(line)
-            print(response)
-            transcript_id = int(response["custom_id"].split("-")[1])
-            results[transcript_id] = response["response"]["body"]
-            
-            # Always save to database
-            content = json.loads(response["response"]["body"]['choices'][0]['message']['content'])
-            insert_query_result(prompt_name, transcript_id, json.dumps(content))
+
+            # Parse the outer JSONL line
+            try:
+                response = json.loads(line)
+            except json.JSONDecodeError as e:
+                print(f"Skipping line {i}: cannot parse JSONL wrapper: {e}")
+                continue
+
+            # Extract transcript ID
+            try:
+                transcript_id = int(response["custom_id"].split("-")[1])
+            except (KeyError, ValueError) as e:
+                print(f"Skipping line {i}: invalid custom_id format: {e}")
+                continue
+
+            # Store the raw response body
+            body = response["response"]["body"]
+            results[transcript_id] = body
+
+            # Safely extract the JSON object from the content field
+            content_str = body['choices'][0]['message']['content']
+            decoder = JSONDecoder()
+            try:
+                content_data, _ = decoder.raw_decode(content_str)
+                insert_query_result(prompt_name, transcript_id, json.dumps(content_data))
+            except JSONDecodeError as e:
+                print(f"Error parsing JSON for transcript {transcript_id}: {e}")
+                print(f"Content: {content_str}")
+                insert_query_result(prompt_name, transcript_id, content_str)
+
         print("\n[3/3] Results processing complete")
         print(f"✓ Processed {len(results)} responses")
-        print("✓ All responses saved to database")
+        print("✓ All valid responses saved to database")
         return results
 
     def check_batch_error(self, batch_id: str) -> Dict:
@@ -254,12 +275,31 @@ class BatchProcessor:
             "status": batch.status,
             "error_file_id": batch.error_file_id if hasattr(batch, 'error_file_id') else None,
             "error_message": batch.error if hasattr(batch, 'error') else None,
-            "error_content": None
+            "error_content": None,
+            "request_counts": None
         }
         
+        # Add request counts if available
+        if hasattr(batch, 'request_counts'):
+            error_info["request_counts"] = {
+                "completed": batch.request_counts.completed,
+                "failed": batch.request_counts.failed,
+                "total": batch.request_counts.total
+            }
+        
         if error_info["error_file_id"]:
-            error_content = self.client.files.content(error_info["error_file_id"])
-            error_info["error_content"] = error_content.text
+            try:
+                error_content = self.client.files.content(error_info["error_file_id"])
+                error_info["error_content"] = error_content.text
+                
+                # Try to parse error content as JSON for better formatting
+                try:
+                    error_json = json.loads(error_content.text)
+                    error_info["error_content"] = json.dumps(error_json, indent=2)
+                except json.JSONDecodeError:
+                    pass  # Keep as plain text if not valid JSON
+            except Exception as e:
+                error_info["error_content"] = f"Error retrieving error file: {str(e)}"
             
         return error_info
 
