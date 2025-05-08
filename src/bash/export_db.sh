@@ -20,15 +20,68 @@ fi
 # Set PYTHONPATH to the current directory
 export PYTHONPATH="$PROJECT_ROOT"
 
-# Export to CSV
-if [ -z "$1" ]; then
-    # No output path specified, use default
-    echo "Exporting local database to CSV (default path)..."
-    python src/py/export_queries.py
-else
-    # Use specified output path
-    echo "Exporting local database to $1..."
-    python src/py/export_queries.py "$1"
+# Parse command line arguments
+OUTPUT_PATH=""
+PROMPTS=()
+LATEST_ONLY=false
+
+# Function to print usage
+print_usage() {
+    echo "Usage: $0 [options]"
+    echo "Options:"
+    echo "  -o, --output PATH    Specify output path for the CSV file"
+    echo "  -p, --prompts P1 P2  List of prompt names to filter by"
+    echo "  -l, --latest-only    Only export the latest query result for each transcript"
+    echo "  -h, --help          Show this help message"
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -o|--output)
+            OUTPUT_PATH="$2"
+            shift 2
+            ;;
+        -p|--prompts)
+            shift
+            while [[ $# -gt 0 && ! $1 =~ ^- ]]; do
+                PROMPTS+=("$1")
+                shift
+            done
+            ;;
+        -l|--latest-only)
+            LATEST_ONLY=true
+            shift
+            ;;
+        -h|--help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            print_usage
+            exit 1
+            ;;
+    esac
+done
+
+# Build the Python command
+PYTHON_CMD="python src/py/export_queries.py"
+
+if [ ! -z "$OUTPUT_PATH" ]; then
+    PYTHON_CMD="$PYTHON_CMD --output $OUTPUT_PATH"
 fi
+
+if [ ${#PROMPTS[@]} -gt 0 ]; then
+    PYTHON_CMD="$PYTHON_CMD --prompts ${PROMPTS[*]}"
+fi
+
+if [ "$LATEST_ONLY" = true ]; then
+    PYTHON_CMD="$PYTHON_CMD --latest-only"
+fi
+
+# Execute the Python script
+echo "Exporting database to CSV..."
+eval $PYTHON_CMD
 
 echo "Export complete!" 
