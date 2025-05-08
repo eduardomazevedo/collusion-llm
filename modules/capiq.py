@@ -75,13 +75,13 @@ def ciqtranscriptcomponenttype():
     return _ciqtranscriptcomponenttype
 
 
-def dl_transcripts(transcriptids, limit=1e5):
+def dl_transcripts(transcriptids, limit=1e7):
     """
     Fetch transcript data and associated person data based on a list of IDs.
 
     Args:
         transcriptids (list of int): A list of transcript IDs.
-        limit (int): Maximum number of rows to fetch. Defaults to 1e5.
+        limit (int): Maximum number of rows to fetch. Defaults to 1e7.
 
     Returns:
         tuple: A tuple containing two pandas.DataFrames:

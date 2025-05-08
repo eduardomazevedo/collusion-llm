@@ -75,7 +75,7 @@ def prep_transcript_for_review(transcript: List[Dict]) -> str:
 
     return formatted_transcript
 
-def get_token_size(transcript_id: int) -> int:
+def transcript_token_size(transcript_id: int) -> int:
     """
     Get the token size of a transcript after formatting it for review.
     
@@ -93,10 +93,11 @@ def get_token_size(transcript_id: int) -> int:
     # Format the transcript for review
     formatted_transcript = prep_transcript_for_review(transcript_data)
     
-    # Initialize tiktoken encoder for GPT-4
+    return token_size(formatted_transcript)
+
+def token_size(text: str) -> int:
+    """
+    Get the token size of a text string.
+    """
     encoding = tiktoken.get_encoding("o200k_base")
-    
-    # Count tokens
-    num_tokens = len(encoding.encode(formatted_transcript))
-    
-    return num_tokens
+    return len(encoding.encode(text))

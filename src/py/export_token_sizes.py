@@ -7,7 +7,7 @@ Usage:
 
 import os
 import pandas as pd
-from modules.utils import get_token_size
+from modules.utils import transcript_token_size
 import config
 
 def main():
@@ -46,7 +46,7 @@ def main():
     # Process each transcript
     for i, transcript_id in enumerate(remaining_ids, 1):
         try:
-            token_size = get_token_size(int(transcript_id))
+            token_size = transcript_token_size(int(transcript_id))
             current_progress = len(processed_ids) + i
             
             # Add new result to the dataframe

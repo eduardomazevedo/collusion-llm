@@ -2,8 +2,8 @@
 """
 Script to run batch processing operations for all companies in the Capital IQ sample.
 This script handles creating batches that stay within OpenAI's size limits:
-- Max 45,000 requests per batch
-- Max 35,000,000 tokens per batch (including prompt and transcripts)
+- Max 50,000 requests per batch
+- Max 40,000,000 tokens per batch (including prompt and transcripts)
 
 Usage:
     python big_batch_runner.py <prompt_name> [--operation <operation>]
@@ -28,18 +28,28 @@ from typing import List, Dict, Optional, Tuple
 from modules.batch_processor import BatchProcessor
 from modules.utils import token_size
 import config
+import openai
 
-def get_prompt_tokens(prompt_text: str) -> int:
-    """
-    Calculate the number of tokens in a prompt text.
-    
-    Args:
-        prompt_text: The prompt text to calculate tokens for
-        
-    Returns:
-        int: Number of tokens in the prompt
-    """
-    return token_size(prompt_text)
+# Constants for OpenAI limits
+MAX_REQUESTS_PER_BATCH = 50000
+MAX_TOKENS_PER_BATCH = 30000000
+MAX_TOKENS_IN_QUEUE = 30000000
+INPUT_TOKEN_PRICE = 0.075 / 1000000  # $0.075 per 1M tokens
+OUTPUT_TOKEN_PRICE = 0.3 / 1000000   # $0.3 per 1M tokens
+AVG_OUTPUT_TOKENS = 250
+MAX_OUTPUT_TOKENS = 500
+
+# Map API statuses to your internal states
+API_TO_INTERNAL = {
+    'validating':   'in_progress',
+    'in_progress':  'in_progress',
+    'finalizing':   'in_progress',
+    'canceling':    'canceling',
+    'completed':    'completed',
+    'failed':       'failed',
+    'expired':      'expired',
+    'canceled':     'canceled',
+}
 
 def get_company_transcripts() -> pd.DataFrame:
     """
@@ -50,14 +60,7 @@ def get_company_transcripts() -> pd.DataFrame:
     """
     csv_path = os.path.join(config.DATA_DIR, 'companies-transcripts.csv')
     try:
-        print("\nReading companies-transcripts.csv...")
-        df = pd.read_csv(csv_path)
-        print("\nCSV Info:")
-        print(df.info())
-        print("\nFirst few rows:")
-        print(df.head())
-        print("\nColumn names:", df.columns.tolist())
-        return df
+        return pd.read_csv(csv_path)
     except FileNotFoundError:
         print(f"Error: Could not find companies-transcripts.csv at {csv_path}")
         return pd.DataFrame()
@@ -105,6 +108,65 @@ def get_transcript_tokens() -> Dict[int, int]:
         print(f"Error reading transcript-tokens.csv: {str(e)}")
         return {}
 
+def check_batch_size(batch_file: str, prompt_tokens: int, transcript_tokens: Dict[int, int]) -> Tuple[bool, int, int]:
+    """
+    Check if a batch file is within OpenAI's size limits.
+    
+    Args:
+        batch_file: Path to the batch input file
+        prompt_tokens: Number of tokens in the prompt
+        transcript_tokens: Dictionary mapping transcript IDs to their token sizes
+        
+    Returns:
+        Tuple of (is_valid, total_requests, total_tokens)
+    """
+    total_requests = 0
+    total_tokens = 0
+    
+    with open(batch_file, 'r') as f:
+        for line in f:
+            request = json.loads(line)
+            transcript_id = int(request['custom_id'].split('-')[1])
+            
+            if transcript_id in transcript_tokens:
+                total_requests += 1
+                total_tokens += prompt_tokens + transcript_tokens[transcript_id]
+    
+    is_valid = (total_requests <= MAX_REQUESTS_PER_BATCH and 
+                total_tokens <= MAX_TOKENS_PER_BATCH)
+    
+    return is_valid, total_requests, total_tokens
+
+def estimate_batch_cost(batch_file: str, prompt_tokens: int, transcript_tokens: Dict[int, int]) -> Tuple[float, float]:
+    """
+    Estimate the cost of processing a batch.
+    
+    Args:
+        batch_file: Path to the batch input file
+        prompt_tokens: Number of tokens in the prompt
+        transcript_tokens: Dictionary mapping transcript IDs to their token sizes
+        
+    Returns:
+        Tuple of (input_cost, output_cost) in dollars
+    """
+    total_input_tokens = 0
+    total_requests = 0
+    
+    with open(batch_file, 'r') as f:
+        for line in f:
+            request = json.loads(line)
+            transcript_id = int(request['custom_id'].split('-')[1])
+            
+            if transcript_id in transcript_tokens:
+                total_requests += 1
+                total_input_tokens += prompt_tokens + transcript_tokens[transcript_id]
+    
+    # Calculate costs
+    input_cost = total_input_tokens * INPUT_TOKEN_PRICE
+    output_cost = total_requests * MAX_OUTPUT_TOKENS * OUTPUT_TOKEN_PRICE
+    
+    return input_cost, output_cost
+
 def create_batches(prompt_name: str) -> List[str]:
     """
     Create batch input files for all companies, staying within OpenAI limits.
@@ -121,7 +183,7 @@ def create_batches(prompt_name: str) -> List[str]:
         raise ValueError(f"Prompt '{prompt_name}' not found in prompts")
     
     # Get prompt token size
-    prompt_tokens = get_prompt_tokens(prompt_config["system_message"])
+    prompt_tokens = token_size(prompt_config["system_message"])
     print(f"Prompt token size: {prompt_tokens}")
     
     # Get all companies and transcripts
@@ -238,7 +300,7 @@ def create_batches(prompt_name: str) -> List[str]:
 class BatchTracker:
     """Class to track batch processing status and manage token limits."""
     
-    def __init__(self, prompt_name: str):
+    def __init__(self, prompt_name: str, client):
         """
         Initialize the BatchTracker.
         
@@ -247,335 +309,377 @@ class BatchTracker:
         """
         self.prompt_name = prompt_name
         self.batches_dir = os.path.join(config.OUTPUT_DIR, f"{prompt_name}_batches")
-        self.tracking_file = os.path.join(config.DATA_DIR, 'batch_tracking.csv')
+        self.tracking_file = os.path.join(config.DATA_DIR, 'batch-tracker.csv')
+        self.client = client
         
-        # Cost constants (per 1,000,000 tokens)
-        self.INPUT_COST_PER_MILLION = 0.075
-        self.OUTPUT_COST_PER_MILLION = 0.3
-        self.AVG_OUTPUT_TOKENS = 250
+        # Get prompt tokens once at initialization
+        prompt_config = BatchProcessor().prompts.get(self.prompt_name)
+        if not prompt_config:
+            raise ValueError(f"Prompt '{self.prompt_name}' not found in prompts")
+        self.prompt_tokens = token_size(prompt_config["system_message"])
+        print(f"\nPrompt token size: {self.prompt_tokens}")
         
-        # Initialize DataFrame columns
-        self.columns = [
-            'company_id', 'company_name', 'input_file', 'token_size',
-            'batch_id', 'status', 'submission_time', 'completion_time',
-            'output_file', 'estimated_input_cost', 'estimated_output_cost',
-            'total_estimated_cost'
-        ]
+        # Get list of all batch files
+        if os.path.exists(self.batches_dir):
+            self.batch_files = [f for f in os.listdir(self.batches_dir) if f.endswith('.jsonl')]
+            print(f"\nFound {len(self.batch_files)} batch files in {self.batches_dir}")
+        else:
+            print(f"\nWarning: Batches directory not found: {self.batches_dir}")
+            self.batch_files = []
         
         # Load or create tracking DataFrame
         if os.path.exists(self.tracking_file):
             self.df = pd.read_csv(self.tracking_file)
-            # Convert timestamps to datetime
-            for col in ['submission_time', 'completion_time']:
-                if col in self.df.columns:
-                    self.df[col] = pd.to_datetime(self.df[col])
-        else:
-            self.df = pd.DataFrame(columns=self.columns)
-    
-    def calculate_costs(self, token_size: int, num_transcripts: int) -> Tuple[float, float, float]:
-        """
-        Calculate estimated costs for a batch.
-        
-        Args:
-            token_size: Total input token size
-            num_transcripts: Number of transcripts in the batch
+            print(f"\nLoaded existing tracking file with {len(self.df)} batches")
             
-        Returns:
-            Tuple of (input_cost, output_cost, total_cost)
-        """
-        # Calculate input cost
-        input_cost = (token_size / 1_000_000) * self.INPUT_COST_PER_MILLION
-        
-        # Calculate output cost (estimated 250 tokens per response)
-        output_tokens = num_transcripts * self.AVG_OUTPUT_TOKENS
-        output_cost = (output_tokens / 1_000_000) * self.OUTPUT_COST_PER_MILLION
-        
-        total_cost = input_cost + output_cost
-        
-        return input_cost, output_cost, total_cost
+            # Check if we need to add more batches
+            if len(self.df) < len(self.batch_files):
+                print(f"\nAdding {len(self.batch_files) - len(self.df)} missing batches to tracker...")
+                self._add_missing_batches()
+        else:
+            # Create new tracking DataFrame
+            self.df = pd.DataFrame(columns=[
+                'batch_file', 'company_id', 'company_name', 'total_requests',
+                'total_tokens', 'input_cost', 'output_cost', 'batch_id',
+                'status', 'completed_requests', 'failed_requests', 'total_requests',
+                'saved_to_db'
+            ])
+            
+            if self.batch_files:
+                print("\nCreating new tracking file with all batches...")
+                self._add_missing_batches()
+            else:
+                print("Creating empty tracking file")
+                self.save()
     
-    def add_batch(self, company_id: int, company_name: str, input_file: str, token_size: int):
-        """
-        Add a new batch to the tracker.
-        
-        Args:
-            company_id: Company ID
-            company_name: Company name
-            input_file: Path to input file
-            token_size: Total token size for the batch
-        """
-        # Count number of transcripts in the input file
-        with open(input_file, 'r') as f:
-            num_transcripts = sum(1 for _ in f)
-        
-        # Calculate costs
-        input_cost, output_cost, total_cost = self.calculate_costs(token_size, num_transcripts)
-        
-        new_row = {
-            'company_id': company_id,
-            'company_name': company_name,
-            'input_file': input_file,
-            'token_size': token_size,
-            'batch_id': None,
-            'status': 'not_submitted',
-            'submission_time': None,
-            'completion_time': None,
-            'output_file': None,
-            'estimated_input_cost': input_cost,
-            'estimated_output_cost': output_cost,
-            'total_estimated_cost': total_cost
-        }
-        self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
+    def _add_missing_batches(self):
+        """Add any missing batches to the tracker."""
+        # Get transcript tokens
+        transcript_tokens = get_transcript_tokens()
+
+        # Load company IDs and names once, then build lookup dict
+        companies_df = get_company_transcripts(usecols=['companyid', 'companyname'])
+        company_map = dict(
+            zip(companies_df['companyid'], companies_df['companyname'])
+        )
+
+        # Get existing batch files from tracker
+        existing_files = set(self.df['batch_file'].tolist())
+
+        # Count how many new batches we need to add
+        new_batches = [f for f in self.batch_files if os.path.join(self.batches_dir, f) not in existing_files]
+        total_new = len(new_batches)
+        print(f"\nFound {total_new} new batches to add to tracker")
+
+        # Add each batch to tracker if not already present
+        added_count = 0
+        for batch_file in new_batches:
+            batch_path = os.path.join(self.batches_dir, batch_file)
+
+            try:
+                # Extract company ID from filename
+                company_id = int(batch_file.split('_')[2].split('.')[0])
+                # Fast lookup of company name
+                company_name = company_map.get(company_id, 'UNKNOWN')
+
+                # Calculate batch size and cost using the pre-computed prompt tokens
+                is_valid, total_requests, total_tokens = check_batch_size(
+                    batch_path, self.prompt_tokens, transcript_tokens
+                )
+                input_cost, output_cost = estimate_batch_cost(
+                    batch_path, self.prompt_tokens, transcript_tokens
+                )
+
+                # Add to tracker
+                self.add_batch(
+                    batch_path, company_id, company_name,
+                    total_requests, total_tokens, input_cost, output_cost
+                )
+                added_count += 1
+                print(f"Added batch {added_count}/{total_new}: {batch_file}")
+            except Exception as e:
+                print(f"Error processing batch {batch_file}: {str(e)}")
+                continue
+
+        print(f"\nFinished adding batches: {added_count}/{total_new} successfully added to tracker")
         self.save()
     
-    def get_total_estimated_cost(self) -> float:
-        """Get total estimated cost for all batches."""
-        return self.df['total_estimated_cost'].sum()
+    def add_batch(
+        self,
+        batch_file: str,
+        company_id: int,
+        company_name: str,
+        total_requests: int,
+        total_tokens: int,
+        input_cost: float,
+        output_cost: float
+    ):
+        """
+        Append one row to tracker both in-memory and on disk, without rewriting the entire CSV.
+        """
+        # Build the new row as a dict
+        new_row = {
+            'batch_file': batch_file,
+            'company_id': company_id,
+            'company_name': company_name,
+            'total_requests': total_requests,
+            'total_tokens': total_tokens,
+            'input_cost': input_cost,
+            'output_cost': output_cost,
+            'batch_id': '',
+            'status': '',
+            'completed_requests': 0,
+            'failed_requests': 0,
+            'saved_to_db': False
+        }
+
+        # 1) Update in-memory DataFrame
+        self.df.loc[len(self.df)] = new_row
+
+        # 2) Append the single row to the CSV tracker file
+        pd.DataFrame([new_row]).to_csv(
+            self.tracker_csv_path,  # path used in your save() method
+            mode='a',
+            header=False,
+            index=False
+        )
     
-    def get_completed_cost(self) -> float:
-        """Get total estimated cost for completed batches."""
-        return self.df[self.df['status'] == 'completed']['total_estimated_cost'].sum()
-    
-    def get_remaining_cost(self) -> float:
-        """Get total estimated cost for remaining batches."""
-        return self.df[self.df['status'] != 'completed']['total_estimated_cost'].sum()
-    
-    def update_batch(self, company_id: int, **kwargs):
+    def update_batch(self, batch_file: str, **kwargs):
         """
         Update batch information.
         
         Args:
-            company_id: Company ID to update
-            **kwargs: Fields to update and their values
+            batch_file: Path to the batch input file
+            **kwargs: Fields to update and their new values
         """
-        mask = self.df['company_id'] == company_id
+        mask = self.df['batch_file'] == batch_file
+        if not mask.any():
+            print(f"Warning: Batch file {batch_file} not found in tracker")
+            return
+        
         for key, value in kwargs.items():
             if key in self.df.columns:
                 self.df.loc[mask, key] = value
+        
         self.save()
     
     def get_submitted_tokens(self) -> int:
-        """Get total tokens of submitted but not completed batches."""
-        mask = (self.df['status'] == 'submitted')
-        return self.df.loc[mask, 'token_size'].sum()
+        """
+        List *all* batch jobs, keep only those whose `status` still holds tokens
+        (‘validating’, ‘in progress’, ‘finalizing’, ‘canceling’), and sum their `.tokens`.
+        """
+        live_stat = {"validating", "in_progress", "finalizing"}
+        # this returns a paginated iterator; pulling it into a list will fetch every page
+        all_batches = list(self.client.batches.list())
+        live_batches = [
+            batch
+            for batch in all_batches
+            
+            if batch.status.lower() in live_stat
+        ]
+        # Make list of batch_ids from live_batches
+        live_batch_ids = [batch.id for batch in live_batches]
+        # Get the total tokens for each live_batch element based on batch_id from tracker df
+        live_batches_df = self.df[self.df['batch_id'].isin(live_batch_ids)]
+        return live_batches_df['total_tokens'].sum()
     
+    def get_submitted_tokens_local(self) -> int:
+        """
+        Get total number of tokens for batches in tracker df that have status "in_progress"
+        """
+        in_progress_df = self.df[self.df['status'] == 'in_progress']
+        return in_progress_df['total_tokens'].sum()
+
+
     def get_available_tokens(self) -> int:
-        """Get available tokens within the 35M limit."""
-        return 35000000 - self.get_submitted_tokens()
+        """Subtract live‐queued tokens from the queue limit to get available capacity."""
+        used = self.get_submitted_tokens_local()
+        return max(0, MAX_TOKENS_IN_QUEUE - used)
     
     def get_next_batch(self) -> Optional[Dict]:
         """
-        Get the next batch to submit based on available tokens.
+        Get the next batch that can be submitted.
         
         Returns:
-            Dictionary with batch information or None if no batches available
+            Dictionary with batch information or None if no batch can be submitted
         """
-        mask = (self.df['status'] == 'not_submitted')
-        available_batches = self.df[mask].sort_values('token_size')
+        # Get batches that haven't been submitted yet
+        unsubmitted = self.df[self.df['status'].isna()]
+        if unsubmitted.empty:
+            return None
         
-        for _, batch in available_batches.iterrows():
-            if batch['token_size'] <= self.get_available_tokens():
-                return batch.to_dict()
-        
-        return None
+        # Return the first unsubmitted batch
+        return unsubmitted.iloc[0].to_dict()
     
     def save(self):
-        """Save tracking DataFrame to CSV."""
+        """Save the tracking DataFrame to file."""
         self.df.to_csv(self.tracking_file, index=False)
+        print(f"\nSaved tracking data to {self.tracking_file}")
+    
+    def save_completed_batches_to_db(self, processor: BatchProcessor):
+        """
+        Save completed batches that haven't been saved to the database yet.
+        
+        Args:
+            processor: BatchProcessor instance to use for saving
+        """
+        # Get completed batches that haven't been saved to db
+        to_save = self.df[(self.df['status'] == 'completed') & (~self.df['saved_to_db'])]
+        
+        if to_save.empty:
+            return
+        
+        print(f"\nSaving {len(to_save)} completed batches to database...")
+        
+        for _, batch in to_save.iterrows():
+            try:
+                print(f"Saving batch {batch['batch_id']} for {batch['company_name']}...")
+                # Process and save batch results to database
+                processor.process_batch_results(batch['batch_id'], self.prompt_name)
+                
+                # Update tracking
+                self.update_batch(
+                    batch['batch_file'],
+                    saved_to_db=True
+                )
+                print(f"Successfully saved batch {batch['batch_id']} to database")
+            except Exception as e:
+                print(f"Error saving batch {batch['batch_id']} to database: {str(e)}")
+    
+    def get_progress_summary(self) -> str:
+        """Get a summary of batch processing progress."""
+        total_batches = len(self.df)
+        completed = len(self.df[self.df['status'] == 'completed'])
+        in_progress = len(self.df[self.df['status'] == 'in_progress'])
+        failed = len(self.df[self.df['status'] == 'failed'])
+        pending = total_batches - completed - in_progress - failed
+        saved_to_db = self.df['saved_to_db'].sum()
+        
+        # Calculate progress percentage
+        progress = (completed + failed) / total_batches * 100 if total_batches > 0 else 0
+        
+        # Get current queue size
+        queue_size = self.get_submitted_tokens_local()
+        queue_percent = (queue_size / MAX_TOKENS_IN_QUEUE) * 100
+        
+        return (f"\nProgress: {progress:.1f}% ({completed + failed}/{total_batches} batches)\n"
+                f"Status: {completed} completed, {in_progress} in progress, {failed} failed, {pending} pending\n"
+                f"Queue: {queue_size:,} tokens ({queue_percent:.1f}% of limit)\n"
+                f"Saved to DB: {saved_to_db}/{completed}")
 
 def submit_and_monitor_batches(prompt_name: str):
-    """
-    Submit and monitor batches, staying within token limits.
-    
-    Args:
-        prompt_name: Name of the prompt to use
-    """
+
     processor = BatchProcessor()
-    tracker = BatchTracker(prompt_name)
-    
-    # Get all input files
-    input_files = [f for f in os.listdir(tracker.batches_dir) 
-                  if f.startswith('input_companyid_') and f.endswith('.jsonl')]
-    
-    if not input_files:
-        print("No input files found")
-        return
-    
-    # Add all input files to tracker if not already there
-    for input_file in input_files:
-        # Extract company ID from filename
-        company_id = int(input_file.split('_')[2].split('.')[0])
-        
-        # Skip if already in tracker
-        if company_id in tracker.df['company_id'].values:
-            continue
-        
-        # Get company name from diagnostic file
-        diagnostic_df = pd.read_csv(os.path.join(config.DATA_DIR, 'transcript_diagnostics.csv'))
-        company_name = diagnostic_df[diagnostic_df['companyid'] == company_id]['companyname'].iloc[0]
-        
-        # Get token size from diagnostic file
-        token_size = diagnostic_df[diagnostic_df['companyid'] == company_id]['token_size'].sum()
-        
-        # Add to tracker
-        tracker.add_batch(
-            company_id=company_id,
-            company_name=company_name,
-            input_file=os.path.join(tracker.batches_dir, input_file),
-            token_size=token_size
-        )
-    
-    print(f"\nTracking {len(tracker.df)} batches")
-    print(f"Initial available tokens: {tracker.get_available_tokens():,}")
-    print(f"Total estimated cost: ${tracker.get_total_estimated_cost():.2f}")
-    print(f"  - Input: ${tracker.df['estimated_input_cost'].sum():.2f}")
-    print(f"  - Output: ${tracker.df['estimated_output_cost'].sum():.2f}")
-    
+    tracker = BatchTracker(prompt_name, client=processor.client)
+
+    # Main submit + interleaved monitor loop
     while True:
-        # Check status of submitted batches
-        submitted_batches = tracker.df[tracker.df['status'] == 'submitted']
-        for _, batch in submitted_batches.iterrows():
-            status = processor.check_batch_status(batch['batch_id'])
-            
-            if status['status'] == 'completed':
-                print(f"\nBatch {batch['batch_id']} completed")
-                print(f"Cost for this batch: ${batch['total_estimated_cost']:.2f}")
-                print(f"  - Input: ${batch['estimated_input_cost']:.2f}")
-                print(f"  - Output: ${batch['estimated_output_cost']:.2f}")
-                
-                # Update tracker
-                tracker.update_batch(
-                    batch['company_id'],
-                    status='completed',
-                    completion_time=datetime.now()
-                )
-                
-                # Process results
-                results = processor.process_batch_results(batch['batch_id'], prompt_name)
-                
-                # Save output file
-                output_file = os.path.join(
-                    tracker.batches_dir,
-                    f"output_companyid_{batch['company_id']}.jsonl"
-                )
-                with open(output_file, 'w') as f:
-                    for result in results.values():
-                        f.write(json.dumps(result) + '\n')
-                
-                tracker.update_batch(
-                    batch['company_id'],
-                    output_file=output_file
-                )
-                
-                # Print progress
-                print(f"\nProgress:")
-                print(f"Completed: ${tracker.get_completed_cost():.2f}")
-                print(f"Remaining: ${tracker.get_remaining_cost():.2f}")
-        
-        # Submit new batches if tokens available
-        while tracker.get_available_tokens() > 0:
-            next_batch = tracker.get_next_batch()
-            if not next_batch:
-                break
-            
-            print(f"\nSubmitting batch for company {next_batch['company_name']}")
-            print(f"Estimated cost: ${next_batch['total_estimated_cost']:.2f}")
-            batch_id = processor.submit_batch(next_batch['input_file'])
-            
-            tracker.update_batch(
-                next_batch['company_id'],
-                batch_id=batch_id,
-                status='submitted',
-                submission_time=datetime.now()
-            )
-        
-        # Check if all batches are completed
-        if (tracker.df['status'] == 'completed').all():
-            print("\nAll batches completed!")
-            print(f"Total cost: ${tracker.get_total_estimated_cost():.2f}")
+        # 1) Summary of all statuses
+        print(tracker.get_progress_summary())
+
+        # 2) Refresh in-progress batches
+        in_prog = tracker.df[tracker.df['status'] == 'in_progress']
+        if not in_prog.empty:
+            print("Checking in_progress batches...")
+            for _, row in in_prog.iterrows():
+                status_info = processor.check_batch_status(row['batch_id'])
+                api_status = status_info['status'].lower()
+                internal_status = API_TO_INTERNAL.get(api_status, 'failed')
+                if internal_status in ('completed', 'failed'):
+                    print(f"  Batch {row['batch_id']} -> {internal_status}")
+                    tracker.update_batch(
+                        row['batch_file'],
+                        batch_id=row['batch_id'],
+                        status=internal_status
+                    )
+            tracker.save_completed_batches_to_db(processor)
+
+        # 3) Next unsubmitted/retryable batch
+        next_batch = tracker.get_next_batch()
+        if next_batch is None:
+            print("\nAll batches have been submitted.")
             break
-        
-        # Wait 5 minutes before next check
-        print(f"\nWaiting 5 minutes... ({datetime.now().strftime('%H:%M:%S')})")
-        time.sleep(300)
+
+        # 4) Check token availability
+        available = tracker.get_available_tokens()
+        if next_batch['total_tokens'] > available:
+            print(f"\nOnly {available:,} tokens free; waiting for slots...")
+            time.sleep(30)
+            continue
+
+        # 5) Attempt submission
+        try:
+            batch_id = processor.submit_batch(next_batch['batch_file'])
+        except openai.OpenAIError as e:
+            code = getattr(e, 'code', '').lower()
+            msg  = str(e).lower()
+            if code == 'token_limit_exceeded' or 'enqueued token limit' in msg or 'token limit' in msg:
+                print(f"Queue limit reached on {next_batch['batch_file']}: {e}")
+                tracker.update_batch(
+                    next_batch['batch_file'],
+                    batch_id=None,
+                    status=pd.NA
+                )
+                time.sleep(30)
+                continue
+            else:
+                print(f"Permanent failure on {next_batch['batch_file']}: {e}")
+                tracker.update_batch(
+                    next_batch['batch_file'],
+                    batch_id=None,
+                    status='failed'
+                )
+        else:
+            print(f"Submitted {next_batch['batch_file']} -> {batch_id}")
+            tracker.update_batch(
+                next_batch['batch_file'],
+                batch_id=batch_id,
+                status='in_progress'
+            )
+
+        time.sleep(5)
+
+    # Final drain monitor loop
+    while True:
+        in_prog = tracker.df[tracker.df['status'] == 'in_progress']
+        if in_prog.empty:
+            print("\nAll batches completed.")
+            break
+
+        print("Final check of in_progress batches...")
+        for _, row in in_prog.iterrows():
+            status_info = processor.check_batch_status(row['batch_id'])
+            api_status = status_info['status'].lower()
+            internal_status = API_TO_INTERNAL.get(api_status, 'failed')
+            if internal_status in ('completed', 'failed'):
+                print(f"  Batch {row['batch_id']} -> {internal_status}")
+                tracker.update_batch(
+                    row['batch_file'],
+                    batch_id=row['batch_id'],
+                    status=internal_status
+                )
+        tracker.save_completed_batches_to_db(processor)
+        time.sleep(30)
+
+
 
 def main():
     parser = argparse.ArgumentParser(description='Run batch processing operations for all companies')
     parser.add_argument('prompt_name', help='Name of the prompt to use')
-    parser.add_argument('--operation', choices=['create', 'submit', 'status', 'process', 'error', 'models', 'all'],
+    parser.add_argument('operation', choices=['create', 'submit', 'all'],
                       default='all', help='Operation to perform')
     args = parser.parse_args()
     
-    if args.operation == 'models':
-        processor = BatchProcessor()
-        print("\nListing available models...")
-        models = processor.list_available_models()
-        print("\nAvailable models:")
-        for model in sorted(models):
-            print(f"- {model}")
-        return
-    
-    # Set up batches directory
-    batches_dir = os.path.join(config.OUTPUT_DIR, f"{args.prompt_name}_batches")
-    os.makedirs(batches_dir, exist_ok=True)
-    
-    if args.operation == 'create':
-        batch_files = create_batches(args.prompt_name)
-        print(f"\nCreated {len(batch_files)} batch files in {batches_dir}")
-        return
-    
-    if args.operation == 'submit':
-        submit_and_monitor_batches(args.prompt_name)
-        return
-    
-    if args.operation == 'status':
-        tracker = BatchTracker(args.prompt_name)
-        print("\nBatch Status Summary:")
-        print(tracker.df[['company_id', 'company_name', 'status', 'token_size']])
-        return
-    
-    if args.operation == 'process':
-        tracker = BatchTracker(args.prompt_name)
-        completed_batches = tracker.df[tracker.df['status'] == 'completed']
-        
-        if completed_batches.empty:
-            print("No completed batches found")
-            return
-        
-        processor = BatchProcessor()
-        for _, batch in completed_batches.iterrows():
-            print(f"\nProcessing batch for company {batch['company_name']}")
-            processor.process_batch_results(batch['batch_id'], args.prompt_name)
-        
-        return
-    
-    if args.operation == 'error':
-        tracker = BatchTracker(args.prompt_name)
-        failed_batches = tracker.df[tracker.df['status'] == 'failed']
-        
-        if failed_batches.empty:
-            print("No failed batches found")
-            return
-        
-        processor = BatchProcessor()
-        for _, batch in failed_batches.iterrows():
-            print(f"\nChecking errors for company {batch['company_name']}")
-            error_info = processor.check_batch_error(batch['batch_id'])
-            print(f"Error: {error_info['error_message']}")
-        
-        return
-    
-    if args.operation == 'all':
-        # Create batches
+    if args.operation in ['create', 'all']:
+        print("\nCreating batch files...")
         batch_files = create_batches(args.prompt_name)
         if not batch_files:
-            print("No batches created")
+            print("No batch files were created")
             return
-        
-        # Submit and monitor batches
+    
+    if args.operation in ['submit', 'all']:
+        print("\nSubmitting and monitoring batches...")
         submit_and_monitor_batches(args.prompt_name)
-        
-        return
 
 if __name__ == "__main__":
     main() 
