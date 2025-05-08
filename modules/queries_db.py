@@ -34,23 +34,63 @@ def fetch_all_queries():
     columns = ['query_id', 'prompt_name', 'transcript_id', 'date', 'response']
     return pd.DataFrame(rows, columns=columns)
 
-def export_to_csv(output_path: str = None):
+def fetch_queries_by_prompts(prompt_names: list[str]):
     """
-    Export the queries database to a CSV file.
+    Fetch query results for specific prompt names and return a pandas DataFrame.
+    
+    Args:
+        prompt_names: List of prompt names to filter by
+    """
+    placeholders = ','.join(['?'] * len(prompt_names))
+    cursor.execute(f"SELECT * FROM queries WHERE prompt_name IN ({placeholders})", prompt_names)
+    
+    rows = cursor.fetchall()
+    columns = ['query_id', 'prompt_name', 'transcript_id', 'date', 'response']
+    return pd.DataFrame(rows, columns=columns)
+
+def get_latest_queries(df: pd.DataFrame = None):
+    """
+    Get the latest query result for each transcript from the given DataFrame.
+    If no DataFrame is provided, uses all queries.
+    
+    Args:
+        df: Optional DataFrame to filter from. If None, uses all queries.
+    """
+    if df is None:
+        df = fetch_all_queries()
+    
+    # Convert date column to datetime for proper sorting
+    df['date'] = pd.to_datetime(df['date'])
+    
+    # Sort by date in descending order and keep first occurrence (latest) for each transcript
+    return df.sort_values('date', ascending=False).drop_duplicates(subset=['transcript_id', 'prompt_name'], keep='first')
+
+def export_to_csv(output_path: str = None, prompt_names: list[str] = None, latest_only: bool = False):
+    """
+    Export the queries database to a CSV file with optional filtering.
     
     Args:
         output_path: Path where to save the CSV file. If None, uses a default path
                     in the output directory with timestamp.
+        prompt_names: Optional list of prompt names to filter by. If None, exports all queries.
+        latest_only: If True, only exports the latest query result for each transcript.
     
     Returns:
         Path to the exported CSV file
     """
     if output_path is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = f"output/queries_export_{timestamp}.csv"
+        output_path = f"output/visualize_db_{timestamp}.csv"
     
-    # Fetch all queries
-    df = fetch_all_queries()
+    # Fetch queries based on filters
+    if prompt_names:
+        df = fetch_queries_by_prompts(prompt_names)
+    else:
+        df = fetch_all_queries()
+    
+    # Get latest entries if requested
+    if latest_only:
+        df = get_latest_queries(df)
     
     # Create output directory if it doesn't exist
     import os
