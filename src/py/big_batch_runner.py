@@ -582,8 +582,17 @@ def submit_and_monitor_batches(prompt_name: str):
             for _, row in in_prog.iterrows():
                 status_info = processor.check_batch_status(row['batch_id'])
                 api_status = status_info['status'].lower()
-                internal_status = API_TO_INTERNAL.get(api_status, 'failed')
-                if internal_status in ('completed', 'failed'):
+
+                # 1) If it's "failed," see if the error code is token_limit_exceeded
+                if api_status == "failed" and status_info.get("error"):
+                    err_obj = status_info["error"]  # e.g. {"code": "token_limit_exceeded", …}
+                    if getattr(err_obj, "code", "") == "token_limit_exceeded":
+                        print(f"  Batch {row['batch_id']} failed due to queue‐token limit. Keeping it pending for retry.")
+                        tracker.update_batch(row['batch_file'], batch_id=None, status=None)
+                        continue
+
+                internal_status = API_TO_INTERNAL.get(api_status, "failed")
+                if internal_status in ("completed", "failed"):
                     print(f"  Batch {row['batch_id']} -> {internal_status}")
                     tracker.update_batch(
                         row['batch_file'],
@@ -673,8 +682,17 @@ def submit_and_monitor_batches(prompt_name: str):
         for _, row in in_prog.iterrows():
             status_info = processor.check_batch_status(row['batch_id'])
             api_status = status_info['status'].lower()
-            internal_status = API_TO_INTERNAL.get(api_status, 'failed')
-            if internal_status in ('completed', 'failed'):
+
+            # 1) If it's "failed," see if the error code is token_limit_exceeded
+            if api_status == "failed" and status_info.get("error"):
+                err_obj = status_info["error"]  # e.g. {"code": "token_limit_exceeded", …}
+                if getattr(err_obj, "code", "") == "token_limit_exceeded":
+                    print(f"  Batch {row['batch_id']} failed due to queue‐token limit. Keeping it pending for retry.")
+                    tracker.update_batch(row['batch_file'], batch_id=None, status=None)
+                    continue
+
+            internal_status = API_TO_INTERNAL.get(api_status, "failed")
+            if internal_status in ("completed", "failed"):
                 print(f"  Batch {row['batch_id']} -> {internal_status}")
                 tracker.update_batch(
                     row['batch_file'],
