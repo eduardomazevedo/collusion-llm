@@ -8,7 +8,18 @@ from modules.db_manager import download_database as download_db, upload_database
 conn = sqlite3.connect(config.DATABASE_PATH)
 cursor = conn.cursor()
 
-def insert_query_result(prompt_name: str, transcript_id: int, response: str):
+def insert_query_result(
+    prompt_name: str,
+    transcript_id: int,
+    response: str,
+    llm_provider: str = "openai",
+    model_name: str = "gpt-4o-mini",
+    call_type: str = "single",
+    temperature: float = None,
+    max_response: int = None,
+    input_tokens: int = None,
+    output_tokens: int = None
+):
     """
     Insert a new query result into the database using an open connection.
     
@@ -16,13 +27,28 @@ def insert_query_result(prompt_name: str, transcript_id: int, response: str):
         prompt_name: Name of the prompt used
         transcript_id: ID of the transcript
         response: The LLM response
+        llm_provider: The LLM provider (e.g. "openai")
+        model_name: The model name (e.g. "gpt-4o-mini")
+        call_type: Type of call ("single" or "batch")
+        temperature: Temperature setting used
+        max_response: Maximum response tokens
+        input_tokens: Number of input tokens used
+        output_tokens: Number of output tokens used
     """
     cursor.execute(
         """
-        INSERT INTO queries (prompt_name, transcript_id, date, response)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO queries (
+            prompt_name, transcript_id, date, response,
+            LLM_provider, model_name, call_type,
+            temperature, max_response, input_tokens, output_tokens
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (prompt_name, transcript_id, datetime.now(timezone.utc).isoformat(), response),
+        (
+            prompt_name, transcript_id, datetime.now(timezone.utc).isoformat(), response,
+            llm_provider, model_name, call_type,
+            temperature, max_response, input_tokens, output_tokens
+        ),
     )
     conn.commit()
 
@@ -31,7 +57,11 @@ def fetch_all_queries():
     cursor.execute("SELECT * FROM queries")
     
     rows = cursor.fetchall()
-    columns = ['query_id', 'prompt_name', 'transcript_id', 'date', 'response']
+    columns = [
+        'query_id', 'prompt_name', 'transcript_id', 'date', 'response',
+        'LLM_provider', 'model_name', 'call_type',
+        'temperature', 'max_response', 'input_tokens', 'output_tokens'
+    ]
     return pd.DataFrame(rows, columns=columns)
 
 def fetch_queries_by_prompts(prompt_names: list[str]):
@@ -45,7 +75,11 @@ def fetch_queries_by_prompts(prompt_names: list[str]):
     cursor.execute(f"SELECT * FROM queries WHERE prompt_name IN ({placeholders})", prompt_names)
     
     rows = cursor.fetchall()
-    columns = ['query_id', 'prompt_name', 'transcript_id', 'date', 'response']
+    columns = [
+        'query_id', 'prompt_name', 'transcript_id', 'date', 'response',
+        'LLM_provider', 'model_name', 'call_type',
+        'temperature', 'max_response', 'input_tokens', 'output_tokens'
+    ]
     return pd.DataFrame(rows, columns=columns)
 
 def get_latest_queries(df: pd.DataFrame = None):

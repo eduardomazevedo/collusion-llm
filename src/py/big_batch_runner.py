@@ -177,7 +177,7 @@ def create_batches(prompt_name: str) -> List[str]:
     Returns:
         List of paths to created batch input files
     """
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     prompt_config = processor.prompts.get(prompt_name)
     if not prompt_config:
         raise ValueError(f"Prompt '{prompt_name}' not found in prompts")
@@ -566,9 +566,14 @@ class BatchTracker:
                 f"Saved to DB: {saved_to_db}/{completed}")
 
 def submit_and_monitor_batches(prompt_name: str):
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     tracker = BatchTracker(prompt_name, client=processor.client)
-    encountered_failure = False
+    
+    # Check if there are any failed batches at the start
+    failed_batches = tracker.df[tracker.df['status'] == 'failed']
+    encountered_failure = not failed_batches.empty
+    if encountered_failure:
+        print(f"\nFound {len(failed_batches)} failed batches. Will wait for in-progress batches to complete before retrying.")
 
     # Main submit + interleaved monitor loop
     while True:
