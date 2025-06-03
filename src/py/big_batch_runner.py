@@ -32,8 +32,8 @@ import openai
 
 # Constants for OpenAI limits
 MAX_REQUESTS_PER_BATCH = 50000
-MAX_TOKENS_PER_BATCH = 30000000
-MAX_TOKENS_IN_QUEUE = 30000000
+MAX_TOKENS_PER_BATCH = 10000000
+MAX_TOKENS_IN_QUEUE = 10000000
 INPUT_TOKEN_PRICE = 0.075 / 1000000  # $0.075 per 1M tokens
 OUTPUT_TOKEN_PRICE = 0.3 / 1000000   # $0.3 per 1M tokens
 AVG_OUTPUT_TOKENS = 250
@@ -341,7 +341,7 @@ class BatchTracker:
             self.df = pd.DataFrame(columns=[
                 'batch_file', 'company_id', 'company_name', 'total_requests',
                 'total_tokens', 'input_cost', 'output_cost', 'batch_id',
-                'status', 'completed_requests', 'failed_requests', 'total_requests',
+                'status', 'total_requests',
                 'saved_to_db'
             ])
             
@@ -428,8 +428,6 @@ class BatchTracker:
             'output_cost': output_cost,
             'batch_id': '',
             'status': '',
-            'completed_requests': 0,
-            'failed_requests': 0,
             'saved_to_db': False
         }
 
@@ -568,9 +566,9 @@ class BatchTracker:
                 f"Saved to DB: {saved_to_db}/{completed}")
 
 def submit_and_monitor_batches(prompt_name: str):
-
     processor = BatchProcessor()
     tracker = BatchTracker(prompt_name, client=processor.client)
+    encountered_failure = False
 
     # Main submit + interleaved monitor loop
     while True:
@@ -592,7 +590,28 @@ def submit_and_monitor_batches(prompt_name: str):
                         batch_id=row['batch_id'],
                         status=internal_status
                     )
+                    # If we encounter a failure, set the flag
+                    if internal_status == 'failed' and not encountered_failure:
+                        encountered_failure = True
+                        print("\nEncountered first batch failure. Waiting for all in-progress batches to complete...")
             tracker.save_completed_batches_to_db(processor)
+
+        # If we encountered a failure, wait for all in-progress batches to complete
+        if encountered_failure:
+            if not tracker.df[tracker.df['status'] == 'in_progress'].empty:
+                print("Waiting for in-progress batches to complete...")
+                time.sleep(30)
+                continue
+            else:
+                print("\nAll in-progress batches completed. Resetting failed batches for retry...")
+                # Reset failed batches
+                failed_mask = tracker.df['status'] == 'failed'
+                if failed_mask.any():
+                    tracker.df.loc[failed_mask, ['batch_id', 'status']] = [None, None]
+                    tracker.save()
+                    print(f"Reset {failed_mask.sum()} failed batches for retry")
+                encountered_failure = False
+                continue
 
         # 3) Next unsubmitted/retryable batch
         next_batch = tracker.get_next_batch()
@@ -629,6 +648,10 @@ def submit_and_monitor_batches(prompt_name: str):
                     batch_id=None,
                     status='failed'
                 )
+                # Set failure flag if this is the first failure
+                if not encountered_failure:
+                    encountered_failure = True
+                    print("\nEncountered first batch failure. Waiting for all in-progress batches to complete...")
         else:
             print(f"Submitted {next_batch['batch_file']} -> {batch_id}")
             tracker.update_batch(
