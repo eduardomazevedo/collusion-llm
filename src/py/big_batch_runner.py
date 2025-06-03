@@ -695,7 +695,8 @@ def submit_and_monitor_batches(prompt_name: str):
                 if success:
                     tracker.update_batch(
                         next_batch['batch_file'],
-                        status='api_completed'
+                        status='api_completed',
+                        saved_to_db=True
                     )
                     print(f"Successfully processed batch {next_batch['batch_file']} with individual API calls")
                 else:
