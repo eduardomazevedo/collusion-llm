@@ -584,8 +584,8 @@ def process_batch_with_individual_calls(batch_file: str, prompt_name: str, proce
     print(f"\nProcessing batch {batch_file} with individual API calls...")
     
     # Get the LLM instance
-    from modules.llm import LLM
-    llm = LLM()
+    from modules.llm import LLMQuery
+    llm = LLMQuery()
     
     # Read the batch file
     with open(batch_file, 'r') as f:
@@ -607,9 +607,7 @@ def process_batch_with_individual_calls(batch_file: str, prompt_name: str, proce
             # Generate response using individual API call
             response = llm.generate_response(
                 prompt_name=prompt_name,
-                transcript_text=transcript_text,
-                temperature=processor.temperature,
-                max_tokens=processor.max_tokens
+                user_input=transcript_text
             )
             
             # Save to database
@@ -617,14 +615,14 @@ def process_batch_with_individual_calls(batch_file: str, prompt_name: str, proce
             insert_query_result(
                 prompt_name=prompt_name,
                 transcript_id=transcript_id,
-                response=response['response'],
+                response=response[0],  # First element is the response string
                 llm_provider=processor.provider,
                 model_name=processor.model,
                 call_type="individual",
                 temperature=processor.temperature,
                 max_response=processor.max_tokens,
-                input_tokens=response.get('input_tokens'),
-                output_tokens=response.get('output_tokens')
+                input_tokens=response[1]['input_tokens'],
+                output_tokens=response[1]['output_tokens']
             )
             
             successful += 1
@@ -646,7 +644,7 @@ def submit_and_monitor_batches(prompt_name: str):
     failed_batches = tracker.df[tracker.df['status'] == 'failed']
     encountered_failure = not failed_batches.empty
     if encountered_failure:
-        print(f"\nFound {len(failed_batches)} failed batches. Will wait for in-progress batches to complete before retrying.")
+        print(f"\nFound {len(failed_batches)} failed batches. Will process next batch individually while monitoring in-progress batches.")
 
     # Main submit + interleaved monitor loop
     while True:
@@ -680,48 +678,45 @@ def submit_and_monitor_batches(prompt_name: str):
                     # If we encounter a failure, set the flag
                     if internal_status == 'failed' and not encountered_failure:
                         encountered_failure = True
-                        print("\nEncountered first batch failure. Waiting for all in-progress batches to complete...")
+                        print("\nEncountered first batch failure. Will process next batch individually while monitoring in-progress batches.")
             tracker.save_completed_batches_to_db(processor)
 
         # If we encountered a failure, process next batch individually
         if encountered_failure:
-            if not tracker.df[tracker.df['status'] == 'in_progress'].empty:
-                print("Waiting for in-progress batches to complete...")
-                time.sleep(30)
-                continue
-            else:
-                print("\nAll in-progress batches completed. Processing next batch individually...")
-                # Get next unprocessed batch
-                next_batch = tracker.get_next_batch()
-                if next_batch is not None:
-                    # Process the batch with individual API calls
-                    success = process_batch_with_individual_calls(
+            # Get next unprocessed batch
+            next_batch = tracker.get_next_batch()
+            if next_batch is not None:
+                # Process the batch with individual API calls
+                success = process_batch_with_individual_calls(
+                    next_batch['batch_file'],
+                    prompt_name,
+                    processor
+                )
+                if success:
+                    tracker.update_batch(
                         next_batch['batch_file'],
-                        prompt_name,
-                        processor
+                        status='api_completed'
                     )
-                    if success:
-                        tracker.update_batch(
-                            next_batch['batch_file'],
-                            status='api_completed'
-                        )
-                        print(f"Successfully processed batch {next_batch['batch_file']} with individual API calls")
-                    else:
-                        print(f"Failed to process batch {next_batch['batch_file']} with individual API calls")
-                        tracker.update_batch(
-                            next_batch['batch_file'],
-                            status='failed'
-                        )
+                    print(f"Successfully processed batch {next_batch['batch_file']} with individual API calls")
                 else:
-                    print("\nNo more batches to process. Resetting failed batches for retry...")
-                    # Reset failed batches
-                    failed_mask = tracker.df['status'] == 'failed'
-                    if failed_mask.any():
-                        tracker.df.loc[failed_mask, ['batch_id', 'status']] = [None, None]
-                        tracker.save()
-                        print(f"Reset {failed_mask.sum()} failed batches for retry")
-                    encountered_failure = False
-                continue
+                    print(f"Failed to process batch {next_batch['batch_file']} with individual API calls")
+                    tracker.update_batch(
+                        next_batch['batch_file'],
+                        status='failed'
+                    )
+            else:
+                print("\nNo more batches to process. Resetting failed batches for retry...")
+                # Reset failed batches
+                failed_mask = tracker.df['status'] == 'failed'
+                if failed_mask.any():
+                    tracker.df.loc[failed_mask, ['batch_id', 'status']] = [None, None]
+                    tracker.save()
+                    print(f"Reset {failed_mask.sum()} failed batches for retry")
+                encountered_failure = False
+            
+            # Wait a bit before next iteration
+            time.sleep(30)
+            continue
 
         # 3) Next unsubmitted/retryable batch
         next_batch = tracker.get_next_batch()
@@ -761,7 +756,7 @@ def submit_and_monitor_batches(prompt_name: str):
                 # Set failure flag if this is the first failure
                 if not encountered_failure:
                     encountered_failure = True
-                    print("\nEncountered first batch failure. Waiting for all in-progress batches to complete...")
+                    print("\nEncountered first batch failure. Will process next batch individually while monitoring in-progress batches.")
         else:
             print(f"Submitted {next_batch['batch_file']} -> {batch_id}")
             tracker.update_batch(
