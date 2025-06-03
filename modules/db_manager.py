@@ -23,7 +23,11 @@ def verify_database(db_path: str) -> bool:
         # Check if queries table exists and has expected columns
         cursor.execute("PRAGMA table_info(queries)")
         columns = [col[1] for col in cursor.fetchall()]
-        expected_columns = {'query_id', 'prompt_name', 'transcript_id', 'date', 'response'}
+        expected_columns = {
+            'query_id', 'prompt_name', 'transcript_id', 'date', 'response',
+            'LLM_provider', 'model_name', 'call_type', 'temperature',
+            'max_response', 'input_tokens', 'output_tokens'
+        }
         
         if not all(col in columns for col in expected_columns):
             return False

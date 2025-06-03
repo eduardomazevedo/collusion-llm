@@ -28,19 +28,23 @@ from modules.queries_db import insert_query_result
 class LLMQuery:
     """Class to manage LLM queries across multiple providers."""
 
-    def __init__(self, provider="openai", model=None, prompts_path=None):
+    def __init__(self, provider="openai", model=None, prompts_path=None, temperature=1.0, max_tokens=500):
         """
         Initializes the LLMQuery class.
 
         :param provider: The LLM provider (default: "openai").
         :param model: LLM model name, defaults to OpenAI's model or config.OPENAI_MODEL.
         :param prompts_path: Path to JSON file containing system prompts.
+        :param temperature: Temperature setting for the model (default: 1.0).
+        :param max_tokens: Maximum number of tokens in the response (default: 500).
         """
         self.provider = provider.lower()
         self.model = model or getattr(config, "OPENAI_MODEL", "gpt-4o-mini")
         self.prompts_path = prompts_path or config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
+        self.temperature = temperature
+        self.max_tokens = max_tokens
 
     def _load_prompts(self):
         """Loads the prompts from the JSON file."""
@@ -65,7 +69,7 @@ class LLMQuery:
 
         :param prompt_name: The key of the prompt in the JSON file.
         :param user_input: The user-provided text input.
-        :return: JSON string from the parsed response from OpenAI using a Pydantic model.
+        :return: Tuple of (JSON string from the parsed response, token usage info).
         """
         prompt_config = self._get_prompt(prompt_name)
         response_model = RESPONSE_FORMAT_CLASSES.get(prompt_config["response_format"])
@@ -82,9 +86,18 @@ class LLMQuery:
             model=self.model,
             messages=messages,
             response_format=response_model,  # Directly pass Pydantic model
+            temperature=self.temperature,
+            max_tokens=self.max_tokens
         )
 
-        return completion.choices[0].message.parsed.model_dump_json()  # Automatically parsed into Pydantic model
+        # Extract token usage
+        usage = completion.usage
+        token_info = {
+            'input_tokens': usage.prompt_tokens,
+            'output_tokens': usage.completion_tokens
+        }
+
+        return completion.choices[0].message.parsed.model_dump_json(), token_info
 
     def apply_prompt_to_transcripts(self, prompt_name, transcript_ids):
         """
@@ -100,8 +113,22 @@ class LLMQuery:
 
         for i, transcript_id in enumerate(transcript_ids, 1):
             print(f"\nProcessing transcript {i}/{len(transcript_ids)} (ID: {transcript_id})...")
-            results[transcript_id] = self.generate_response(prompt_name, transcript_texts[transcript_id])
-            insert_query_result(prompt_name, transcript_id, results[transcript_id])
+            response, token_info = self.generate_response(prompt_name, transcript_texts[transcript_id])
+            results[transcript_id] = response
+            
+            # Save to database with metadata
+            insert_query_result(
+                prompt_name=prompt_name,
+                transcript_id=transcript_id,
+                response=response,
+                llm_provider=self.provider,
+                model_name=self.model,
+                call_type="single",
+                temperature=self.temperature,
+                max_response=self.max_tokens,
+                input_tokens=token_info['input_tokens'],
+                output_tokens=token_info['output_tokens']
+            )
             print(f"✓ Saved response to database")
 
         print(f"\nCompleted processing all {len(transcript_ids)} transcripts!")

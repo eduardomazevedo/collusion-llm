@@ -44,19 +44,23 @@ RESPONSE_FORMAT_CLASSES = {
 class BatchProcessor:
     """Class to manage batch processing of transcripts."""
 
-    def __init__(self, provider="openai", model=None, prompts_path=None):
+    def __init__(self, provider="openai", model=None, prompts_path=None, temperature=1.0, max_tokens=500):
         """
         Initializes the BatchProcessor class.
 
         :param provider: The LLM provider (default: "openai").
         :param model: LLM model name, defaults to OpenAI's model or config.OPENAI_MODEL.
         :param prompts_path: Path to JSON file containing system prompts.
+        :param temperature: Temperature setting for the model (default: 1.0).
+        :param max_tokens: Maximum tokens in the response (default: 500).
         """
         self.provider = provider.lower()
         self.model = model or getattr(config, "OPENAI_MODEL", "gpt-4o-mini")
         self.prompts_path = prompts_path or config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
+        self.temperature = temperature
+        self.max_tokens = max_tokens
 
     def _load_prompts(self):
         """Load prompts from the prompts JSON file."""
@@ -101,13 +105,13 @@ class BatchProcessor:
                         "url": "/v1/chat/completions",
                         "body": {
                             "model": self.model,
-                            "temperature": 1,
+                            "temperature": self.temperature,
                             "response_format": response_model.model_json_schema(),
                             "messages": [
                                 {"role": "system", "content": prompt_config["system_message"]},
                                 {"role": "user", "content": prep_transcript_for_review(transcript_data)}
                             ],
-                            "max_tokens": 500
+                            "max_tokens": self.max_tokens
                         }
                     }
                     f.write(json.dumps(request) + "\n")
@@ -248,11 +252,35 @@ class BatchProcessor:
             decoder = JSONDecoder()
             try:
                 content_data, _ = decoder.raw_decode(content_str)
-                insert_query_result(prompt_name, transcript_id, json.dumps(content_data))
+                
+                # Insert into database with all required parameters
+                insert_query_result(
+                    prompt_name=prompt_name,
+                    transcript_id=transcript_id,
+                    response=content_str,
+                    llm_provider=self.provider,
+                    model_name=self.model,
+                    call_type="batch",
+                    temperature=self.temperature,
+                    max_response=self.max_tokens,
+                    input_tokens=body.get('usage', {}).get('prompt_tokens'),
+                    output_tokens=body.get('usage', {}).get('completion_tokens')
+                )
             except JSONDecodeError as e:
                 print(f"Error parsing JSON for transcript {transcript_id}: {e}")
                 print(f"Content: {content_str}")
-                insert_query_result(prompt_name, transcript_id, content_str)
+                insert_query_result(
+                    prompt_name=prompt_name,
+                    transcript_id=transcript_id,
+                    response=content_str,
+                    llm_provider=self.provider,
+                    model_name=self.model,
+                    call_type="batch",
+                    temperature=self.temperature,
+                    max_response=self.max_tokens,
+                    input_tokens=None,
+                    output_tokens=None
+                )
 
         print("\n[3/3] Results processing complete")
         print(f"✓ Processed {len(results)} responses")

@@ -21,7 +21,14 @@ def initialize_db():
                 prompt_name TEXT NOT NULL,
                 transcript_id INTEGER NOT NULL,
                 date TEXT NOT NULL,
-                response TEXT NOT NULL
+                response TEXT NOT NULL,
+                LLM_provider TEXT,
+                model_name TEXT,
+                call_type TEXT,
+                temperature REAL,
+                max_response INTEGER,
+                input_tokens INTEGER,
+                output_tokens INTEGER
             )
         ''')
         conn.commit()

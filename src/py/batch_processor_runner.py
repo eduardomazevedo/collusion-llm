@@ -60,7 +60,7 @@ def get_transcript_ids(company_ids):
 
 def create_batch_input(company_ids, prompt_name, output_path):
     """Create batch input file for given company IDs."""
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     transcript_ids = get_transcript_ids(company_ids)
     
     if not transcript_ids:
@@ -76,19 +76,19 @@ def create_batch_input(company_ids, prompt_name, output_path):
 
 def submit_batch(input_file):
     """Submit batch job."""
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     print("Submitting batch job...")
     return processor.submit_batch(input_file)
 
 def check_batch_status(batch_id):
     """Check batch status."""
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     print(f"Checking status of batch {batch_id}...")
     return processor.check_batch_status(batch_id)
 
 def process_batch_results(batch_id, prompt_name):
     """Process batch results."""
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     print(f"Processing results for batch {batch_id}...")
     results = processor.process_batch_results(batch_id, prompt_name)
     if not results:
@@ -99,7 +99,7 @@ def process_batch_results(batch_id, prompt_name):
 
 def check_batch_error(batch_id):
     """Check batch error information."""
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     print(f"Checking error information for batch {batch_id}...")
     error_info = processor.check_batch_error(batch_id)
     
@@ -118,7 +118,7 @@ def check_batch_error(batch_id):
 
 def list_models():
     """List available models."""
-    processor = BatchProcessor()
+    processor = BatchProcessor(temperature=1.0, max_tokens=500)
     print("\nListing available models...")
     models = processor.list_available_models()
     print("\nAvailable models:")
