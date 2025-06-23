@@ -93,3 +93,40 @@ Use `--operation` flag with:
 ### Optional Arguments
 - `--batch-id <id>`: Required for `status`, `process`, and `error` operations
 - `--input-file <path>`: Custom input (relative) file path for `submit` operation (default: `output/batch_inputs/<prompt_name>_input.jsonl`)
+
+## Running Big Batches (All Companies)
+`bash ./src/bash/run_big_batch.sh <prompt_name> <operation>`
+
+Process all companies in the Capital IQ sample using the big batch runner. This handles OpenAI's size limits automatically and provides robust error handling with fallback to individual API calls.
+
+### Required Arguments
+- `prompt_name`: Name of the prompt from prompts config (e.g., "ComprehensiveV1")
+- `operation`: One of the following:
+  - `create`: Create batch files for all companies
+  - `submit`: Submit and monitor all batches
+  - `all`: Create and submit batches in sequence
+
+### Features
+- **Automatic batching**: Creates one batch per company to stay within OpenAI limits
+- **Token management**: Tracks queue usage and waits when limits are reached
+- **Error recovery**: Falls back to individual API calls if batch API fails
+- **Progress tracking**: Monitors all batches and saves results to database
+- **Resume capability**: Can restart from where it left off if interrupted
+
+### Example Usage
+```bash
+# Create batches for all companies
+bash ./src/bash/run_big_batch.sh SimpleCapacityV8.1.1 create
+
+# Submit and monitor all batches
+bash ./src/bash/run_big_batch.sh SimpleCapacityV8.1.1 submit
+
+# Create and submit in one command
+bash ./src/bash/run_big_batch.sh SimpleCapacityV8.1.1 all
+```
+
+Progress is tracked in `data/batch-tracker.csv` and results are automatically saved to the database as batches complete.
+
+Recommentations:
+- Run the create procedure individually first, and then the submission.
+- Resume submit procedure if necessary to accommodate rate limitations in batch or individual API submissions

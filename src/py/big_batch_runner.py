@@ -556,23 +556,33 @@ class BatchTracker:
     def get_progress_summary(self) -> str:
         """Get a summary of batch processing progress."""
         total_batches = len(self.df)
-        completed = len(self.df[self.df['status'] == 'completed'])
+        
+        # Count different types of completed batches
+        batch_completed = len(self.df[self.df['status'] == 'completed'])
+        api_completed = len(self.df[self.df['status'] == 'api_completed'])
+        api_partial = len(self.df[self.df['status'] == 'api_partial'])
         in_progress = len(self.df[self.df['status'] == 'in_progress'])
         failed = len(self.df[self.df['status'] == 'failed'])
-        pending = total_batches - completed - in_progress - failed
-        saved_to_db = self.df['saved_to_db'].sum()
+        
+        # Calculate total completed (including partial completions)
+        total_completed = batch_completed + api_completed + api_partial
+        pending = total_batches - total_completed - in_progress - failed
         
         # Calculate progress percentage
-        progress = (completed + failed) / total_batches * 100 if total_batches > 0 else 0
+        progress = (total_completed + failed) / total_batches * 100 if total_batches > 0 else 0
         
         # Get current queue size
         queue_size = self.get_submitted_tokens_local()
         queue_percent = (queue_size / MAX_TOKENS_IN_QUEUE) * 100
         
-        return (f"\nProgress: {progress:.1f}% ({completed + failed}/{total_batches} batches)\n"
-                f"Status: {completed} completed, {in_progress} in progress, {failed} failed, {pending} pending\n"
+        # Count saved to DB (both batch and individual API processing)
+        saved_to_db = len(self.df[self.df['saved_to_db'] == True])
+        
+        return (f"\nProgress: {progress:.1f}% ({total_completed + failed}/{total_batches} batches)\n"
+                f"Status: {batch_completed} batch completed, {api_completed} api completed, {api_partial} api partial, "
+                f"{in_progress} in progress, {failed} failed, {pending} pending\n"
                 f"Queue: {queue_size:,} tokens ({queue_percent:.1f}% of limit)\n"
-                f"Saved to DB: {saved_to_db}/{completed}")
+                f"Saved to DB: {saved_to_db}/{total_completed}")
 
 def process_batch_with_individual_calls(batch_file: str, prompt_name: str, processor: BatchProcessor) -> Tuple[bool, int]:
     """
