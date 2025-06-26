@@ -130,3 +130,6 @@ Progress is tracked in `data/batch-tracker.csv` and results are automatically sa
 Recommentations:
 - Run the create procedure individually first, and then the submission.
 - Resume submit procedure if necessary to accommodate rate limitations in batch or individual API submissions
+
+## Exporting high scorer excel sheet with transcript information
+Note: a bit sloppy atm

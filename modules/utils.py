@@ -101,3 +101,123 @@ def token_size(text: str) -> int:
     """
     encoding = tiktoken.get_encoding("o200k_base")
     return len(encoding.encode(text))
+
+def extract_invalid_response(response_string: str, keys: List[str]) -> Dict:
+    """
+    Extract data from a badly formatted JSON string that can't be parsed as JSON.
+    
+    Args:
+        response_string: The badly formatted JSON string
+        keys: List of known keys that should be present in the response
+        
+    Returns:
+        Dict: Dictionary with extracted key-value pairs
+    """
+    # Reduce any existing spaces to a single space
+    response_string = re.sub(r'\s+', ' ', response_string)
+    
+    # Eliminate any backslash
+    response_string = response_string.replace('\\', '')
+    
+    # Split response using the known keys (including their double quotes)
+    parts = []
+    current_pos = 0
+    
+    for key in keys:
+        key_with_quotes = f'"{key}"'
+        pos = response_string.find(key_with_quotes, current_pos)
+        if pos != -1:
+            parts.append((key, pos))
+            current_pos = pos + len(key_with_quotes)
+    
+    # Sort parts by position
+    parts.sort(key=lambda x: x[1])
+    
+    result = {}
+    
+    # Process each part
+    for i, (key, pos) in enumerate(parts):
+        if key == "score":
+            # Extract the first integer found between "score" and the next key or end
+            start_pos = pos + len(f'"{key}"')
+            if i + 1 < len(parts):
+                end_pos = parts[i + 1][1]
+            else:
+                end_pos = len(response_string)
+            
+            text_between = response_string[start_pos:end_pos]
+            # Find the first integer
+            match = re.search(r'\d+', text_between)
+            if match:
+                result[key] = int(match.group())
+            else:
+                result[key] = None
+                
+        elif key == "reasoning":
+            # Extract everything after the first colon, clean up the string
+            start_pos = pos + len(f'"{key}"')
+            if i + 1 < len(parts):
+                end_pos = parts[i + 1][1]
+            else:
+                end_pos = len(response_string)
+            
+            text_between = response_string[start_pos:end_pos]
+            # Find everything after the first colon
+            colon_pos = text_between.find(':')
+            if colon_pos != -1:
+                reasoning_text = text_between[colon_pos + 1:]
+                # Remove all symbols and spaces before the first letter character
+                first_letter_pos = -1
+                for j, char in enumerate(reasoning_text):
+                    if char.isalpha():
+                        first_letter_pos = j
+                        break
+                
+                if first_letter_pos != -1:
+                    reasoning_text = reasoning_text[first_letter_pos:]
+                    # Remove everything from the end after the last letter character
+                    last_letter_pos = -1
+                    for j in range(len(reasoning_text) - 1, -1, -1):
+                        if reasoning_text[j].isalpha():
+                            last_letter_pos = j
+                            break
+                    
+                    if last_letter_pos != -1:
+                        reasoning_text = reasoning_text[:last_letter_pos + 1]
+                    
+                    result[key] = reasoning_text.strip()
+                else:
+                    result[key] = ""
+            else:
+                result[key] = ""
+                
+        elif key == "excerpts":
+            # Extract everything after the first colon
+            start_pos = pos + len(f'"{key}"')
+            if i + 1 < len(parts):
+                end_pos = parts[i + 1][1]
+            else:
+                end_pos = len(response_string)
+            
+            text_between = response_string[start_pos:end_pos]
+            colon_pos = text_between.find(':')
+            if colon_pos != -1:
+                excerpts_text = text_between[colon_pos + 1:]
+                
+                # Check if there are square brackets
+                open_bracket = excerpts_text.find('[')
+                close_bracket = excerpts_text.find(']')
+                
+                if open_bracket != -1:
+                    if close_bracket != -1:
+                        # Take text between brackets
+                        excerpts_text = excerpts_text[open_bracket + 1:close_bracket]
+                    else:
+                        # Take everything after open bracket
+                        excerpts_text = excerpts_text[open_bracket + 1:]
+                
+                result[key] = excerpts_text.strip()
+            else:
+                result[key] = ""
+    
+    return result

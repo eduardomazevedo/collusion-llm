@@ -203,8 +203,12 @@ class ScoreReasonExcerpts(BaseModel):
     reasoning: str
     excerpts: list[str]
 
+class SimpleExcerptAnalyzer(BaseModel):
+    score: int
+
 # Map response format names to Pydantic models
 RESPONSE_FORMAT_CLASSES = {
+    "SimpleExcerptAnalyzer": SimpleExcerptAnalyzer,
     "ResponseBinary": ResponseBinary,
     "ResponseScore": ResponseScore,
     "ResponseSignals": ResponseSignals,
@@ -220,4 +224,5 @@ RESPONSE_FORMAT_CLASSES = {
     "CapacityScoreReasoning": CapacityScoreReasoning,
     "PriceCapacity": PriceCapacity,
     "ScoreReasonExcerpts": ScoreReasonExcerpts,
+    "SimpleExcerptAnalyzer": SimpleExcerptAnalyzer,
 }

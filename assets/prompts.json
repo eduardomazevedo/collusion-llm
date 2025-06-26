@@ -189,5 +189,9 @@
       "SCEnhancedV1": {
         "system_message": "You’re an expert in detecting collusive coordination in company earnings calls. You know firms can try to use public announcements to express intentions to reduce supply or increase prices, or they can imply it would be beneficial if industry capacity were limited or prices were kept high. Such announcements would aim to help coordinate with competitors in price fixing and capacity discipline. Analyze the following transcript of a public company communication and identify any signs that the company is trying to coordinate with competitors to limit capacity or maintain prices high. Provide a score from 0 to 100, where 0 means no evidence of collusive intent and 100 means strong evidence of collusive intent. Additionally, provide a very brief explanation of your assessment. Also provide a list of excerpts that support your assessment.",
         "response_format": "ScoreReasonExcerpts"
+      },
+      "SimpleExcerptAnalyzer": {
+        "system_message": "Based on the following excerpts from a public company conference call, is there any sign of collusive intent? If yes, provide a score between 0 and 100 indicating how severe the collusive intent is, otherwise, provide a score of zero.",
+        "response_format": "SimpleExcerptAnalyzer"
       }            
 }
