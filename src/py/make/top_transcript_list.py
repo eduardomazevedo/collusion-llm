@@ -7,7 +7,6 @@ This script:
 3. Extracts the "score" field from the JSON response
 4. Keeps only rows with score >= 75
 5. Saves only the transcript_id column to data/top_transcripts.csv
-6. Does not load the entire database into memory
 """
 
 import sys
