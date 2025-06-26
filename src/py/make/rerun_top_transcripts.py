@@ -2,7 +2,9 @@
 #%%
 """
 Script to rerun batch processing for top transcripts using SimpleCapacityV8.1.1 prompt.
-Run interactively for debugging.
+We start from data/top_transcripts.csv list, which has the transcripts with score >= 75 in the first run (about 4500).
+Then run 10 queries on each otherm and upload to the database.
+Run interactively, as we have to wait for the batch to complete to get the results. Took about 3 hours in 2025-06-26.
 """
 
 import os
@@ -38,63 +40,86 @@ transcript_ids = [tid for tid in transcript_ids if tid != 3374921]
 print(f"Loaded {len(transcript_ids)} transcript IDs")
 print(f"First 10 IDs: {transcript_ids[:10]}")
 
+#%% Split into batches of 500
+batch_size = 500
+num_batches = len(transcript_ids) // batch_size
+batches = [transcript_ids[i:i+batch_size] for i in range(0, len(transcript_ids), batch_size)]
+print(f"Split into {len(batches)} batches")
+print(f"First batch: {batches[0]}")
+
+
+
 #%% Create batch input file
 prompt_name = "SimpleCapacityV8.1.1"
-output_path = os.path.join(batch_output_dir, f"{prompt_name}_top_transcripts_input.jsonl")
-
-print(f"Creating batch input file...")
-print(f"Prompt: {prompt_name}")
-print(f"Number of transcripts: {len(transcript_ids)}")
-print(f"Output path: {output_path}")
-
 processor = BatchProcessor(temperature=1.0, max_tokens=500)
-input_file = processor.create_batch_input_file(
-    prompt_name=prompt_name,
-    transcript_ids=transcript_ids,
-    output_path=output_path
-)
-print(f"✓ Batch input file created successfully: {input_file}")
+
+print(f"Creating batch input files for {len(batches)} batches...")
+print(f"Prompt: {prompt_name}")
+
+input_files = []
+for i, batch in enumerate(batches):
+    output_path = os.path.join(batch_output_dir, f"{prompt_name}_top_transcripts_batch_{i+1}_input.jsonl")
+    
+    print(f"\nBatch {i+1}/{len(batches)}:")
+    print(f"  Number of transcripts: {len(batch)}")
+    print(f"  Output path: {output_path}")
+    
+    input_file = processor.create_batch_input_file(
+        prompt_name=prompt_name,
+        transcript_ids=batch,
+        output_path=output_path
+    )
+    input_files.append(input_file)
+    print(f"  ✓ Batch input file created successfully: {input_file}")
+
+print(f"\n✓ All {len(input_files)} batch input files created successfully")
 
 #%% Submit batch job
-print(f"Submitting batch job...")
-print(f"Input file: {input_file}")
+n_runs_per_transcript = 10
+print(f"Submitting {len(input_files)} batch jobs {n_runs_per_transcript} times each...")
 
-batch_id = processor.submit_batch(input_file)
-print(f"✓ Batch job submitted successfully")
-print(f"Batch ID: {batch_id}")
+batch_ids = []
+for run in range(n_runs_per_transcript):
+    print(f"\n=== Run {run + 1}/{n_runs_per_transcript} ===")
+    
+    for i, input_file in enumerate(input_files):
+        print(f"\nBatch {i+1}/{len(input_files)} (Run {run + 1}):")
+        print(f"  Input file: {input_file}")
+        
+        batch_id = processor.submit_batch(input_file)
+        batch_ids.append(batch_id)
+        print(f"  ✓ Batch job submitted successfully")
+        print(f"  Batch ID: {batch_id}")
+
+print(f"\n✓ All {len(batch_ids)} batch jobs submitted successfully")
+print(f"Total batch IDs: {len(batch_ids)}")
+print(f"Batch IDs: {batch_ids}")
 
 #%% Monitor batch status (run this cell to check progress)
-print(f"Monitoring batch status for ID: {batch_id}")
+total_tasks_completed = 0
+total_tasks = 0
+total_batches_completed = 0
+total_tasks_failed = 0
 
-status_info = processor.check_batch_status(batch_id)
-print(f"Status: {status_info['status']}")
-print(f"Completed: {status_info['completed']}")
-print(f"Failed: {status_info['failed']}")
-print(f"Total: {status_info['total']}")
-print(f"Success Rate: {status_info['success_rate']:.1f}%")
+for i, batch_id in enumerate(batch_ids):
+    status_info = processor.check_batch_status(batch_id)
+    
+    total_tasks_completed += status_info['completed']
+    total_tasks += status_info['total']
+    total_tasks_failed += status_info['failed']
+    
+    if status_info['status'] == 'completed':
+        total_batches_completed += 1
 
-if status_info['error']:
-    print(f"Error: {status_info['error']}")
+print(f"Progress: {total_tasks_completed}/{total_tasks} tasks completed ({total_tasks_completed/total_tasks*100:.1f}%)")
+print(f"Failed tasks: {total_tasks_failed}")
+print(f"Batches completed: {total_batches_completed}/{len(batch_ids)} ({total_batches_completed/len(batch_ids)*100:.1f}%)")
 
 #%% Process batch results (run this when batch is completed)
-print(f"Processing batch results for ID: {batch_id}")
-print(f"Prompt: {prompt_name}")
+for i, batch_id in enumerate(batch_ids):
+    print(f"\nProcessing batch results for ID: {batch_id} ({i+1}/{len(batch_ids)})")
+    print(f"Prompt: {prompt_name}")
 
-results = processor.process_batch_results(batch_id, prompt_name)
-print(f"✓ Batch results processed successfully")
-print(f"Number of results: {len(results)}")
-
-#%% Check batch errors (run this if there are issues)
-print(f"Checking for errors in batch ID: {batch_id}")
-
-error_info = processor.check_batch_error(batch_id)
-print(f"Batch Status: {error_info['status']}")
-
-if error_info['error_message']:
-    print(f"Error Message: {error_info['error_message']}")
-
-if error_info['error_file_id']:
-    print(f"Error File ID: {error_info['error_file_id']}")
-    if error_info['error_content']:
-        print("\nError File Content:")
-        print(error_info['error_content']) 
+    results = processor.process_batch_results(batch_id, prompt_name)
+    print(f"✓ Batch results processed successfully")
+    print(f"Number of results: {len(results)}")
