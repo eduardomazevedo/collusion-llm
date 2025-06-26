@@ -10,6 +10,9 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 WRDS_USERNAME = os.getenv('WRDS_USERNAME')
 WRDS_PASSWORD = os.getenv('WRDS_PASSWORD')
 
+# LLM
+OPENAI_MODEL = "gpt-4o-mini"
+
 # Root folder
 ROOT = os.getenv('ROOT')
 
