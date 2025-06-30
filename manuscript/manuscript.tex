@@ -1,0 +1,49 @@
+\documentclass[12pt]{article}
+\usepackage{custom}
+
+% Data reading
+\newcommand{\data}[1]{\input{../output/constants/#1.txt}\unskip}
+
+% External references for any separately compiled online appendix.
+% \usepackage{xr}
+% \externaldocument{"appendix"}
+% \externaldocument{"manuscript"}
+
+\begin{document}
+\title{Title%
+\thanks{Thanks}
+}
+
+\author{Eduardo M. Azevedo% 
+\thanks{Wharton: 3733 Spruce Street, Philadelphia, PA 19104: eazevedo@wharton.upenn.edu, \url{https://eduardomazevedo.github.io/.}}
+\and John Smith% 
+\thanks{}
+}
+
+\date{
+First version: XXX \\
+This version: \today}
+
+\maketitle
+
+\begin{abstract}%
+Abstract%
+\end{abstract}
+
+\newpage
+
+\section{\label{sec:intro}Introduction}
+\input{introduction.tex}
+
+\printbibliography
+
+\appendix
+\newpage
+\begin{center}
+{\huge Appendix}{\huge\par}
+\par\end{center}
+
+\section{Proofs\label{sec:appendix-proofs}}
+% \input{appendix-proofs.tex}
+
+\end{document}

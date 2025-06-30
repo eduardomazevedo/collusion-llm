@@ -1,0 +1,72 @@
+\ProvidesPackage{custom}
+
+% Character encoding
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+
+% Bibliography with biber backend
+\RequirePackage[backend=biber, style=authoryear, sorting=nyt]{biblatex}
+% Add bibliography resource file
+\addbibresource{bibliography.bib}
+
+% Fonts
+\RequirePackage{mathpazo}
+
+% Colors
+\RequirePackage{xcolor}
+\definecolor{ghibli_palette_red}{RGB}{255, 92, 92}
+\definecolor{ghibli_palette_gold}{RGB}{255, 215, 0}
+\definecolor{ghibli_palette_deep_teal}{RGB}{59, 105, 120}
+\definecolor{ghibli_palette_cream}{RGB}{249, 245, 227}
+\definecolor{ghibli_palette_light_gray}{RGB}{218, 218, 218}
+\definecolor{ghibli_palette_gray}{RGB}{108, 122, 142}
+\definecolor{ghibli_palette_blue}{RGB}{143, 177, 233}
+\definecolor{ghibli_palette_green}{RGB}{166, 215, 132}
+\definecolor{ghibli_palette_muted_green}{RGB}{132, 165, 157}
+\definecolor{ghibli_palette_warm_red}{RGB}{242, 132, 130}
+
+% Essential packages
+\RequirePackage{graphicx}
+\RequirePackage{amsmath}
+\RequirePackage{amsthm}
+\RequirePackage{amssymb}
+\RequirePackage{fullpage}
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{subcaption}
+
+% Apply the color links
+\hypersetup{
+    colorlinks=true,       % Enable colored links
+    linkcolor=ghibli_palette_red,      % Color for internal links (e.g., equations, sections)
+    citecolor=ghibli_palette_deep_teal,      % Color for citations
+    urlcolor=ghibli_palette_deep_teal        % Color for URLs
+}
+
+% Theorem environments setup
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+% Appendix counter management
+\RequirePackage{chngcntr}
+\RequirePackage{apptools}
+\AtAppendix{
+    \counterwithin{proposition}{section}
+    \counterwithin{assumption}{section}
+    \counterwithin{theorem}{section}
+    \counterwithin{lemma}{section}
+    \counterwithin{corollary}{section}
+    \counterwithin{equation}{section}
+}
+
+% Mathematical notation
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\ubar}[1]{\text{\b{$#1$}}}
+
+\endinput
