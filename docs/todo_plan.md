@@ -30,7 +30,7 @@
 - Major issue: **High false positive rate**
 - Suggested use: As a **discovery tool** to assist human lawyers
 - 📌 **TODO [EDUARDO]**:
-  - Improve the leaderboard to include a clear, high-quality performance metric
+  - Let's focus on MSE relative to Joe's coding as our main metric.
   - Apply this metric to both our model and runner-up models
 - 📌 **TODO [JOE]**:
   - Create a dataset of the top 100 results
@@ -42,11 +42,11 @@
 - Aim: Evaluate what contributes to performance improvements
 - 📌 **TODO [EDUARDO]**:
   - After benchmarking is finalized:
-    - Run experiments varying:
-      - Number of queries (1x, 10x)
+    - Run experiments varying (using our main prompt SimpleCapacityV8.1.1):
+      - Number of queries (1x, 10x) ---> Ran Joe's prompts 10 times.
+      - Model.
       - Follow-up queries
       - Use of prior queries
-      - Older vs newer models
 
 ---
 

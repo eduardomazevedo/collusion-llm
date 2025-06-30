@@ -47,3 +47,42 @@ Thumbs.db
 
 # Ignore scratch.py
 scratch.py
+
+# LaTeX temporary files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.xdv
+*.bcf
+*.run.xml
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.loa
+*.lol
+*.maf
+*.mtc
+*.mtc1
+*.slg
+*.sls
+*.svn
+*.bak
+*.tmp
+*.swp
+*.swo
+*~
