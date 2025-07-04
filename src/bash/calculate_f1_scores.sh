@@ -61,7 +61,7 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --prompt PROMPT_NAME           Specific prompt name to analyze (default: all prompts)"
             echo "  --threshold THRESHOLD          Threshold for LLM score binary conversion (default: 75.0)"
-            echo "  --joe-threshold THRESH         Threshold for Joe's score binary conversion (default: 50.0)"
+            echo "  --joe-threshold THRESHOLD      Threshold for Joe's score binary conversion (default: 50.0)"
             echo "  --analysis-threshold THRESHOLD Threshold for analysis score validation (default: 75.0)"
             echo "  --output OUTPUT_PATH           Output CSV file path (default: data/f1_scores.csv)"
             echo "  --detailed                     Print detailed metrics including confusion matrices"

@@ -94,8 +94,19 @@ Idea 2: chunks (later, more tedious; need to decide how fancy we want to be)
 **DONE** Idea 3: second LLM call (Ioan to implement)
 - on excerpts, says whether it’s indeed collusive (need a new table that references the query id of the original table, but all other identifying stuff shouldn’t be repeated)
 
+------------------------------------------------------------------------------------------------------------------------------
+
+Running the prompt SimpleCapacityV8.1.1 1x on joe and acl test sample using other models from openai for benchmarking
+Models:
+gpt-3.5-turbo-0125 (0.5/M input) --> doesn't support structured output
+gpt-4o-mini-2024-07-18 (0.15/M input)
+gpt-4.1-nano-2025-04-14 (0.1/M input) DONE
+gpt-4.1-mini-2025-04-14 (0.4/M input) DONE
+o4-mini-2025-04-16 (1.1/M input) almost DONE
 
 
-
+Considerations:
+- in create_leaderboard.py instead of simply loading the responses as json and extrracting score, try that first, but if we can't read the json because it doesn't have valid json format, use utils function extract_invalid_response and take the score value from that
+- add another function in create_leaderboard.py called calculate_F1 similar to the functions that calculate accuracies; this function should returns the F1 score based on the recall and precision of the LLM response score versus the test sample values (using )
 
 
