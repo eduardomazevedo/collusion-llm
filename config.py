@@ -11,7 +11,7 @@ WRDS_USERNAME = os.getenv('WRDS_USERNAME')
 WRDS_PASSWORD = os.getenv('WRDS_PASSWORD')
 
 # LLM
-OPENAI_MODEL = "gpt-4o-mini"
+OPENAI_MODEL = "o4-mini-2025-04-16"
 
 # Root folder
 ROOT = os.getenv('ROOT')

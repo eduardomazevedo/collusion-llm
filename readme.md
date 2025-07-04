@@ -66,6 +66,34 @@ bash ./src/bash/update_leaderboard.sh --sort acl_pos_precision
 
 The leaderboard is sorted by `combined_accuracy` in descending order by default, but you can sort by any other metric using the `--sort` option. For example, if false positives are more costly than false negatives, you might want to sort by precision metrics.
 
+## Benchmarking LLM Performance
+
+Calculate comprehensive performance metrics (precision, recall, F1, specificity) against human-reviewed datasets:
+
+```bash
+bash ./src/bash/calculate_f1_scores.sh [options]
+```
+
+### Options
+- `--prompt <name>`: Analyze specific prompt (default: all prompts)
+- `--threshold <value>`: LLM score threshold for binary conversion (default: 75.0)
+- `--joe-threshold <value>`: Joe's score threshold for binary conversion (default: 50.0)
+- `--analysis-threshold <value>`: Analysis validation threshold (default: 75.0)
+- `--detailed`: Show detailed metrics including confusion matrices
+- `--output <path>`: Output CSV file path (default: data/f1_scores.csv)
+
+### Example
+```bash
+# Compare different threshold configurations
+bash ./src/bash/calculate_f1_scores.sh --prompt SimpleCapacityV8.1.1 --threshold 75 --joe-threshold 50 --analysis-threshold 50 --detailed
+```
+
+The benchmarking evaluates multiple approaches:
+- **Non-interactive**: Single response or averaged responses
+- **Agentic**: Repeated high-scoring responses, analysis-based validation
+
+Results include metrics for Joe's subsample, ACL's subsample, and pooled data.
+
 ## Database Export (for review)
 The project uses SQLite for storing query results. The database is stored in `data/queries.db`. To export the database to CSV:
 

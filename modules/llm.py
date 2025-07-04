@@ -28,7 +28,7 @@ from modules.queries_db import insert_query_result
 class LLMQuery:
     """Class to manage LLM queries across multiple providers."""
 
-    def __init__(self, provider="openai", model=None, prompts_path=None, temperature=1.0, max_tokens=500):
+    def __init__(self, provider="openai", model=None, prompts_path=None, temperature=1.0, max_tokens=2000):
         """
         Initializes the LLMQuery class.
 
@@ -39,7 +39,7 @@ class LLMQuery:
         :param max_tokens: Maximum number of tokens in the response (default: 500).
         """
         self.provider = provider.lower()
-        self.model = model or getattr(config, "OPENAI_MODEL", "gpt-4o-mini")
+        self.model = model or getattr(config, "OPENAI_MODEL", "o4-mini-2025-04-16")
         self.prompts_path = prompts_path or config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
@@ -81,14 +81,23 @@ class LLMQuery:
             {"role": "user", "content": user_input},
         ]
 
+        # Determine which parameter to use based on model
+        # Newer models (o1, o4, etc.) use max_completion_tokens
+        completion_params = {
+            "model": self.model,
+            "messages": messages,
+            "response_format": response_model,  # Directly pass Pydantic model
+            "temperature": self.temperature,
+        }
+        
+        # Check if this is a newer model that requires max_completion_tokens
+        if self.model.startswith(('o1', 'o4', 'gpt-4o-2024-08-06')):
+            completion_params["max_completion_tokens"] = self.max_tokens
+        else:
+            completion_params["max_tokens"] = self.max_tokens
+
         # Use OpenAI's `.parse()` method with a Pydantic model
-        completion = self.client.beta.chat.completions.parse(
-            model=self.model,
-            messages=messages,
-            response_format=response_model,  # Directly pass Pydantic model
-            temperature=self.temperature,
-            max_tokens=self.max_tokens
-        )
+        completion = self.client.beta.chat.completions.parse(**completion_params)
 
         # Extract token usage
         usage = completion.usage
@@ -110,28 +119,50 @@ class LLMQuery:
         print(f"\nStarting to process {len(transcript_ids)} transcripts with prompt '{prompt_name}'...")
         transcript_texts = capiq.get_transcripts(transcript_ids)
         results = {}
+        failed_transcripts = []
 
         for i, transcript_id in enumerate(transcript_ids, 1):
             print(f"\nProcessing transcript {i}/{len(transcript_ids)} (ID: {transcript_id})...")
-            response, token_info = self.generate_response(prompt_name, transcript_texts[transcript_id])
-            results[transcript_id] = response
-            
-            # Save to database with metadata
-            insert_query_result(
-                prompt_name=prompt_name,
-                transcript_id=transcript_id,
-                response=response,
-                llm_provider=self.provider,
-                model_name=self.model,
-                call_type="single",
-                temperature=self.temperature,
-                max_response=self.max_tokens,
-                input_tokens=token_info['input_tokens'],
-                output_tokens=token_info['output_tokens']
-            )
-            print(f"✓ Saved response to database")
+            try:
+                response, token_info = self.generate_response(prompt_name, transcript_texts[transcript_id])
+                results[transcript_id] = response
+                
+                # Save to database with metadata
+                insert_query_result(
+                    prompt_name=prompt_name,
+                    transcript_id=transcript_id,
+                    response=response,
+                    llm_provider=self.provider,
+                    model_name=self.model,
+                    call_type="single",
+                    temperature=self.temperature,
+                    max_response=self.max_tokens,
+                    input_tokens=token_info['input_tokens'],
+                    output_tokens=token_info['output_tokens']
+                )
+                print(f"✓ Saved response to database")
+            except Exception as e:
+                error_type = type(e).__name__
+                print(f"✗ Failed to process transcript {transcript_id}: {error_type}: {str(e)}")
+                failed_transcripts.append((transcript_id, str(e)))
+                
+                # Special handling for length limit errors
+                if error_type == "LengthFinishReasonError":
+                    print(f"  → Response exceeded max_tokens limit ({self.max_tokens}). Consider increasing max_tokens.")
 
-        print(f"\nCompleted processing all {len(transcript_ids)} transcripts!")
+        # Summary
+        successful_count = len(results)
+        failed_count = len(failed_transcripts)
+        print(f"\n{'='*60}")
+        print(f"Processing complete!")
+        print(f"  ✓ Successfully processed: {successful_count}/{len(transcript_ids)} transcripts")
+        if failed_count > 0:
+            print(f"  ✗ Failed: {failed_count} transcripts")
+            print(f"\nFailed transcript IDs:")
+            for tid, error in failed_transcripts:
+                print(f"    - {tid}: {error}")
+        print(f"{'='*60}\n")
+        
         return results
 
 

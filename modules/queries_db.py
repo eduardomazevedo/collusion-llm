@@ -36,7 +36,7 @@ def insert_analysis_result(
     prompt_name: str,
     response: str,
     llm_provider: str = "openai",
-    model_name: str = "gpt-4o-mini",
+    model_name: str = "o4-mini-2025-04-16",
     call_type: str = "single",
     temperature: float = None,
     max_response: int = None,
@@ -51,7 +51,7 @@ def insert_analysis_result(
         prompt_name: Name of the analysis prompt used
         response: The LLM response
         llm_provider: The LLM provider (e.g. "openai")
-        model_name: The model name (e.g. "gpt-4o-mini")
+        model_name: The model name (e.g. "o4-mini-2025-04-16")
         call_type: Type of call ("single" or "batch")
         temperature: Temperature setting used
         max_response: Maximum response tokens
@@ -83,7 +83,7 @@ def insert_query_result(
     transcript_id: int,
     response: str,
     llm_provider: str = "openai",
-    model_name: str = "gpt-4o-mini",
+    model_name: str = "o4-mini-2025-04-16",
     call_type: str = "single",
     temperature: float = None,
     max_response: int = None,
@@ -98,7 +98,7 @@ def insert_query_result(
         transcript_id: ID of the transcript
         response: The LLM response
         llm_provider: The LLM provider (e.g. "openai")
-        model_name: The model name (e.g. "gpt-4o-mini")
+        model_name: The model name (e.g. "o4-mini-2025-04-16")
         call_type: Type of call ("single" or "batch")
         temperature: Temperature setting used
         max_response: Maximum response tokens
