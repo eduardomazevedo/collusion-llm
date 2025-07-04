@@ -79,6 +79,27 @@ pytest tests/modules/test_llm.py
 pytest --cov=modules tests/
 ```
 
+### LaTeX Manuscript Compilation
+```bash
+# Compile the manuscript with bibliography
+bash ./src/bash/compile_manuscript.sh
+
+# The script handles the full pdflatex + biber workflow automatically
+# Output PDF: manuscript/manuscript.pdf
+
+# Auto-compile on file changes (watches .tex, .bib, .sty files)
+bash ./src/bash/watch_manuscript.sh      # Uses fswatch (more efficient)
+# OR
+bash ./src/bash/watch_manuscript_simple.sh  # Simple polling method
+
+# The watcher will:
+# - Run initial compilation
+# - Monitor for changes every 2 seconds
+# - Auto-recompile when files are saved
+# - Show colored status messages
+# - Press Ctrl+C to stop
+```
+
 ## Key Modules and Their Purposes
 
 - **`modules/llm.py`**: Core LLM interface for OpenAI API calls
