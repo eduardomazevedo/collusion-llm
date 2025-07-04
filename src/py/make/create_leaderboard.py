@@ -95,7 +95,7 @@ def calculate_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str
 def performance_score(
     prompt_name: str,
     test_set: str = 'all',
-    binary_threshold: float = 65.0
+    binary_threshold: float = 75.0
 ) -> Dict[str, float]:
     """
     Calculate performance scores for a prompt.
