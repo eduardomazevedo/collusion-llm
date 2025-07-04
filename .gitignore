@@ -86,3 +86,6 @@ scratch.py
 *.swp
 *.swo
 *~
+
+# PDF files (generated from LaTeX)
+*.pdf
