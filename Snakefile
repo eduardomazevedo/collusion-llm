@@ -9,6 +9,7 @@ rule all:
         "data/gvkey_table.feather",
         "data/gvkey_list.txt",
         "data/company-year-compustat.parquet",
+        "data/main-analysis-dataset.feather",
         "output/yaml/transcript-stats.yaml",
         "output/constants/.populated"
 
@@ -50,6 +51,23 @@ rule company_year_dataset:
         "data/company-year-compustat.parquet"
     shell:
         "python src/py/make/company-year-dataset.py"
+
+rule main_dataset:
+    """
+    Create the main analysis dataset at the transcript level.
+    Combines transcript details, human ratings, LLM flags, and Compustat data.
+    Creates binary flags for human and LLM collusion detection.
+    """
+    input:
+        transcript_detail="data/transcript-detail.feather",
+        compustat="data/company-year-compustat.parquet",
+        human_ratings="data/human-ratings.csv",
+        top_transcripts="data/top_transcripts.csv",
+        queries_db="data/queries.sqlite"
+    output:
+        "data/main-analysis-dataset.feather"
+    shell:
+        "python src/py/make/main_dataset.py"
 
 rule transcript_data_stats:
     """
