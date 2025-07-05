@@ -1,3 +1,10 @@
+# Working on downstream analysis.
+  - See below for creating and updating the queries database.
+  - For downstream analysis:
+    - `bash ./src/bash/setup.sh`
+    - download a query database `bash ./src/bash/manage_db.sh download`.
+    - `snakemake --cores 2` to reproduce analysis.
+
 # Setup
   - `rclone config` to set rclone remote `collusion-llm` pointing to Google drive folder.
   - `bash ./src/bash/setup.sh` 

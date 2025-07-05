@@ -145,4 +145,5 @@ dependencies = [
     "widgetsnbextension==4.0.13",
     "zipp==3.21.0",
     "tooldantic @ git+https://github.com/nicholishen/tooldantic.git",
+    "snakemake>=9.7.1",
 ]
