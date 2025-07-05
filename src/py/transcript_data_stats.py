@@ -67,9 +67,9 @@ total_length_years = total_length_days / 365.25  # Account for leap years
 
 # Create description of total length
 if total_length_years >= 1:
-    total_length_description = f"{total_length_years:.2f} years ({total_length_days:.1f} days, {total_length_hours:.1f} hours)"
+    total_length_description = f"{total_length_years:.2f} years"
 elif total_length_days >= 1:
-    total_length_description = f"{total_length_days:.1f} days ({total_length_hours:.1f} hours)"
+    total_length_description = f"{total_length_days:.1f} days"
 else:
     total_length_description = f"{total_length_hours:.1f} hours"
 
