@@ -89,3 +89,6 @@ scratch.py
 
 # PDF files (generated from LaTeX)
 *.pdf
+
+# snakemake
+*.snakemake/
