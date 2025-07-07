@@ -1,1 +1,22 @@
-Hello, world! Here is a citation: \textcite{harrington2022collusion}.
+Some firms use public communications to facilitate collusive behavior. Previous research documents this in airlines \parencite{aryal2022coordinated}, generic pharmaceuticals, print advertising, truck rentals, steel, and meatpacking \parencite{harrington2022collusion}. This paper investigates this behavior at scale in a large corpora of 500,000 corporate earnings calls. We use natural language processing with large language models (LLMs) to sift through the data and identify collusive language.
+
+The following two earnings calls tagged as collusive by the LLM capture the gist of our findings. Smithfield Foods is the world largest pork producer. In Smithfield's Q4 2009 earnings call, CEO Larry Pope stated:
+
+\begin{quote}
+We have initiated a third round of sow herd reductions and we will be reducing our herds another 3\% effective immediately\ldots So from our standpoint, we're doing our part in this industry to continue to rightsize the business from a production standpoint to match the demand\ldots I think we solidly need a 10\% cut back. I think that would make the industry very profitable.
+\end{quote}
+
+This is an example where the LLM rediscovered commnication that is widely thought to be facilitating collusion. \textcite{harrington2022collusion} studied the Smithfield case, and argues that this and other statements facilitated collusive behavior. He argues that the CEO suggests that the industry should reduce supply, and states that Smithfield is ``doing its part''. A 2018 private anti-trust lawsuit accused Smithfield and other producers of violating section 1 of the Sherman Act, and colluding to fix prices. Smith settled in 2022 for 75 million dollars, and other producers face continuing litigation \parencite{inrepork2023, reuters2023smithfield}.
+
+Interestingly, the LLM search also tagged examples that were not previously known in the literature. Gol is Brazil's largest domestic airline. In a 2014 investor call, executies stated:
+
+\begin{quote}
+This scenario required very important actions on the part of the company. The first was to reduce the capacity. GOL Airlines, during this period, since 2011, reduced its offer of seats by 15\%. This reduction after a few months was followed by our main competitor, bringing to the Brazilian market a level of rationality that continues. (Paulo Kakinoff, CEO)
+
+I don't see the possibility for changes in this discipline. I don't see any opportunity to -- for the reduction in the oil prices to be translated into a reduction in the prices in the rates. (Constantino Jr., Chairman of the Board)
+\end{quote}
+
+There are no lawsuits against Gol over the statements, nor were they previously covered by economists and legal scholars. However, the statements are similar to those considered collusive by \textcite{aryal2022coordinated} in the American airlines industry. Thus, the LLM search discovered new cases of collusive public statements.
+
+We make four contributions. First, we show that LLMs can be used to identify collusive language. Second, we show that, while LLMs are useful, they make many mistakes, so that most of the calls identified as collusive by the LLMs are false positives. Thus, while LLMs produce useful output at low effort, they require careful human oversight to avoid mislabeling. Third, we create a benchmark dataset and investigate the performance of different methods. Fourth, we document the overall prevalence and correlates of collusive communications.
+
