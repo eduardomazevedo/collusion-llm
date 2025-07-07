@@ -1,6 +1,6 @@
 Some firms use public communications to facilitate collusive behavior. Previous research documents this in airlines \parencite{aryal2022coordinated}, generic pharmaceuticals, print advertising, truck rentals, steel, and meatpacking \parencite{harrington2022collusion}. This paper investigates this behavior at scale in a large corpora of 500,000 corporate earnings calls. We use natural language processing with large language models (LLMs) to sift through the data and identify collusive language.
 
-The following two earnings calls tagged as collusive by the LLM capture the gist of our findings. Smithfield Foods is the world largest pork producer. In Smithfield's Q4 2009 earnings call, CEO Larry Pope stated:
+The following three earnings calls tagged as collusive by the LLM capture the gist of our findings. The first example shows that LLM search can correctly discover collusive communications. Smithfield Foods is the world largest pork producer. In Smithfield's Q4 2009 earnings call, CEO Larry Pope stated:
 
 \begin{quote}
 We have initiated a third round of sow herd reductions and we will be reducing our herds another 3\% effective immediately\ldots So from our standpoint, we're doing our part in this industry to continue to rightsize the business from a production standpoint to match the demand\ldots I think we solidly need a 10\% cut back. I think that would make the industry very profitable.
@@ -8,7 +8,7 @@ We have initiated a third round of sow herd reductions and we will be reducing o
 
 This is an example where the LLM search rediscovered commnication that is thought to be facilitating collusion. \textcite{harrington2022collusion} studied the Smithfield case, and argues that this and other statements facilitated collusive behavior. He argues that the CEO suggests that the industry should reduce supply, and states that Smithfield is ``doing its part''. A 2018 private anti-trust lawsuit accused Smithfield and other producers of violating section 1 of the Sherman Act, and colluding to fix prices. Smith settled in 2022 for 75 million dollars, and other producers face continuing litigation \parencite{inrepork2023, reuters2023smithfield}. The LLM tagged this call as collusive, even though we did not specifically train it to do so. Of course, the LLM's base model is likely to have read \textcite{harrington2022collusion} during its training.
 
-Interestingly, the LLM search also tagged examples that were not previously known in the literature. Gol is Brazil's largest domestic airline. In a 2014 investor call, executies stated:
+The second exmple shows that the LLM search can find collusive communications that were not previously known in the literature. Gol is Brazil's largest domestic airline. In a 2014 investor call, executies stated:
 
 \begin{quote}
 This scenario required very important actions on the part of the company. The first was to reduce the capacity. GOL Airlines, during this period, since 2011, reduced its offer of seats by 15\%. This reduction after a few months was followed by our main competitor, bringing to the Brazilian market a level of rationality that continues. (Paulo Kakinoff, CEO)
@@ -17,6 +17,14 @@ I don't see the possibility for changes in this discipline. I don't see any oppo
 \end{quote}
 
 There are no lawsuits against Gol over the statements, nor were they previously covered by economists and legal scholars. However, the statements are similar to those considered collusive by \textcite{aryal2022coordinated} in the American airlines industry. Thus, the LLM search discovered new cases of potentially collusive public statements.
+
+Finally, the third example shows that the LLM search commonly makes mistakes. In fact, due to the rarity of collusive statements, most of the calls tagged as collusive by the LLMs are false positives. For example, the LLM tagged the following statement by Allegiant Travel Company executives as collusive:
+
+\begin{quote}
+We restricted capacity because of the spike in fuel prices we were experiencing\ldots Restricting capacity is critical in managing appropriate increases in fares\ldots Our tight capacity plan\ldots We do expect to see that number start to come in a little bit [for costs]\ldots We view it as tougher comps\ldots we feel really good about revenue\ldots
+\end{quote}
+
+We rated this call as not collusive, because it is simply discussing unilateral conduct in response to market conditions. We found that XXX\% of the top 100 calls rated as collusive were false positives. Thus, while this is a useful technique for research and for legal discovery, it requires careful human oversight to avoid mislabeling.
 
 We make four contributions. First, we show that LLMs can be used to identify collusive language. Second, we show that, while LLMs are useful, they make many mistakes, so that most of the calls identified as collusive by the LLMs are false positives. Thus, while LLMs produce useful output at low effort, they require careful human oversight to avoid mislabeling. Third, we create a benchmark dataset and investigate the performance of different methods. Fourth, we document the overall prevalence and correlates of collusive communications.
 
