@@ -12,16 +12,14 @@ import sys
 
 def load_human_ratings() -> pd.DataFrame:
     """Load human ratings from CSV file."""
-    df = pd.read_csv("data/human-ratings.csv")
-    # Rename column to match database
-    df = df.rename(columns={'transcriptid': 'transcript_id'})
+    df = pd.read_csv("data/human_ratings.csv")
     return df
 
 def load_llm_responses(prompt_name: str) -> pd.DataFrame:
     """Load LLM responses for a specific prompt from the database."""
     conn = sqlite3.connect("data/queries.sqlite")
     query = """
-    SELECT transcript_id, response, date
+    SELECT transcriptid, response, date
     FROM queries
     WHERE prompt_name = ?
     ORDER BY date DESC
@@ -113,7 +111,7 @@ def performance_score(
     llm_responses = load_llm_responses(prompt_name)
     
     # Merge human ratings with LLM responses
-    df = pd.merge(human_ratings, llm_responses, on='transcript_id', how='inner')
+    df = pd.merge(human_ratings, llm_responses, on='transcriptid', how='inner')
     
     scores = {}
     

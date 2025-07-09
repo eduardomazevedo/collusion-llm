@@ -5,7 +5,7 @@ import yaml
 from datetime import datetime
 
 # Load the transcript detail data
-data_path = os.path.join(config.DATA_DIR, 'transcript-detail.feather')
+data_path = os.path.join(config.DATA_DIR, 'transcript_detail.feather')
 df = pd.read_feather(data_path)
 
 # Print the variable names (column names)
@@ -17,18 +17,18 @@ print(f"\nDataset shape: {df.shape}")
 print(f"Number of rows: {df.shape[0]}")
 print(f"Number of columns: {df.shape[1]}")
 
-# Filter to transcripts with transcriptid in the transcript_id in
+# Filter to transcripts with transcriptid in the transcriptid in
 # the query database data/queries.sqlite
 import sqlite3
 
 # Connect to the queries database and get unique transcript IDs
 conn = sqlite3.connect(config.DATABASE_PATH)
-query_transcript_ids = pd.read_sql_query("SELECT DISTINCT transcript_id FROM queries", conn)
+query_transcript_ids = pd.read_sql_query("SELECT DISTINCT transcriptid FROM queries", conn)
 conn.close()
 
 # Filter the transcript data to only include transcripts that have queries
 initial_count = len(df)
-df_filtered = df[df['transcriptid'].isin(query_transcript_ids['transcript_id'])]
+df_filtered = df[df['transcriptid'].isin(query_transcript_ids['transcriptid'])]
 filtered_count = len(df_filtered)
 dropped_count = initial_count - filtered_count
 

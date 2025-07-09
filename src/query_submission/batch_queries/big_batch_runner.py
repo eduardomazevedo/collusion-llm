@@ -55,31 +55,31 @@ API_TO_INTERNAL = {
 
 def get_company_transcripts() -> pd.DataFrame:
     """
-    Get all companies and their transcripts from companies-transcripts.csv.
+    Get all companies and their transcripts from companies_transcripts.csv.
     
     Returns:
         DataFrame with companyid, companyname, transcriptid, and headline columns
     """
-    csv_path = os.path.join(config.DATA_DIR, 'companies-transcripts.csv')
+    csv_path = os.path.join(config.DATA_DIR, 'companies_transcripts.csv')
     try:
         return pd.read_csv(csv_path)
     except FileNotFoundError:
-        print(f"Error: Could not find companies-transcripts.csv at {csv_path}")
+        print(f"Error: Could not find companies_transcripts.csv at {csv_path}")
         return pd.DataFrame()
     except Exception as e:
-        print(f"Error reading companies-transcripts.csv: {str(e)}")
+        print(f"Error reading companies_transcripts.csv: {str(e)}")
         return pd.DataFrame()
 
 def get_transcript_tokens() -> Dict[int, int]:
     """
-    Get token sizes for all transcripts from transcript-tokens.csv.
+    Get token sizes for all transcripts from transcript_tokens.csv.
     
     Returns:
         Dictionary mapping transcript IDs to their token sizes
     """
-    csv_path = os.path.join(config.DATA_DIR, 'transcript-tokens.csv')
+    csv_path = os.path.join(config.DATA_DIR, 'transcript_tokens.csv')
     try:
-        print("\nReading transcript-tokens.csv...")
+        print("\nReading transcript_tokens.csv...")
         df = pd.read_csv(csv_path)
         print("\nCSV Info:")
         print(df.info())
@@ -104,10 +104,10 @@ def get_transcript_tokens() -> Dict[int, int]:
         print(f"\nCreated dictionary with {len(token_dict)} entries")
         return token_dict
     except FileNotFoundError:
-        print(f"Error: Could not find transcript-tokens.csv at {csv_path}")
+        print(f"Error: Could not find transcript_tokens.csv at {csv_path}")
         return {}
     except Exception as e:
-        print(f"Error reading transcript-tokens.csv: {str(e)}")
+        print(f"Error reading transcript_tokens.csv: {str(e)}")
         return {}
 
 def check_batch_size(batch_file: str, prompt_tokens: int, transcript_tokens: Dict[int, int]) -> Tuple[bool, int, int]:
@@ -128,11 +128,11 @@ def check_batch_size(batch_file: str, prompt_tokens: int, transcript_tokens: Dic
     with open(batch_file, 'r') as f:
         for line in f:
             request = json.loads(line)
-            transcript_id = int(request['custom_id'].split('-')[1])
+            transcriptid = int(request['custom_id'].split('-')[1])
             
-            if transcript_id in transcript_tokens:
+            if transcriptid in transcript_tokens:
                 total_requests += 1
-                total_tokens += prompt_tokens + transcript_tokens[transcript_id]
+                total_tokens += prompt_tokens + transcript_tokens[transcriptid]
     
     is_valid = (total_requests <= MAX_REQUESTS_PER_BATCH and 
                 total_tokens <= MAX_TOKENS_PER_BATCH)
@@ -157,11 +157,11 @@ def estimate_batch_cost(batch_file: str, prompt_tokens: int, transcript_tokens: 
     with open(batch_file, 'r') as f:
         for line in f:
             request = json.loads(line)
-            transcript_id = int(request['custom_id'].split('-')[1])
+            transcriptid = int(request['custom_id'].split('-')[1])
             
-            if transcript_id in transcript_tokens:
+            if transcriptid in transcript_tokens:
                 total_requests += 1
-                total_input_tokens += prompt_tokens + transcript_tokens[transcript_id]
+                total_input_tokens += prompt_tokens + transcript_tokens[transcriptid]
     
     # Calculate costs
     input_cost = total_input_tokens * INPUT_TOKEN_PRICE
@@ -224,7 +224,7 @@ def create_batches(prompt_name: str) -> List[str]:
     print(f"\nProcessing {total_companies} companies...")
     
     # Process each company's transcripts
-    for company_id, group in company_groups:
+    for companyid, group in company_groups:
         company_name = group['companyname'].iloc[0]
         company_transcripts = group['transcriptid'].tolist()
         
@@ -246,15 +246,15 @@ def create_batches(prompt_name: str) -> List[str]:
             continue
         
         # Create a batch for this company's transcripts
-        print(f"\nCreating batch for company {company_name} (ID: {company_id}): {len(valid_transcripts)} transcripts, {company_tokens:,} tokens")
-        # Convert company_id to string without decimal point
-        company_id_str = str(int(company_id))
-        batch_path = os.path.join(batches_dir, f"input_companyid_{company_id_str}.jsonl")
+        print(f"\nCreating batch for company {company_name} (ID: {companyid}): {len(valid_transcripts)} transcripts, {company_tokens:,} tokens")
+        # Convert companyid to string without decimal point
+        companyid_str = str(int(companyid))
+        batch_path = os.path.join(batches_dir, f"input_companyid_{companyid_str}.jsonl")
         
         # Create batch file
         output_path = processor.create_batch_input_file(
             prompt_name=prompt_name,
-            transcript_ids=valid_transcripts,
+            transcriptids=valid_transcripts,
             output_path=batch_path
         )
         
@@ -263,20 +263,20 @@ def create_batches(prompt_name: str) -> List[str]:
         with open(batch_path, 'r') as f:
             for line in f:
                 request = json.loads(line)
-                transcript_id = int(request['custom_id'].split('-')[1])
-                processed_transcripts.add(transcript_id)
+                transcriptid = int(request['custom_id'].split('-')[1])
+                processed_transcripts.add(transcriptid)
                 
                 # Update text length (using the user message content)
                 try:
                     text_length = len(request['body']['messages'][1]['content'])
-                    diagnostic_df.loc[diagnostic_df['transcriptid'] == transcript_id, 'text_length'] = text_length
+                    diagnostic_df.loc[diagnostic_df['transcriptid'] == transcriptid, 'text_length'] = text_length
                 except (KeyError, IndexError) as e:
-                    print(f"\nError accessing content for transcript {transcript_id}: {str(e)}")
+                    print(f"\nError accessing content for transcript {transcriptid}: {str(e)}")
                     print("Request structure:")
                     print(json.dumps(request, indent=2))
         
         # Report batch completion statistics
-        print(f"\nBatch for company {company_name} (ID: {company_id}) completed:")
+        print(f"\nBatch for company {company_name} (ID: {companyid}) completed:")
         print(f"- Intended to process: {len(valid_transcripts)} transcripts")
         print(f"- Successfully processed: {len(processed_transcripts)} transcripts")
         missing_count = len(valid_transcripts) - len(processed_transcripts)
@@ -311,7 +311,7 @@ class BatchTracker:
         """
         self.prompt_name = prompt_name
         self.batches_dir = os.path.join(config.OUTPUT_DIR, f"{prompt_name}_batches")
-        self.tracking_file = os.path.join(config.DATA_DIR, 'batch-tracker.csv')
+        self.tracking_file = os.path.join(config.DATA_DIR, 'batch_tracker.csv')
         self.client = client
         
         # Get prompt tokens once at initialization
@@ -345,7 +345,7 @@ class BatchTracker:
         else:
             # Create new tracking DataFrame
             self.df = pd.DataFrame(columns=[
-                'batch_file', 'company_id', 'company_name', 'total_requests',
+                'batch_file', 'companyid', 'company_name', 'total_requests',
                 'total_tokens', 'input_cost', 'output_cost', 'batch_id',
                 'status', 'saved_to_db', 'completed_requests'
             ])
@@ -383,9 +383,9 @@ class BatchTracker:
 
             try:
                 # Extract company ID from filename
-                company_id = int(batch_file.split('_')[2].split('.')[0])
+                companyid = int(batch_file.split('_')[2].split('.')[0])
                 # Fast lookup of company name
-                company_name = company_map.get(company_id, 'UNKNOWN')
+                company_name = company_map.get(companyid, 'UNKNOWN')
 
                 # Calculate batch size and cost using the pre-computed prompt tokens
                 is_valid, total_requests, total_tokens = check_batch_size(
@@ -397,7 +397,7 @@ class BatchTracker:
 
                 # Add to tracker
                 self.add_batch(
-                    batch_path, company_id, company_name,
+                    batch_path, companyid, company_name,
                     total_requests, total_tokens, input_cost, output_cost
                 )
                 added_count += 1
@@ -412,7 +412,7 @@ class BatchTracker:
     def add_batch(
         self,
         batch_file: str,
-        company_id: int,
+        companyid: int,
         company_name: str,
         total_requests: int,
         total_tokens: int,
@@ -425,7 +425,7 @@ class BatchTracker:
         # Build the new row as a dict
         new_row = {
             'batch_file': batch_file,
-            'company_id': company_id,
+            'companyid': companyid,
             'company_name': company_name,
             'total_requests': total_requests,
             'total_tokens': total_tokens,
@@ -614,10 +614,10 @@ def process_batch_with_individual_calls(batch_file: str, prompt_name: str, proce
         try:
             # Parse the request
             request = json.loads(line)
-            transcript_id = int(request['custom_id'].split('-')[1])
+            transcriptid = int(request['custom_id'].split('-')[1])
             transcript_text = request['body']['messages'][1]['content']
             
-            print(f"\nProcessing request {i}/{total_lines} for transcript {transcript_id}...")
+            print(f"\nProcessing request {i}/{total_lines} for transcript {transcriptid}...")
             
             # Generate response using individual API call
             response = llm.generate_response(
@@ -629,7 +629,7 @@ def process_batch_with_individual_calls(batch_file: str, prompt_name: str, proce
             from modules.queries_db import insert_query_result
             insert_query_result(
                 prompt_name=prompt_name,
-                transcript_id=transcript_id,
+                transcriptid=transcriptid,
                 response=response[0],  # First element is the response string
                 llm_provider=processor.provider,
                 model_name=processor.model,
@@ -641,11 +641,11 @@ def process_batch_with_individual_calls(batch_file: str, prompt_name: str, proce
             )
             
             successful += 1
-            print(f"✓ Successfully processed transcript {transcript_id}")
+            print(f"✓ Successfully processed transcript {transcriptid}")
             
         except Exception as e:
             failed += 1
-            print(f"✗ Failed to process transcript {transcript_id}: {str(e)}")
+            print(f"✗ Failed to process transcript {transcriptid}: {str(e)}")
             continue
     
     print(f"\nBatch processing complete: {successful} successful, {failed} failed")

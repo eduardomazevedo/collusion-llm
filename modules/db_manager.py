@@ -24,7 +24,7 @@ def verify_database(db_path: str) -> bool:
         cursor.execute("PRAGMA table_info(queries)")
         columns = [col[1] for col in cursor.fetchall()]
         expected_columns = {
-            'query_id', 'prompt_name', 'transcript_id', 'date', 'response',
+            'query_id', 'prompt_name', 'transcriptid', 'date', 'response',
             'LLM_provider', 'model_name', 'call_type', 'temperature',
             'max_response', 'input_tokens', 'output_tokens'
         }

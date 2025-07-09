@@ -1,5 +1,5 @@
 """
-Get gvkeys for the company IDs in the transcript-detail.feather file and save them to data/gvkey_table.feather and data/gvkey_list.txt.
+Get gvkeys for the company IDs in the transcript_detail.feather file and save them to data/gvkey_table.feather and data/gvkey_list.txt.
 """
 #%%
 import config
@@ -13,11 +13,11 @@ conn = wrds.Connection(wrds_username=config.WRDS_USERNAME, password=config.WRDS_
 print("WRDS connection established!")
 
 
-#%% Get list of unique companyid in the table data/transcript-detail.feather
-transcript_detail_path = "data/transcript-detail.feather"
+#%% Get list of unique companyid in the table data/transcript_detail.feather
+transcript_detail_path = "data/transcript_detail.feather"
 transcript_detail_data = pd.read_feather(transcript_detail_path, columns=["companyid"])
 unique_company_ids = transcript_detail_data["companyid"].dropna().unique()
-print(f"Found {len(unique_company_ids)} unique company IDs in transcript-detail.feather")
+print(f"Found {len(unique_company_ids)} unique company IDs in transcript_detail.feather")
 
 
 #%% Get rows from ciq.wrds_gvkey table for matching company IDs

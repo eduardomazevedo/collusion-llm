@@ -57,7 +57,7 @@ check_batches_exist() {
 
 # Function to check if tracking file exists
 check_tracking_file() {
-    local tracking_file="$PROJECT_ROOT/data/batch-tracker.csv"
+    local tracking_file="$PROJECT_ROOT/data/batch_tracker.csv"
     if [ -f "$tracking_file" ]; then
         return 0  # Tracking file exists
     else
@@ -102,7 +102,7 @@ case "$OPERATION" in
         if [ $? -eq 0 ]; then
             echo "Batch submission completed successfully"
             if check_tracking_file; then
-                echo "Progress is being tracked in: data/batch-tracker.csv"
+                echo "Progress is being tracked in: data/batch_tracker.csv"
             fi
             echo "Full submission log saved to: $LOG_FILE"
         else
@@ -145,7 +145,7 @@ case "$OPERATION" in
         if [ $? -eq 0 ]; then
             echo "Batch submission completed successfully"
             if check_tracking_file; then
-                echo "Progress is being tracked in: data/batch-tracker.csv"
+                echo "Progress is being tracked in: data/batch_tracker.csv"
             fi
         else
             echo "Error: Batch submission failed"

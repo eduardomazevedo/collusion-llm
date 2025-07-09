@@ -13,13 +13,13 @@ import config
 import pandas as pd
 
 # Load datasets
-compustat_df = pd.read_parquet('data/company-year-compustat.parquet')
-human_ratings_df = pd.read_csv('data/human-ratings.csv')
+compustat_df = pd.read_parquet('data/company_year_compustat.parquet')
+human_ratings_df = pd.read_csv('data/human_ratings.csv')
 top_transcripts_df = pd.read_csv('data/top_transcripts.csv')
-df = pd.read_feather('data/transcript-detail.feather')
+df = pd.read_feather('data/transcript_detail.feather')
 
-# Load transcript_id from queries database
-queried_transcript_ids = pd.read_sql('SELECT transcript_id FROM queries', 'sqlite:///data/queries.sqlite')['transcript_id'].unique()
+# Load transcriptid from queries database
+queried_transcript_ids = pd.read_sql('SELECT transcriptid FROM queries', 'sqlite:///data/queries.sqlite')['transcriptid'].unique()
 
 
 #%% Filter only queried transcripts
@@ -38,7 +38,7 @@ transcript_ids_flagged_by_humans = human_ratings_df[human_ratings_df['collusion'
 
 
 #%% List of llm flagged transcripts
-transcript_ids_flagged_by_llm = top_transcripts_df['transcript_id'].unique()
+transcript_ids_flagged_by_llm = top_transcripts_df['transcriptid'].unique()
 
 #%% Create dummies for collusion flags
 df['benchmark_human_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_humans).astype(int)
@@ -58,4 +58,4 @@ df = df.merge(
 
 
 #%% Save
-df.to_feather('data/main-analysis-dataset.feather')
+df.to_feather('data/main_analysis_dataset.feather')

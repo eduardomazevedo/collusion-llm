@@ -73,14 +73,14 @@ class BatchProcessor:
         except json.JSONDecodeError:
             raise ValueError(f"Invalid JSON in prompts file at {self.prompts_path}")
 
-    def create_batch_input_file(self, prompt_name: str, transcript_ids: List[int], 
+    def create_batch_input_file(self, prompt_name: str, transcriptids: List[int], 
                               output_path: str = "batch_input.jsonl") -> str:
         """
         Create a JSONL file for batch processing.
 
         Args:
             prompt_name: Name of the prompt to use
-            transcript_ids: List of transcript IDs to process
+            transcriptids: List of transcript IDs to process
             output_path: Path to save the JSONL file
 
         Returns:
@@ -92,15 +92,15 @@ class BatchProcessor:
             raise ValueError(f"Prompt '{prompt_name}' not found in prompts")
 
         # Get transcript texts
-        transcript_texts = capiq.get_transcripts(transcript_ids)
+        transcript_texts = capiq.get_transcripts(transcriptids)
         
         # Create batch input file
         with open(output_path, "w") as f:
-            for transcript_id in transcript_ids:
-                if transcript_id in transcript_texts:
-                    transcript_data = json.loads(transcript_texts[transcript_id])
+            for transcriptid in transcriptids:
+                if transcriptid in transcript_texts:
+                    transcript_data = json.loads(transcript_texts[transcriptid])
                     request = {
-                        "custom_id": f"request-{transcript_id}",
+                        "custom_id": f"request-{transcriptid}",
                         "method": "POST",
                         "url": "/v1/chat/completions",
                         "body": {
@@ -238,14 +238,14 @@ class BatchProcessor:
 
             # Extract transcript ID
             try:
-                transcript_id = int(response["custom_id"].split("-")[1])
+                transcriptid = int(response["custom_id"].split("-")[1])
             except (KeyError, ValueError) as e:
                 print(f"Skipping line {i}: invalid custom_id format: {e}")
                 continue
 
             # Store the raw response body
             body = response["response"]["body"]
-            results[transcript_id] = body
+            results[transcriptid] = body
 
             # Safely extract the JSON object from the content field
             content_str = body['choices'][0]['message']['content']
@@ -256,7 +256,7 @@ class BatchProcessor:
                 # Insert into database with all required parameters
                 insert_query_result(
                     prompt_name=prompt_name,
-                    transcript_id=transcript_id,
+                    transcriptid=transcriptid,
                     response=content_str,
                     llm_provider=self.provider,
                     model_name=self.model,
@@ -267,11 +267,11 @@ class BatchProcessor:
                     output_tokens=body.get('usage', {}).get('completion_tokens')
                 )
             except JSONDecodeError as e:
-                print(f"Error parsing JSON for transcript {transcript_id}: {e}")
+                print(f"Error parsing JSON for transcript {transcriptid}: {e}")
                 print(f"Content: {content_str}")
                 insert_query_result(
                     prompt_name=prompt_name,
-                    transcript_id=transcript_id,
+                    transcriptid=transcriptid,
                     response=content_str,
                     llm_provider=self.provider,
                     model_name=self.model,

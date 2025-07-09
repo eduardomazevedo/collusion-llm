@@ -29,7 +29,7 @@ Prices:
 **DONE**
 Batch group submission: within big_batch_runner.py a function that takes as argument a prompt name and submits batches from the appropriate folder while following rate limits form OpenAI
 - go through all jsonl batches in batch folder (named like the prompt name and "_batches" in output folder) and extract all transcript ids from custom_id (e.g. from "custom_id": "request-94097" get transcriptid 94097)
-- for each transcriptid get its number of tokens from transcript-tokens.csv located in data folder
+- for each transcriptid get its number of tokens from transcript_tokens.csv located in data folder
 - make a dataframe batch_tracker that records the following for each batch file:
 - record for each batch the total input tokens
 - record for each batch the estimated input cost (using token size of the given prompt times the number of requests in the batch file, and the token sizes of each transcript corresponding to each request within the batch); price is $0.075 per 1,000,000 input tokens

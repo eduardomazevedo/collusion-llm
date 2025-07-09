@@ -86,7 +86,7 @@ def get_all_llm_responses() -> pd.DataFrame:
     SELECT 
         query_id,
         prompt_name,
-        transcript_id,
+        transcriptid,
         response,
         date,
         model_name,
@@ -117,7 +117,7 @@ def get_analysis_responses() -> pd.DataFrame:
         aq.response as analysis_response,
         aq.date as analysis_date,
         q.prompt_name as original_prompt_name,
-        q.transcript_id,
+        q.transcriptid,
         q.model_name,
         q.response as original_response
     FROM analysis_queries aq
@@ -190,10 +190,10 @@ def process_non_interactive_single(
         return empty_metrics
     
     # Keep only the earliest response per transcript
-    df = df.sort_values('date').groupby('transcript_id').first().reset_index()
+    df = df.sort_values('date').groupby('transcriptid').first().reset_index()
     
     # Merge with human ratings
-    merged = pd.merge(df, human_ratings, left_on='transcript_id', right_on='transcriptid', how='inner')
+    merged = pd.merge(df, human_ratings, on='transcriptid', how='inner')
     
     results = {}
     
@@ -269,11 +269,11 @@ def process_non_interactive_average(
         return empty_metrics
     
     # Average scores per transcript
-    avg_scores = df.groupby('transcript_id')['score'].mean().reset_index()
-    avg_scores.columns = ['transcript_id', 'avg_score']
+    avg_scores = df.groupby('transcriptid')['score'].mean().reset_index()
+    avg_scores.columns = ['transcriptid', 'avg_score']
     
     # Merge with human ratings
-    merged = pd.merge(avg_scores, human_ratings, left_on='transcript_id', right_on='transcriptid', how='inner')
+    merged = pd.merge(avg_scores, human_ratings, on='transcriptid', how='inner')
     
     results = {}
     
@@ -354,19 +354,19 @@ def process_agentic_repeated_high(
         return empty_metrics
     
     # Get first response per transcript
-    first_responses = df.sort_values('date').groupby('transcript_id').first().reset_index()
+    first_responses = df.sort_values('date').groupby('transcriptid').first().reset_index()
     
     # Identify high-scoring transcripts
-    high_scoring_transcripts = first_responses[first_responses['score'] >= threshold]['transcript_id'].tolist()
+    high_scoring_transcripts = first_responses[first_responses['score'] >= threshold]['transcriptid'].tolist()
     
     # For high-scoring transcripts, average all responses
     # For others, use the first response
     final_scores = []
     
-    for transcript_id in df['transcript_id'].unique():
-        transcript_df = df[df['transcript_id'] == transcript_id]
+    for transcriptid in df['transcriptid'].unique():
+        transcript_df = df[df['transcriptid'] == transcriptid]
         
-        if transcript_id in high_scoring_transcripts:
+        if transcriptid in high_scoring_transcripts:
             # Average all responses for high-scoring transcripts
             avg_score = transcript_df['score'].mean()
         else:
@@ -374,14 +374,14 @@ def process_agentic_repeated_high(
             avg_score = transcript_df.sort_values('date').iloc[0]['score']
         
         final_scores.append({
-            'transcript_id': transcript_id,
+            'transcriptid': transcriptid,
             'final_score': avg_score
         })
     
     final_scores_df = pd.DataFrame(final_scores)
     
     # Merge with human ratings
-    merged = pd.merge(final_scores_df, human_ratings, left_on='transcript_id', right_on='transcriptid', how='inner')
+    merged = pd.merge(final_scores_df, human_ratings, on='transcriptid', how='inner')
     
     results = {}
     
@@ -451,7 +451,7 @@ def process_agentic_analysis(
     conn = sqlite3.connect(config.DATABASE_PATH)
     query = """
     SELECT 
-        transcript_id,
+        transcriptid,
         response,
         date
     FROM queries
@@ -464,7 +464,7 @@ def process_agentic_analysis(
     # Extract scores and keep earliest per transcript
     all_responses['original_score'] = all_responses['response'].apply(extract_score_from_response)
     all_responses = all_responses[all_responses['original_score'].notna()]
-    all_responses = all_responses.sort_values('date').groupby('transcript_id').first().reset_index()
+    all_responses = all_responses.sort_values('date').groupby('transcriptid').first().reset_index()
     
     # Get analysis results for this prompt/model
     analysis_df = analysis_responses[
@@ -474,16 +474,16 @@ def process_agentic_analysis(
     
     # Average analysis scores per transcript
     if len(analysis_df) > 0:
-        avg_analysis = analysis_df.groupby('transcript_id')['analysis_score'].mean().reset_index()
-        avg_analysis.columns = ['transcript_id', 'analysis_avg_score']
+        avg_analysis = analysis_df.groupby('transcriptid')['analysis_score'].mean().reset_index()
+        avg_analysis.columns = ['transcriptid', 'analysis_avg_score']
     else:
-        avg_analysis = pd.DataFrame(columns=['transcript_id', 'analysis_avg_score'])
+        avg_analysis = pd.DataFrame(columns=['transcriptid', 'analysis_avg_score'])
     
     # Merge original scores with analysis scores
     merged_scores = pd.merge(
-        all_responses[['transcript_id', 'original_score']], 
+        all_responses[['transcriptid', 'original_score']], 
         avg_analysis, 
-        on='transcript_id', 
+        on='transcriptid', 
         how='left'
     )
     
@@ -506,14 +506,14 @@ def process_agentic_analysis(
             corrected_score = original
             
         corrected_scores.append({
-            'transcript_id': row['transcript_id'],
+            'transcriptid': row['transcriptid'],
             'corrected_score': corrected_score
         })
     
     corrected_df = pd.DataFrame(corrected_scores)
     
     # Merge with human ratings to get test set
-    merged = pd.merge(corrected_df, human_ratings, left_on='transcript_id', right_on='transcriptid', how='inner')
+    merged = pd.merge(corrected_df, human_ratings, on='transcriptid', how='inner')
     
     empty_metrics = get_empty_metrics()
     
@@ -601,11 +601,11 @@ def process_agentic_analysis_filtered(
         return empty_metrics
     
     # Average original scores per transcript (in case of multiple analyses)
-    avg_original_scores = high_analysis_df.groupby('transcript_id')['original_score'].mean().reset_index()
-    avg_original_scores.columns = ['transcript_id', 'filtered_original_score']
+    avg_original_scores = high_analysis_df.groupby('transcriptid')['original_score'].mean().reset_index()
+    avg_original_scores.columns = ['transcriptid', 'filtered_original_score']
     
     # Merge with human ratings
-    merged = pd.merge(avg_original_scores, human_ratings, left_on='transcript_id', right_on='transcriptid', how='inner')
+    merged = pd.merge(avg_original_scores, human_ratings, on='transcriptid', how='inner')
     
     results = {}
     
@@ -694,7 +694,7 @@ def main():
     ]['transcriptid'].unique()
     
     # Filter LLM responses to only test transcripts
-    llm_responses = llm_responses[llm_responses['transcript_id'].isin(test_transcript_ids)]
+    llm_responses = llm_responses[llm_responses['transcriptid'].isin(test_transcript_ids)]
     
     print(f"Found {len(llm_responses)} LLM responses for test transcripts")
     print(f"Found {len(analysis_responses)} analysis responses")

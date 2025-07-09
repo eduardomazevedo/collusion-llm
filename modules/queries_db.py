@@ -80,7 +80,7 @@ def insert_analysis_result(
 
 def insert_query_result(
     prompt_name: str,
-    transcript_id: int,
+    transcriptid: int,
     response: str,
     llm_provider: str = "openai",
     model_name: str = "o4-mini-2025-04-16",
@@ -95,7 +95,7 @@ def insert_query_result(
     
     Args:
         prompt_name: Name of the prompt used
-        transcript_id: ID of the transcript
+        transcriptid: ID of the transcript
         response: The LLM response
         llm_provider: The LLM provider (e.g. "openai")
         model_name: The model name (e.g. "o4-mini-2025-04-16")
@@ -108,14 +108,14 @@ def insert_query_result(
     cursor.execute(
         """
         INSERT INTO queries (
-            prompt_name, transcript_id, date, response,
+            prompt_name, transcriptid, date, response,
             LLM_provider, model_name, call_type,
             temperature, max_response, input_tokens, output_tokens
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            prompt_name, transcript_id, datetime.now(timezone.utc).isoformat(), response,
+            prompt_name, transcriptid, datetime.now(timezone.utc).isoformat(), response,
             llm_provider, model_name, call_type,
             temperature, max_response, input_tokens, output_tokens
         ),
@@ -128,7 +128,7 @@ def fetch_all_queries():
     
     rows = cursor.fetchall()
     columns = [
-        'query_id', 'prompt_name', 'transcript_id', 'date', 'response',
+        'query_id', 'prompt_name', 'transcriptid', 'date', 'response',
         'LLM_provider', 'model_name', 'call_type',
         'temperature', 'max_response', 'input_tokens', 'output_tokens'
     ]
@@ -146,7 +146,7 @@ def fetch_queries_by_prompts(prompt_names: list[str]):
     
     rows = cursor.fetchall()
     columns = [
-        'query_id', 'prompt_name', 'transcript_id', 'date', 'response',
+        'query_id', 'prompt_name', 'transcriptid', 'date', 'response',
         'LLM_provider', 'model_name', 'call_type',
         'temperature', 'max_response', 'input_tokens', 'output_tokens'
     ]
@@ -167,7 +167,7 @@ def get_latest_queries(df: pd.DataFrame = None):
     df['date'] = pd.to_datetime(df['date'])
     
     # Sort by date in descending order and keep first occurrence (latest) for each transcript
-    return df.sort_values('date', ascending=False).drop_duplicates(subset=['transcript_id', 'prompt_name'], keep='first')
+    return df.sort_values('date', ascending=False).drop_duplicates(subset=['transcriptid', 'prompt_name'], keep='first')
 
 def export_to_csv(output_path: str = None, prompt_names: list[str] = None, latest_only: bool = False):
     """
@@ -408,7 +408,7 @@ def fetch_analysis_with_original_data(analysis_prompt_name: str = None):
                 a.LLM_provider as analysis_llm_provider,
                 a.model_name as analysis_model_name,
                 q.prompt_name as original_prompt_name,
-                q.transcript_id,
+                q.transcriptid,
                 q.date as original_date,
                 q.response as original_response
             FROM analysis_queries a
@@ -426,7 +426,7 @@ def fetch_analysis_with_original_data(analysis_prompt_name: str = None):
                 a.LLM_provider as analysis_llm_provider,
                 a.model_name as analysis_model_name,
                 q.prompt_name as original_prompt_name,
-                q.transcript_id,
+                q.transcriptid,
                 q.date as original_date,
                 q.response as original_response
             FROM analysis_queries a
@@ -437,7 +437,7 @@ def fetch_analysis_with_original_data(analysis_prompt_name: str = None):
     columns = [
         'analysis_query_id', 'reference_query_id', 'analysis_prompt_name', 'analysis_date',
         'analysis_response', 'analysis_llm_provider', 'analysis_model_name',
-        'original_prompt_name', 'transcript_id', 'original_date', 'original_response'
+        'original_prompt_name', 'transcriptid', 'original_date', 'original_response'
     ]
     df = pd.DataFrame(rows, columns=columns)
     

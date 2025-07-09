@@ -19,8 +19,8 @@ def analyze_duplicates():
     # Get all entries
     df = pd.read_sql_query("SELECT * FROM queries", conn)
     
-    # Find duplicates (same prompt_name, transcript_id, and response, but different query_id and date)
-    duplicates = df.duplicated(subset=['prompt_name', 'transcript_id', 'response'], keep=False)
+    # Find duplicates (same prompt_name, transcriptid, and response, but different query_id and date)
+    duplicates = df.duplicated(subset=['prompt_name', 'transcriptid', 'response'], keep=False)
     duplicate_entries = df[duplicates]
     
     if len(duplicate_entries) == 0:
@@ -30,7 +30,7 @@ def analyze_duplicates():
     
     # Show duplicate statistics
     total_entries = len(df)
-    unique_entries = df.drop_duplicates(subset=['prompt_name', 'transcript_id', 'response'], keep='last')
+    unique_entries = df.drop_duplicates(subset=['prompt_name', 'transcriptid', 'response'], keep='last')
     print(f"\nTotal entries: {total_entries}")
     print(f"Entries after deduplication: {len(unique_entries)}")
     print(f"Entries to be removed: {total_entries - len(unique_entries)}")
@@ -49,7 +49,7 @@ def remove_duplicates():
         WHERE query_id IN (
             SELECT MAX(query_id)
             FROM queries
-            GROUP BY prompt_name, transcript_id, response
+            GROUP BY prompt_name, transcriptid, response
         )
     """)
     

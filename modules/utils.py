@@ -75,19 +75,19 @@ def prep_transcript_for_review(transcript: List[Dict]) -> str:
 
     return formatted_transcript
 
-def transcript_token_size(transcript_id: int) -> int:
+def transcript_token_size(transcriptid: int) -> int:
     """
     Get the token size of a transcript after formatting it for review.
     
     Args:
-        transcript_id: The ID of the transcript to process
+        transcriptid: The ID of the transcript to process
         
     Returns:
         int: The number of tokens in the formatted transcript
     """
     # Get the raw transcript from capiq
-    transcript_dict = capiq.get_transcripts([transcript_id])
-    transcript_json = transcript_dict[transcript_id]
+    transcript_dict = capiq.get_transcripts([transcriptid])
+    transcript_json = transcript_dict[transcriptid]
     transcript_data = json.loads(transcript_json)
     
     # Format the transcript for review
