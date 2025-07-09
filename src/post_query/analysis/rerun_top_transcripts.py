@@ -33,8 +33,8 @@ csv_path = os.path.join(config.DATA_DIR, 'top_transcripts.csv')
 print(f"Loading transcript IDs from: {csv_path}")
 
 df = pd.read_csv(csv_path)
-transcript_ids = df['transcript_id'].tolist()
-# Remove transcript_id 3374921 from the list because
+transcript_ids = df['transcriptid'].tolist()
+# Remove transcriptid 3374921 from the list because
 # it is not found in capitaliq. Was probably an error.
 transcript_ids = [tid for tid in transcript_ids if tid != 3374921]
 print(f"Loaded {len(transcript_ids)} transcript IDs")

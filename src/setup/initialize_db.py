@@ -19,7 +19,7 @@ def initialize_db():
             CREATE TABLE IF NOT EXISTS queries (
                 query_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 prompt_name TEXT NOT NULL,
-                transcript_id INTEGER NOT NULL,
+                transcriptid INTEGER NOT NULL,
                 date TEXT NOT NULL,
                 response TEXT NOT NULL,
                 LLM_provider TEXT,

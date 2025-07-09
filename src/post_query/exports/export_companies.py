@@ -31,7 +31,7 @@ num_companies = result_df['companyid'].nunique()
 print(f"\nNumber of unique companies: {num_companies}")
 
 # Save to CSV
-output_path = os.path.join(config.ROOT, 'data', 'companies-transcripts.csv')
+output_path = os.path.join(config.ROOT, 'data', 'companies_transcripts.csv')
 result_df.to_csv(output_path, index=False)
 
 print(f"Exported {len(result_df)} unique company-transcript combinations to {output_path}") 

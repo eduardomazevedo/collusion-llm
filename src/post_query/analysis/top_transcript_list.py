@@ -3,10 +3,10 @@ Script to extract top transcript list from the database.
 
 This script:
 1. Queries the database for only SimpleCapacityV8.1.1 prompts
-2. For each transcript_id, keeps only the smallest query_id (earliest query)
+2. For each transcriptid, keeps only the smallest query_id (earliest query)
 3. Extracts the "score" field from the JSON response
 4. Keeps only rows with score >= 75
-5. Saves only the transcript_id column to data/top_transcripts.csv
+5. Saves only the transcriptid column to data/top_transcripts.csv
 """
 
 import sys
@@ -24,26 +24,26 @@ import config
 def extract_top_transcripts():
     """
     Extract SimpleCapacityV8.1.1 prompts from the database,
-    keeping only the earliest query for each transcript_id,
+    keeping only the earliest query for each transcriptid,
     extracting the score from JSON response,
     filtering for score >= 75,
-    and save only transcript_id to a CSV file.
+    and save only transcriptid to a CSV file.
     """
     try:
         # Connect to the database
         conn = sqlite3.connect(config.DATABASE_PATH)
         
-        # Query only the specific prompt, keeping the smallest query_id for each transcript_id
+        # Query only the specific prompt, keeping the smallest query_id for each transcriptid
         # Only select the columns we want
         query = """
-        SELECT query_id, prompt_name, transcript_id, response
+        SELECT query_id, prompt_name, transcriptid, response
         FROM queries 
         WHERE prompt_name = 'SimpleCapacityV8.1.1' 
         AND query_id IN (
             SELECT MIN(query_id) 
             FROM queries 
             WHERE prompt_name = 'SimpleCapacityV8.1.1' 
-            GROUP BY transcript_id
+            GROUP BY transcriptid
         )
         ORDER BY query_id
         """
@@ -73,21 +73,21 @@ def extract_top_transcripts():
         # Sort by score descending
         df_filtered = df_filtered.sort_values('score', ascending=False)
         
-        # Save only transcript_id to CSV
+        # Save only transcriptid to CSV
         output_path = os.path.join(config.DATA_DIR, "top_transcripts.csv")
-        df_filtered[['transcript_id']].to_csv(output_path, index=False)
+        df_filtered[['transcriptid']].to_csv(output_path, index=False)
         
         print(f"Extracted {len(df)} total rows from SimpleCapacityV8.1.1 prompts")
         print(f"Filtered to {len(df_filtered)} rows with score >= 75")
-        print(f"Saved transcript_ids to: {output_path}")
+        print(f"Saved transcriptids to: {output_path}")
         
         # Show a preview of the data
         print("\nPreview of extracted data (score >= 75):")
         print("=" * 50)
-        print(df_filtered[['transcript_id', 'score']].head())
+        print(df_filtered[['transcriptid', 'score']].head())
         
         # Show unique transcript count
-        unique_transcripts = df_filtered['transcript_id'].nunique()
+        unique_transcripts = df_filtered['transcriptid'].nunique()
         print(f"\nUnique transcripts with score >= 75: {unique_transcripts}")
         
         # Show score statistics

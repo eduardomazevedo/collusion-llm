@@ -114,12 +114,12 @@ The benchmarking evaluates multiple approaches:
 Results include metrics for Joe's subsample, ACL's subsample, and pooled data.
 
 ## Database Export (for review)
-The project uses SQLite for storing query results. The database is stored in `data/queries.db`. To export the database to CSV:
+The project uses SQLite for storing query results. The database is stored in `data/datasets/queries.sqlite`. To export the database to CSV:
 
 ```bash
 python ./src/post_query/exports/export_queries.py [--output output_path]
 ```
-If no output path is specified, it will create a timestamped file in the `output` directory.
+If no output path is specified, it will create a timestamped file in the `data/outputs` directory.
 
 ## Running Batches
 `bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> [options]`
@@ -139,7 +139,7 @@ Use `--operation` flag with:
 
 ### Optional Arguments
 - `--batch-id <id>`: Required for `status`, `process`, and `error` operations
-- `--input-file <path>`: Custom input (relative) file path for `submit` operation (default: `output/batch_inputs/<prompt_name>_input.jsonl`)
+- `--input-file <path>`: Custom input (relative) file path for `submit` operation (default: `data/cache/batch_inputs/<prompt_name>_input.jsonl`)
 
 ## Running Big Batches (All Companies)
 `bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> <operation>`
@@ -172,7 +172,7 @@ bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 
 bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 all
 ```
 
-Progress is tracked in `data/batch-tracker.csv` and results are automatically saved to the database as batches complete.
+Progress is tracked in `data/intermediaries/batch-tracker.csv` and results are automatically saved to the database as batches complete.
 
 Recommentations:
 - Run the create procedure individually first, and then the submission.
@@ -180,3 +180,21 @@ Recommentations:
 
 ## Exporting high scorer excel sheet with transcript information
 Note: a bit sloppy atm
+
+## Naming Conventions
+
+### File Naming
+- Python scripts and shell scripts use underscores: `calculate_f1_scores.py`, `run_benchmark.sh`
+- Avoid hyphens in file names
+
+### Database Fields
+- Use `transcriptid` and `companyid` (no underscore) to match WRDS/CapIQ conventions
+- This maintains consistency with the original data sources
+
+### Python Variables
+- Use snake_case: `transcript_id`, `company_id`
+- Convert from database field names when loading data into Python
+
+### CSV Files
+- May use either `transcript_id` or `transcriptid` for historical reasons
+- New exports should prefer the underscore format for consistency with Python conventions

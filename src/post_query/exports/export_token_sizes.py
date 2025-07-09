@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to export token sizes for all transcripts in companies-transcripts.csv.
+Script to export token sizes for all transcripts in companies_transcripts.csv.
 Usage:
     python export_token_sizes.py
 """
@@ -11,12 +11,12 @@ from modules.utils import transcript_token_size
 import config
 
 def main():
-    # Read the companies-transcripts.csv file
-    csv_path = os.path.join(config.DATA_DIR, 'companies-transcripts.csv')
+    # Read the companies_transcripts.csv file
+    csv_path = os.path.join(config.DATA_DIR, 'companies_transcripts.csv')
     try:
         df = pd.read_csv(csv_path, header=0, names=['companyid', 'companyname', 'transcriptid', 'headline'])
     except FileNotFoundError:
-        print(f"Error: Could not find companies-transcripts.csv at {csv_path}")
+        print(f"Error: Could not find companies_transcripts.csv at {csv_path}")
         return
 
     # Get unique transcript IDs
@@ -24,15 +24,15 @@ def main():
     total_transcripts = len(transcript_ids)
     print(f"Found {total_transcripts} unique transcripts")
 
-    # Check if transcript-tokens.csv exists and load it
-    output_path = os.path.join(config.DATA_DIR, 'transcript-tokens.csv')
+    # Check if transcript_tokens.csv exists and load it
+    output_path = os.path.join(config.DATA_DIR, 'transcript_tokens.csv')
     if os.path.exists(output_path):
         try:
             results_df = pd.read_csv(output_path, header=0, names=['transcriptid', 'tokensize'])
             processed_ids = set(results_df['transcriptid'].unique())
             print(f"Found {len(processed_ids)} already processed transcripts")
         except Exception as e:
-            print(f"Error reading existing transcript-tokens.csv: {str(e)}")
+            print(f"Error reading existing transcript_tokens.csv: {str(e)}")
             results_df = pd.DataFrame(columns=['transcriptid', 'tokensize'])
             processed_ids = set()
     else:

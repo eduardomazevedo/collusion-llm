@@ -5,7 +5,7 @@ Script to create top_transcripts_data.csv with aggregated query data and follow-
 This script:
 1. Reads list of top transcripts from top_transcripts.csv
 2. Gets queries from the queries table for SimpleCapacityV8.1.1 prompt
-3. Aggregates queries by transcript_id with required variables
+3. Aggregates queries by transcriptid with required variables
 4. Merges follow-up analysis data from analysis_queries table
 5. Merges company name and date from transcript-detail.feather
 """
@@ -55,7 +55,7 @@ def create_top_transcript_data():
     print("Step 1: Reading top transcripts list...")
     top_transcripts_path = os.path.join(config.DATA_DIR, "top_transcripts.csv")
     top_transcripts_df = pd.read_csv(top_transcripts_path)
-    top_transcript_ids = top_transcripts_df['transcript_id'].tolist()
+    top_transcript_ids = top_transcripts_df['transcriptid'].tolist()
     print(f"Found {len(top_transcript_ids)} top transcript IDs")
     
     # Step 2: Get queries for SimpleCapacityV8.1.1 prompt efficiently
@@ -65,10 +65,10 @@ def create_top_transcript_data():
     # Use parameterized query to avoid SQL injection and improve performance
     placeholders = ','.join(['?'] * len(top_transcript_ids))
     query = f"""
-    SELECT query_id, transcript_id, response, date
+    SELECT query_id, transcriptid, response, date
     FROM queries 
     WHERE prompt_name = 'SimpleCapacityV8.1.1' 
-    AND transcript_id IN ({placeholders})
+    AND transcriptid IN ({placeholders})
     ORDER BY query_id
     """
     
@@ -81,14 +81,14 @@ def create_top_transcript_data():
     queries_df['reasoning'] = queries_df['response'].apply(lambda x: extract_from_response(x, 'reasoning', ''))
     queries_df['excerpts'] = queries_df['response'].apply(lambda x: extract_excerpts_from_response(x))
     
-    # Step 4: Aggregate by transcript_id
-    print("Step 4: Aggregating data by transcript_id...")
+    # Step 4: Aggregate by transcriptid
+    print("Step 4: Aggregating data by transcriptid...")
     
     # Sort by query_id to ensure we get the first query for each transcript
     queries_df = queries_df.sort_values('query_id')
     
-    # Group by transcript_id and aggregate
-    aggregated_df = queries_df.groupby('transcript_id').agg({
+    # Group by transcriptid and aggregate
+    aggregated_df = queries_df.groupby('transcriptid').agg({
         'score': ['first', 'mean'],  # first score as original_score, mean as mean_score
         'reasoning': 'first',        # reasoning from first query
         'excerpts': 'first',         # excerpts from first query
@@ -96,7 +96,7 @@ def create_top_transcript_data():
     }).reset_index()
     
     # Flatten column names
-    aggregated_df.columns = ['transcript_id', 'original_score', 'mean_score', 'reasoning', 'excerpts', 'n_queries']
+    aggregated_df.columns = ['transcriptid', 'original_score', 'mean_score', 'reasoning', 'excerpts', 'n_queries']
     
     # Step 5: Get follow-up analysis data
     print("Step 5: Getting follow-up analysis data...")
@@ -118,29 +118,29 @@ def create_top_transcript_data():
         # Extract follow-up scores
         analysis_df['follow_up_score'] = analysis_df['response'].apply(lambda x: extract_from_response(x, 'score'))
         
-        # Merge with queries_df to get transcript_id
+        # Merge with queries_df to get transcriptid
         follow_up_with_transcript = pd.merge(
             analysis_df, 
-            queries_df[['query_id', 'transcript_id']], 
+            queries_df[['query_id', 'transcriptid']], 
             left_on='reference_query_id', 
             right_on='query_id',
             how='left'
         )
         
-        # Aggregate follow-up data by transcript_id
-        transcript_follow_up = follow_up_with_transcript.groupby('transcript_id').agg({
+        # Aggregate follow-up data by transcriptid
+        transcript_follow_up = follow_up_with_transcript.groupby('transcriptid').agg({
             'follow_up_score': 'mean',
             'reference_query_id': 'count'
         }).reset_index()
         
         # Rename columns
-        transcript_follow_up.columns = ['transcript_id', 'mean_follow_up_score', 'n_follow_up_queries']
+        transcript_follow_up.columns = ['transcriptid', 'mean_follow_up_score', 'n_follow_up_queries']
         
         # Merge with aggregated_df
         aggregated_df = pd.merge(
             aggregated_df, 
             transcript_follow_up, 
-            on='transcript_id', 
+            on='transcriptid', 
             how='left'
         )
     else:
@@ -152,15 +152,14 @@ def create_top_transcript_data():
     print("Step 6: Merging with transcript details...")
     transcript_detail_df = pd.read_feather(config.TRANSCRIPT_DETAIL_PATH)
     
-    # Select only the columns we need and rename transcriptid to transcript_id for merging
+    # Select only the columns we need
     transcript_detail_subset = transcript_detail_df[['transcriptid', 'companyname', 'mostimportantdateutc']].copy()
-    transcript_detail_subset = transcript_detail_subset.rename(columns={'transcriptid': 'transcript_id'})
     
     # Merge with aggregated data
     final_df = pd.merge(
         aggregated_df, 
         transcript_detail_subset, 
-        on='transcript_id', 
+        on='transcriptid', 
         how='left'
     )
     
@@ -169,7 +168,7 @@ def create_top_transcript_data():
     
     # Reorder columns
     column_order = [
-        'transcript_id',
+        'transcriptid',
         'companyname',
         'mostimportantdateutc',
         'original_score',

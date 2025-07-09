@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create a dataset of Compustat data in data/company-year-compustat.parquet.
+Create a dataset of Compustat data in data/company_year_compustat.parquet.
 
 This script:
 1. Loads US and Global Compustat data
@@ -18,10 +18,10 @@ from pathlib import Path
 def main():
     # Define file paths
     base_path = Path(__file__).parent.parent.parent.parent
-    us_file = base_path / "data" / "raw" / "compustat" / "compustat-us.csv"
-    global_file = base_path / "data" / "raw" / "compustat" / "compustat-global.csv"
+    us_file = base_path / "data" / "raw" / "compustat" / "compustat_us.csv"
+    global_file = base_path / "data" / "raw" / "compustat" / "compustat_global.csv"
     gvkey_table_file = base_path / "data" / "gvkey_table.feather"
-    output_file = base_path / "data" / "company-year-compustat.parquet"
+    output_file = base_path / "data" / "company_year_compustat.parquet"
     
     print("Loading Compustat US data...")
     us_df = pd.read_csv(us_file)

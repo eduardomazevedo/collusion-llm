@@ -22,7 +22,7 @@ import config
 
 def get_transcript_ids(company_ids):
     """
-    Get transcript IDs for given company IDs from companies-transcripts.csv.
+    Get transcript IDs for given company IDs from companies_transcripts.csv.
     
     Args:
         company_ids: List of company IDs or a single company ID
@@ -37,12 +37,12 @@ def get_transcript_ids(company_ids):
     # Convert company IDs to strings for comparison
     company_ids = [str(cid) for cid in company_ids]
     
-    # Read the companies-transcripts.csv file
-    csv_path = os.path.join(config.DATA_DIR, 'companies-transcripts.csv')
+    # Read the companies_transcripts.csv file
+    csv_path = os.path.join(config.DATA_DIR, 'companies_transcripts.csv')
     try:
         df = pd.read_csv(csv_path, names=['companyid', 'companyname', 'transcriptid', 'headline'])
     except FileNotFoundError:
-        print(f"Error: Could not find companies-transcripts.csv at {csv_path}")
+        print(f"Error: Could not find companies_transcripts.csv at {csv_path}")
         return []
     
     # Filter for the given company IDs
@@ -70,7 +70,7 @@ def create_batch_input(company_ids, prompt_name, output_path):
     print(f"Creating batch input file with {len(transcript_ids)} transcripts...")
     return processor.create_batch_input_file(
         prompt_name=prompt_name,
-        transcript_ids=transcript_ids,  # This is now a List[int]
+        transcriptids=transcript_ids,  # This is now a List[int]
         output_path=output_path
     )
 

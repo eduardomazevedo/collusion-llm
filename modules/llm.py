@@ -108,29 +108,29 @@ class LLMQuery:
 
         return completion.choices[0].message.parsed.model_dump_json(), token_info
 
-    def apply_prompt_to_transcripts(self, prompt_name, transcript_ids):
+    def apply_prompt_to_transcripts(self, prompt_name, transcriptids):
         """
         Applies a prompt to a list of transcripts.
 
         :param prompt_name: The key of the prompt in the JSON file.
-        :param transcript_ids: List of transcript IDs to process.
+        :param transcriptids: List of transcript IDs to process.
         :return: Dictionary mapping transcript IDs to their JSON string responses.
         """
-        print(f"\nStarting to process {len(transcript_ids)} transcripts with prompt '{prompt_name}'...")
-        transcript_texts = capiq.get_transcripts(transcript_ids)
+        print(f"\nStarting to process {len(transcriptids)} transcripts with prompt '{prompt_name}'...")
+        transcript_texts = capiq.get_transcripts(transcriptids)
         results = {}
         failed_transcripts = []
 
-        for i, transcript_id in enumerate(transcript_ids, 1):
-            print(f"\nProcessing transcript {i}/{len(transcript_ids)} (ID: {transcript_id})...")
+        for i, transcriptid in enumerate(transcriptids, 1):
+            print(f"\nProcessing transcript {i}/{len(transcriptids)} (ID: {transcriptid})...")
             try:
-                response, token_info = self.generate_response(prompt_name, transcript_texts[transcript_id])
-                results[transcript_id] = response
+                response, token_info = self.generate_response(prompt_name, transcript_texts[transcriptid])
+                results[transcriptid] = response
                 
                 # Save to database with metadata
                 insert_query_result(
                     prompt_name=prompt_name,
-                    transcript_id=transcript_id,
+                    transcriptid=transcriptid,
                     response=response,
                     llm_provider=self.provider,
                     model_name=self.model,
@@ -143,8 +143,8 @@ class LLMQuery:
                 print(f"✓ Saved response to database")
             except Exception as e:
                 error_type = type(e).__name__
-                print(f"✗ Failed to process transcript {transcript_id}: {error_type}: {str(e)}")
-                failed_transcripts.append((transcript_id, str(e)))
+                print(f"✗ Failed to process transcript {transcriptid}: {error_type}: {str(e)}")
+                failed_transcripts.append((transcriptid, str(e)))
                 
                 # Special handling for length limit errors
                 if error_type == "LengthFinishReasonError":
@@ -155,7 +155,7 @@ class LLMQuery:
         failed_count = len(failed_transcripts)
         print(f"\n{'='*60}")
         print(f"Processing complete!")
-        print(f"  ✓ Successfully processed: {successful_count}/{len(transcript_ids)} transcripts")
+        print(f"  ✓ Successfully processed: {successful_count}/{len(transcriptids)} transcripts")
         if failed_count > 0:
             print(f"  ✗ Failed: {failed_count} transcripts")
             print(f"\nFailed transcript IDs:")

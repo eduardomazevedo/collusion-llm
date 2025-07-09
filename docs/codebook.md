@@ -4,7 +4,7 @@
 
 ## Datasets
 
-### 1. `transcript-detail.feather` (37MB, 496,329 rows)
+### 1. `transcript_detail.feather` (37MB, 496,329 rows)
 
 **Description**: metadata for earnings call transcripts from Capital IQ.
 
@@ -46,7 +46,7 @@
 - `reasoning` (text): Reasoning from the original score query
 - `excerpts` (text): Relevant excerpts from the original score query
 
-### 4. `human-ratings.csv` (8.0KB, 416 rows)
+### 4. `human_ratings.csv` (8.0KB, 416 rows)
 
 **Description**: Human expert ratings and comments for collusion detection in transcripts.
 
@@ -137,7 +137,13 @@
 ## Data Relationships
 
 - `transcriptid` / `transcript_id` serves as the primary key linking most datasets
-- `top_transcripts.csv` contains a subset of transcript IDs from `transcript-detail.feather`
-- `human-ratings.csv` combines data from both Joe's scores and ACL flags
+- `top_transcripts.csv` contains a subset of transcript IDs from `transcript_detail.feather`
+- `human_ratings.csv` combines data from both Joe's scores and ACL flags
 - `queries.sqlite` contains LLM analysis results for transcripts
 - `leaderboard.csv` shows performance metrics for different prompt versions
+
+## Naming Conventions
+
+- **Database fields**: Use `transcriptid` and `companyid` (no underscore) to match WRDS/CapIQ naming conventions
+- **CSV files**: May use either `transcript_id` or `transcriptid` for historical reasons
+- **Python code**: Use snake_case (e.g., `transcript_id`, `company_id`) when working within Python scripts

@@ -171,6 +171,11 @@ bash ./src/tex_scripts/watch_manuscript_simple.sh  # Simple polling method
 - **analysis_queries table**: Stores follow-up analysis on high-scoring transcripts
 - Foreign key relationships maintained between tables
 
+### Naming Conventions
+- **File naming**: Use underscores in file names (e.g., `calculate_f1_scores.py`, not `calculate-f1-scores.py`)
+- **Database fields**: Use `transcriptid` and `companyid` (no underscore) to match WRDS/CapIQ naming conventions
+- **Python variables**: Use snake_case (e.g., `transcript_id`, `company_id`) when working within Python code
+
 ### LLM Integration
 - Responses use Pydantic models for structured output
 - Batch processing handles OpenAI rate limits automatically
@@ -196,7 +201,7 @@ bash ./src/tex_scripts/watch_manuscript_simple.sh  # Simple polling method
 - Input tokens: $0.075 per 1M tokens
 - Output tokens: $0.3 per 1M tokens
 - Average transcript: ~10K tokens
-- Use `bash ./src/post_query/exports/export_token_sizes.sh` to analyze token usage
+- Use `python ./src/post_query/exports/export_token_sizes.py` to analyze token usage
 
 ## Common Workflows
 
@@ -207,8 +212,8 @@ bash ./src/tex_scripts/watch_manuscript_simple.sh  # Simple polling method
 4. If satisfactory, run batch processing
 
 ### Analyzing Results
-1. Export results: `bash ./src/post_query/exports/export_analysis.sh`
-2. High score analysis: `bash ./src/query_submission/analysis_queries/analyze_high_scores.sh`
+1. Export results: `python ./src/post_query/exports/export_analysis.py`
+2. High score analysis: `python ./src/query_submission/analysis_queries/analyze_high_scores.py`
 3. Use notebooks in `src/notebooks/` for custom analysis
 
 ### Debugging Failed Batches

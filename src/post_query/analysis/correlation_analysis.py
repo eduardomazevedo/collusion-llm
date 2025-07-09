@@ -9,7 +9,7 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 def load_data():
     """Load the main analysis dataset"""
-    data_path = Path(__file__).parent.parent.parent / "data" / "main-analysis-dataset.feather"
+    data_path = Path(__file__).parent.parent.parent / "data" / "main_analysis_dataset.feather"
     df = pd.read_feather(data_path)
     return df
 

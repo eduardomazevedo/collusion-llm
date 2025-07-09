@@ -90,7 +90,7 @@ class UnifiedExporter:
         
         # Keep only latest per transcript if requested
         if latest_only:
-            df = df.sort_values('created_at').groupby(['transcript_id', 'prompt_name']).last().reset_index()
+            df = df.sort_values('created_at').groupby(['transcriptid', 'prompt_name']).last().reset_index()
             logging.info(f"Kept latest queries only: {len(df)} results")
         
         # Set output path
@@ -164,7 +164,7 @@ class UnifiedExporter:
         logging.info("Exporting company metadata...")
         
         # Read transcript details
-        transcript_detail_path = os.path.join(config.DATA_DIR, 'datasets', 'transcript-detail.feather')
+        transcript_detail_path = os.path.join(config.DATA_DIR, 'datasets', 'transcript_detail.feather')
         df = pd.read_feather(transcript_detail_path)
         
         # Select and rename columns
@@ -179,7 +179,7 @@ class UnifiedExporter:
         
         # Set output path
         if not output_path:
-            output_path = os.path.join(config.DATA_DIR, 'datasets', 'companies-transcripts.csv')
+            output_path = os.path.join(config.DATA_DIR, 'datasets', 'companies_transcripts.csv')
         
         # Save without header
         df.to_csv(output_path, index=False, header=False)
@@ -202,20 +202,20 @@ class UnifiedExporter:
         
         # Set output path
         if not output_path:
-            output_path = os.path.join(config.DATA_DIR, 'intermediaries', 'transcript-tokens.csv')
+            output_path = os.path.join(config.DATA_DIR, 'intermediaries', 'transcript_tokens.csv')
         
         # Load existing data if incremental
         existing_data = {}
         if incremental and os.path.exists(output_path):
             try:
                 existing_df = pd.read_csv(output_path)
-                existing_data = dict(zip(existing_df['transcript_id'], existing_df['token_count']))
+                existing_data = dict(zip(existing_df['transcriptid'], existing_df['token_count']))
                 logging.info(f"Loaded {len(existing_data)} existing token calculations")
             except Exception as e:
                 logging.warning(f"Could not load existing data: {e}")
         
         # Get all transcript IDs
-        transcript_detail_path = os.path.join(config.DATA_DIR, 'datasets', 'transcript-detail.feather')
+        transcript_detail_path = os.path.join(config.DATA_DIR, 'datasets', 'transcript_detail.feather')
         df = pd.read_feather(transcript_detail_path)
         all_transcript_ids = df['transcriptid'].unique()
         
@@ -230,7 +230,7 @@ class UnifiedExporter:
         results = []
         failed_count = 0
         
-        for i, transcript_id in enumerate(transcript_ids):
+        for i, transcriptid in enumerate(transcript_ids):
             if i % 100 == 0 and i > 0:
                 logging.info(f"Processed {i}/{len(transcript_ids)} transcripts")
                 # Save intermediate results
@@ -240,18 +240,18 @@ class UnifiedExporter:
             
             try:
                 # Get token size for transcript
-                token_size = transcript_token_size(transcript_id)
+                token_size = transcript_token_size(transcriptid)
                 
                 if token_size is not None:
                     results.append({
-                        'transcript_id': transcript_id,
+                        'transcriptid': transcriptid,
                         'token_count': token_size
                     })
                 else:
                     failed_count += 1
                     
             except Exception as e:
-                logging.warning(f"Failed to process transcript {transcript_id}: {e}")
+                logging.warning(f"Failed to process transcript {transcriptid}: {e}")
                 failed_count += 1
         
         # Save final results
@@ -266,14 +266,14 @@ class UnifiedExporter:
         # Combine with existing data
         all_data = existing_data.copy()
         for result in new_results:
-            all_data[result['transcript_id']] = result['token_count']
+            all_data[result['transcriptid']] = result['token_count']
         
         # Convert to dataframe and save
         df = pd.DataFrame([
-            {'transcript_id': tid, 'token_count': size}
+            {'transcriptid': tid, 'token_count': size}
             for tid, size in all_data.items()
         ])
-        df.sort_values('transcript_id', inplace=True)
+        df.sort_values('transcriptid', inplace=True)
         df.to_csv(output_path, index=False)
     
     def create_visualizer(self, input_path: str = None, output_path: str = None) -> str:
@@ -300,7 +300,7 @@ class UnifiedExporter:
         logging.info(f"Processing {len(df)} high-scoring transcripts")
         
         # Get unique transcript IDs
-        transcript_ids = df['transcript_id'].unique().tolist()
+        transcript_ids = df['transcriptid'].unique().tolist()
         
         # Fetch transcripts in batches
         batch_size = 50
@@ -317,22 +317,22 @@ class UnifiedExporter:
                 logging.error(f"Failed to fetch batch: {e}")
         
         # Add transcript content to dataframe
-        df['full_transcript'] = df['transcript_id'].map(lambda x: json.dumps(all_transcripts.get(x, {})))
+        df['full_transcript'] = df['transcriptid'].map(lambda x: json.dumps(all_transcripts.get(x, {})))
         
         # Load company metadata
-        companies_path = os.path.join(config.DATA_DIR, 'datasets', 'companies-transcripts.csv')
+        companies_path = os.path.join(config.DATA_DIR, 'datasets', 'companies_transcripts.csv')
         companies_df = pd.read_csv(companies_path, names=['companyid', 'companyname', 'transcriptid', 'headline'])
         
         # Merge with company data
         df = df.merge(
             companies_df[['companyname', 'transcriptid', 'headline']],
-            left_on='transcript_id',
+            left_on='transcriptid',
             right_on='transcriptid',
             how='left'
         )
         
         # Reorder columns
-        column_order = ['transcript_id', 'companyname', 'headline', 'score', 'reasoning', 'excerpts', 'full_transcript']
+        column_order = ['transcriptid', 'companyname', 'headline', 'score', 'reasoning', 'excerpts', 'full_transcript']
         df = df[[col for col in column_order if col in df.columns]]
         
         # Save to Excel
