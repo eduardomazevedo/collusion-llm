@@ -48,4 +48,4 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script
-python3 src/py/fix_db.py $FIX_FLAG $ADD_METADATA_FLAG 
+python3 src/archive/fix_db.py $FIX_FLAG $ADD_METADATA_FLAG 

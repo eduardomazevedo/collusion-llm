@@ -2,8 +2,8 @@
 
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# Get the project root directory (two levels up from the script)
-PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
+# Get the project root directory (three levels up from the script)
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../.." && pwd )"
 
 # Change to project root directory
 cd "$PROJECT_ROOT"
@@ -34,10 +34,10 @@ shift
 export PYTHONPATH="$PROJECT_ROOT"
 
 # Run the Python script
-python src/py/populate_benchmarking_data.py "$PROMPT_NAME" "$@"
+python src/query_submission/single_queries/populate_benchmarking_data.py "$PROMPT_NAME" "$@"
 
 # Update the leaderboard
 echo "Updating leaderboard..."
-python src/py/make/create_leaderboard.py
+python src/post_query/benchmarking/create_leaderboard.py
 
 echo "Benchmark complete and leaderboard updated!" 

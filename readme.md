@@ -1,13 +1,25 @@
-# Working on downstream analysis.
-  - See below for creating and updating the queries database.
-  - For downstream analysis:
-    - `bash ./src/bash/setup.sh`
-    - download a query database `bash ./src/bash/manage_db.sh download`.
-    - `snakemake --cores 2` to reproduce analysis.
+# Collusion Detection with LLMs
 
-# Setup
-  - `rclone config` to set rclone remote `collusion-llm` pointing to Google drive folder.
-  - `bash ./src/bash/setup.sh` 
+This project uses Large Language Models (LLMs) to detect potential collusive behavior in corporate earnings call transcripts. The system analyzes public company communications to identify signs of price-fixing or capacity limitation coordination between competitors.
+
+## Quick Start
+
+```bash
+# 1. Initial setup (creates venv, downloads data, initializes database)
+bash ./src/setup/setup.sh
+
+# 2. Configure rclone for Google Drive sync
+rclone config  # Create remote named 'collusion-llm'
+
+# 3. Download existing database or initialize new one
+bash ./src/cli/manage_db.sh download  # Get latest database
+# OR
+bash ./src/cli/manage_db.sh init     # Start fresh
+
+# 4. Run analysis pipeline
+source .venv/bin/activate
+snakemake --cores 2  # For downstream analysis
+``` 
 
 # Example .env file
 OPENAI_API_KEY = abc123
@@ -16,23 +28,23 @@ WRDS_PASSWORD = mordor123
 ROOT=/Users/sauron/projects/collusion-llm
 
 # Pipeline
-  - Setup: `bash ./src/bash/setup.sh`
+  - Setup: `bash ./src/setup/setup.sh`
   - Database management:
-    - Initialize new database: `bash ./src/bash/manage_db.sh init`
-    - Or get latest: `bash ./src/bash/manage_db.sh download`
-    - Check status: `bash ./src/bash/manage_db.sh status`
-  - Run prompts on transcripts: `bash ./src/bash/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>]`
-    - Assess prompt performance: "data/leaderboard.csv" updates every time `run_benchmark.sh` runs
-  - Upload database: `bash ./src/bash/manage_db.sh upload`
+    - Initialize new database: `bash ./src/cli/manage_db.sh init`
+    - Or get latest: `bash ./src/cli/manage_db.sh download`
+    - Check status: `bash ./src/cli/manage_db.sh status`
+  - Run prompts on transcripts: `bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>]`
+    - Assess prompt performance: "data/outputs/benchmarking/leaderboard.csv" updates every time benchmark runs
+  - Upload database: `bash ./src/cli/manage_db.sh upload`
 
 ### Updating Leaderboard with New Threshold
 To update the leaderboard with a new threshold value:
-1. Change the `binary_threshold` default value in `src/py/make/create_leaderboard.py`
-2. Run: `bash ./src/bash/update_leaderboard.sh`
+1. Change the `binary_threshold` default value in `src/post_query/benchmarking/create_leaderboard.py`
+2. Run: `bash ./src/post_query/benchmarking/update_leaderboard.sh`
 
 You can also sort the leaderboard by any available metric using the `--sort` option:
 ```bash
-bash ./src/bash/update_leaderboard.sh --sort <metric>
+bash ./src/post_query/benchmarking/update_leaderboard.sh --sort <metric>
 ```
 
 Available metrics for sorting:
@@ -50,7 +62,7 @@ Available metrics for sorting:
 
 For example, to sort by ACL positive precision:
 ```bash
-bash ./src/bash/update_leaderboard.sh --sort acl_pos_precision
+bash ./src/post_query/benchmarking/update_leaderboard.sh --sort acl_pos_precision
 ```
 
 ## Leaderboard Interpretation
@@ -78,7 +90,7 @@ The leaderboard is sorted by `combined_accuracy` in descending order by default,
 Calculate comprehensive performance metrics (precision, recall, F1, specificity) against human-reviewed datasets:
 
 ```bash
-bash ./src/bash/calculate_f1_scores.sh [options]
+python ./src/post_query/benchmarking/calculate_f1_scores.py [options]
 ```
 
 ### Options
@@ -92,7 +104,7 @@ bash ./src/bash/calculate_f1_scores.sh [options]
 ### Example
 ```bash
 # Compare different threshold configurations
-bash ./src/bash/calculate_f1_scores.sh --prompt SimpleCapacityV8.1.1 --threshold 75 --joe-threshold 50 --analysis-threshold 50 --detailed
+python ./src/post_query/benchmarking/calculate_f1_scores.py --prompt SimpleCapacityV8.1.1 --threshold 75 --joe-threshold 50 --analysis-threshold 50 --detailed
 ```
 
 The benchmarking evaluates multiple approaches:
@@ -105,12 +117,12 @@ Results include metrics for Joe's subsample, ACL's subsample, and pooled data.
 The project uses SQLite for storing query results. The database is stored in `data/queries.db`. To export the database to CSV:
 
 ```bash
-./src/bash/export_db.sh [output_path]
+python ./src/post_query/exports/export_queries.py [--output output_path]
 ```
 If no output path is specified, it will create a timestamped file in the `output` directory.
 
 ## Running Batches
-`bash ./src/bash/run_batch.sh <company_ids> <prompt_name> [options]`
+`bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> [options]`
 
 ### Required Arguments
 - `company_ids`: Single company ID or comma-separated list (e.g., "12345" or "12345,67890")
@@ -130,7 +142,7 @@ Use `--operation` flag with:
 - `--input-file <path>`: Custom input (relative) file path for `submit` operation (default: `output/batch_inputs/<prompt_name>_input.jsonl`)
 
 ## Running Big Batches (All Companies)
-`bash ./src/bash/run_big_batch.sh <prompt_name> <operation>`
+`bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> <operation>`
 
 Process all companies in the Capital IQ sample using the big batch runner. This handles OpenAI's size limits automatically and provides robust error handling with fallback to individual API calls.
 
@@ -151,13 +163,13 @@ Process all companies in the Capital IQ sample using the big batch runner. This 
 ### Example Usage
 ```bash
 # Create batches for all companies
-bash ./src/bash/run_big_batch.sh SimpleCapacityV8.1.1 create
+bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 create
 
 # Submit and monitor all batches
-bash ./src/bash/run_big_batch.sh SimpleCapacityV8.1.1 submit
+bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 submit
 
 # Create and submit in one command
-bash ./src/bash/run_big_batch.sh SimpleCapacityV8.1.1 all
+bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 all
 ```
 
 Progress is tracked in `data/batch-tracker.csv` and results are automatically saved to the database as batches complete.

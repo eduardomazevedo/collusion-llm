@@ -21,8 +21,8 @@ done
 
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# Get the project root directory (two levels up from the script)
-PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
+# Get the project root directory (three levels up from the script)
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../.." && pwd )"
 
 # Change to project root directory
 cd "$PROJECT_ROOT"
@@ -41,6 +41,6 @@ export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 # Update the leaderboard
 echo "Updating leaderboard..."
-python3 src/py/make/create_leaderboard.py --sort "$SORT_METRIC"
+python3 src/post_query/benchmarking/create_leaderboard.py --sort "$SORT_METRIC"
 
 echo "Leaderboard updated!" 

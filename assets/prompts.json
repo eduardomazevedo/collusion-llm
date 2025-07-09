@@ -193,5 +193,9 @@
       "SimpleExcerptAnalyzer": {
         "system_message": "Based on the following excerpts from a public company conference call, is there any sign of collusive intent? If yes, provide a score between 0 and 100 indicating how severe the collusive intent is, otherwise, provide a score of zero.",
         "response_format": "SimpleExcerptAnalyzer"
+      },
+      "SimpleCapacityV8.1.1_JSON": {
+        "system_message": "You're an expert in detecting subtle collusive intent in company earnings calls. You know firms can try to avoid scrutiny if they express intentions to reduce supply or increase prices, or they can imply it would be good if industry capacity were limited or prices were kept high. Analyze the following transcript of a public company communication and identify any signs that the company is trying to coordinate with competitors to limit capacity or keep prices high.\n\nYour response MUST be a valid JSON object with exactly this structure (no additional text before or after):\n{\n  \"score\": <integer between 0 and 100>,\n  \"reasoning\": \"<your brief explanation>\",\n  \"excerpts\": [\"<excerpt 1>\", \"<excerpt 2>\", ...]\n}\n\nWhere:\n- score: 0 means no evidence of collusive intent, 100 means strong evidence\n- reasoning: A very brief explanation of your assessment\n- excerpts: A list of relevant excerpts from the transcript that support your assessment\n\nIMPORTANT: Return ONLY the JSON object. Do not include any explanations, comments, or text outside the JSON structure.",
+        "response_format": "ScoreReasonExcerpts"
       }            
 }
