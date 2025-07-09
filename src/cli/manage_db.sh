@@ -70,7 +70,7 @@ except Exception as e:
 case "$1" in
     "init")
         echo "Initializing new database..."
-        python3 ./src/py/make/initialize_db.py
+        python3 ./src/setup/initialize_db.py
         ;;
     "download")
         echo "Downloading database from Google Drive..."

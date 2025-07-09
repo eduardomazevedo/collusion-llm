@@ -221,3 +221,86 @@ def extract_invalid_response(response_string: str, keys: List[str]) -> Dict:
                 result[key] = ""
     
     return result
+
+
+def extract_score_from_unstructured_response(response: str) -> int:
+    """
+    Extract score from various LLM response formats, including unstructured responses
+    from older models that don't support structured output.
+    
+    Args:
+        response: The response string from the LLM
+        
+    Returns:
+        int: The extracted score (0-100), or None if not found
+    """
+    if not response:
+        return None
+        
+    # Try to parse as valid JSON first
+    try:
+        # Handle both direct JSON and potential wrapper text
+        # Find the first { and last } to extract JSON
+        start_idx = response.find('{')
+        end_idx = response.rfind('}')
+        
+        if start_idx != -1 and end_idx != -1:
+            json_str = response[start_idx:end_idx + 1]
+            parsed = json.loads(json_str)
+            
+            if isinstance(parsed, dict):
+                # Look for score in various possible keys
+                score_keys = ['score', 'severity_score', 'confidence_score']
+                for key in score_keys:
+                    if key in parsed:
+                        score = parsed[key]
+                        # Ensure it's an integer between 0 and 100
+                        if isinstance(score, (int, float)):
+                            return int(min(100, max(0, score)))
+                        elif isinstance(score, str) and score.isdigit():
+                            return int(min(100, max(0, int(score))))
+    except json.JSONDecodeError:
+        pass
+    
+    # If JSON parsing fails, try regex patterns
+    patterns = [
+        r'"score"\s*:\s*(\d+)',           # "score": 75
+        r'score\s*:\s*(\d+)',              # score: 75
+        r'"score"\s*=\s*(\d+)',            # "score" = 75
+        r'Score:\s*(\d+)',                 # Score: 75
+        r'SCORE:\s*(\d+)',                 # SCORE: 75
+        r'Score\s+is\s+(\d+)',             # Score is 75
+        r'score\s+of\s+(\d+)',             # score of 75
+        r'(\d+)\s*/\s*100',                # 75/100
+        r'(\d+)\s+out\s+of\s+100',         # 75 out of 100
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, response, re.IGNORECASE)
+        if match:
+            score = int(match.group(1))
+            # Ensure it's between 0 and 100
+            return min(100, max(0, score))
+    
+    # Try using the existing extract_invalid_response function
+    try:
+        extracted = extract_invalid_response(response, ['score'])
+        if extracted.get('score') is not None:
+            score = extracted['score']
+            return min(100, max(0, score))
+    except:
+        pass
+    
+    # If all else fails, look for any number between 0 and 100
+    # that appears to be a score (this is a last resort)
+    numbers = re.findall(r'\b(\d{1,3})\b', response)
+    for num_str in numbers:
+        num = int(num_str)
+        if 0 <= num <= 100:
+            # Check if this number is in a scoring context
+            idx = response.find(num_str)
+            context = response[max(0, idx-20):idx+20].lower()
+            if any(word in context for word in ['score', 'rating', 'assessment', 'severity']):
+                return num
+    
+    return None

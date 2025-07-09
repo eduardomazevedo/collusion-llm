@@ -3,7 +3,7 @@
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Get the project root directory (two levels up from the script)
-PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../.." && pwd )"
 
 # Change to project root directory
 cd "$PROJECT_ROOT"
@@ -69,7 +69,7 @@ check_tracking_file() {
 case "$OPERATION" in
     "create")
         echo "Creating batches for prompt: $PROMPT_NAME"
-        python src/py/big_batch_runner.py "$PROMPT_NAME" create
+        python src/query_submission/batch_queries/big_batch_runner.py "$PROMPT_NAME" create
         if [ $? -eq 0 ]; then
             echo "Batch creation completed successfully"
             if check_batches_exist "$PROMPT_NAME"; then
@@ -97,7 +97,7 @@ case "$OPERATION" in
         LOG_FILE="submission.log"
         
         # Run the Python script and capture both stdout and stderr
-        python -u src/py/big_batch_runner.py "$PROMPT_NAME" submit 2>&1 | tee "$LOG_FILE"
+        python -u src/query_submission/batch_queries/big_batch_runner.py "$PROMPT_NAME" submit 2>&1 | tee "$LOG_FILE"
         
         if [ $? -eq 0 ]; then
             echo "Batch submission completed successfully"
@@ -128,7 +128,7 @@ case "$OPERATION" in
         
         # First create batches
         echo "Step 1: Creating batches..."
-        python src/py/big_batch_runner.py "$PROMPT_NAME" create
+        python src/query_submission/batch_queries/big_batch_runner.py "$PROMPT_NAME" create
         if [ $? -ne 0 ]; then
             echo "Error: Batch creation failed"
             exit 1
@@ -141,7 +141,7 @@ case "$OPERATION" in
         
         # Then submit batches
         echo "Step 2: Submitting batches..."
-        python src/py/big_batch_runner.py "$PROMPT_NAME" submit
+        python src/query_submission/batch_queries/big_batch_runner.py "$PROMPT_NAME" submit
         if [ $? -eq 0 ]; then
             echo "Batch submission completed successfully"
             if check_tracking_file; then

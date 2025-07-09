@@ -3,16 +3,16 @@
 
 rule all:
     input:
-        "data/raw/compustat/compustat-us.csv",
-        "data/raw/compustat/compustat-global.csv",
-        "data/raw/compustat/readme.md",
-        "data/gvkey_table.feather",
-        "data/gvkey_list.txt",
-        "data/company-year-compustat.parquet",
-        "data/main-analysis-dataset.feather",
-        "data/top_transcripts_data.csv",
-        "output/yaml/transcript-stats.yaml",
-        "output/constants/.populated"
+        "data/cache/raw/compustat/compustat-us.csv",
+        "data/cache/raw/compustat/compustat-global.csv",
+        "data/cache/raw/compustat/readme.md",
+        "data/datasets/gvkey_table.feather",
+        "data/intermediaries/gvkey_list.txt",
+        "data/datasets/company-year-compustat.parquet",
+        "data/datasets/main-analysis-dataset.feather",
+        "data/outputs/analysis/top_transcripts_data.csv",
+        "data/outputs/yaml/transcript-stats.yaml",
+        "data/outputs/constants/.populated"
 
 rule download_compustat:
     """
@@ -20,11 +20,11 @@ rule download_compustat:
     Downloads US and global Compustat data in CSV format plus readme.
     """
     output:
-        us_csv="data/raw/compustat/compustat-us.csv",
-        global_csv="data/raw/compustat/compustat-global.csv",
-        readme="data/raw/compustat/readme.md"
+        us_csv="data/cache/raw/compustat/compustat-us.csv",
+        global_csv="data/cache/raw/compustat/compustat-global.csv",
+        readme="data/cache/raw/compustat/readme.md"
     shell:
-        "bash src/bash/download_compustat.sh"
+        "bash src/pre_query/data_preparation/download_compustat.sh"
 
 rule get_gvkey:
     """
@@ -32,12 +32,12 @@ rule get_gvkey:
     Creates mapping table and list of gvkeys for further processing.
     """
     input:
-        "data/transcript-detail.feather"
+        "data/datasets/transcript-detail.feather"
     output:
-        table="data/gvkey_table.feather",
-        list_file="data/gvkey_list.txt"
+        table="data/datasets/gvkey_table.feather",
+        list_file="data/intermediaries/gvkey_list.txt"
     shell:
-        "python src/py/make/get_gvkey.py"
+        "python src/pre_query/dataset_creation/get_gvkey.py"
 
 rule company_year_dataset:
     """
@@ -45,13 +45,13 @@ rule company_year_dataset:
     Merges both datasets, adds location info, and maps gvkeys to company IDs.
     """
     input:
-        us_csv="data/raw/compustat/compustat-us.csv",
-        global_csv="data/raw/compustat/compustat-global.csv",
-        gvkey_table="data/gvkey_table.feather"
+        us_csv="data/cache/raw/compustat/compustat-us.csv",
+        global_csv="data/cache/raw/compustat/compustat-global.csv",
+        gvkey_table="data/datasets/gvkey_table.feather"
     output:
-        "data/company-year-compustat.parquet"
+        "data/datasets/company-year-compustat.parquet"
     shell:
-        "python src/py/make/company-year-dataset.py"
+        "python src/pre_query/dataset_creation/company-year-dataset.py"
 
 rule main_dataset:
     """
@@ -60,15 +60,15 @@ rule main_dataset:
     Creates binary flags for human and LLM collusion detection.
     """
     input:
-        transcript_detail="data/transcript-detail.feather",
-        compustat="data/company-year-compustat.parquet",
-        human_ratings="data/human-ratings.csv",
-        top_transcripts="data/top_transcripts.csv",
-        queries_db="data/queries.sqlite"
+        transcript_detail="data/datasets/transcript-detail.feather",
+        compustat="data/datasets/company-year-compustat.parquet",
+        human_ratings="data/datasets/human_ratings/human-ratings.csv",
+        top_transcripts="data/outputs/analysis/top_transcripts.csv",
+        queries_db="data/datasets/queries.sqlite"
     output:
-        "data/main-analysis-dataset.feather"
+        "data/datasets/main-analysis-dataset.feather"
     shell:
-        "python src/py/make/main_dataset.py"
+        "python src/pre_query/dataset_creation/main_dataset.py"
 
 rule top_transcript_data:
     """
@@ -77,13 +77,13 @@ rule top_transcript_data:
     Includes company names, dates, and excerpt data for detailed analysis.
     """
     input:
-        top_transcripts="data/top_transcripts.csv",
-        queries_db="data/queries.sqlite",
-        transcript_detail="data/transcript-detail.feather"
+        top_transcripts="data/outputs/analysis/top_transcripts.csv",
+        queries_db="data/datasets/queries.sqlite",
+        transcript_detail="data/datasets/transcript-detail.feather"
     output:
-        "data/top_transcripts_data.csv"
+        "data/outputs/analysis/top_transcripts_data.csv"
     shell:
-        "python src/py/make/top_transcript_data.py"
+        "python src/post_query/analysis/top_transcript_data.py"
 
 rule transcript_data_stats:
     """
@@ -91,12 +91,12 @@ rule transcript_data_stats:
     Analyzes transcript details and creates YAML output with key metrics.
     """
     input:
-        transcript_detail="data/transcript-detail.feather",
-        queries_db="data/queries.sqlite"
+        transcript_detail="data/datasets/transcript-detail.feather",
+        queries_db="data/datasets/queries.sqlite"
     output:
-        "output/yaml/transcript-stats.yaml"
+        "data/outputs/yaml/transcript-stats.yaml"
     shell:
-        "python src/py/transcript_data_stats.py"
+        "python src/post_query/analysis/transcript_data_stats.py"
 
 rule populate_constants:
     """
@@ -104,8 +104,8 @@ rule populate_constants:
     Creates multiple format versions (int, float, percentage, etc.) for use in manuscripts.
     """
     input:
-        "output/yaml/transcript-stats.yaml"
+        "data/outputs/yaml/transcript-stats.yaml"
     output:
-        "output/constants/.populated"
+        "data/outputs/constants/.populated"
     shell:
-        "python src/py/make/populate_constants.py && touch output/constants/.populated"
+        "python src/post_query/exports/populate_constants.py && touch data/outputs/constants/.populated"

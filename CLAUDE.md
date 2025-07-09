@@ -8,10 +8,38 @@ This is a research project that uses LLMs to detect potential collusive behavior
 
 ## Architecture
 
-The project follows a pipeline architecture:
+The project follows a pipeline architecture organized by workflow stages:
+
+### Directory Structure
+```
+src/
+├── cli/              # Command-line interfaces (manage_db.sh)
+├── setup/            # Setup and initialization scripts
+├── pre_query/        # Data preparation and prompt testing
+│   ├── data_preparation/
+│   ├── dataset_creation/
+│   └── prompt_testing/
+├── query_submission/ # LLM query execution
+│   ├── single_queries/
+│   ├── batch_queries/
+│   └── analysis_queries/
+└── post_query/       # Analysis and exports
+    ├── benchmarking/
+    ├── analysis/
+    └── exports/
+
+data/
+├── datasets/         # Core datasets and databases
+├── intermediaries/   # Generated intermediate files
+├── outputs/          # Analysis results
+├── cache/           # Temporary files and batches
+└── metadata/        # Data documentation
+```
+
+### Processing Pipeline
 - Data ingestion from Capital IQ (earnings call transcripts)
 - LLM-based analysis using various prompts (40+ variations)
-- Results storage in SQLite database
+- Results storage in SQLite database (data/datasets/queries.sqlite)
 - Performance evaluation against human expert ratings
 - Batch processing capabilities for large-scale analysis
 
@@ -20,43 +48,48 @@ The project follows a pipeline architecture:
 ### Setup and Environment
 ```bash
 # Initial setup (runs all setup scripts)
-bash ./src/bash/setup.sh
+bash ./src/setup/setup.sh
 
 # Activate virtual environment
 source .venv/bin/activate
+
+# Note: Many Python scripts can now be run directly after activating the virtual environment
+# Example: python src/post_query/benchmarking/calculate_f1_scores.py --help
 ```
 
 ### Database Management
 ```bash
 # Initialize new database
-bash ./src/bash/manage_db.sh init
+bash ./src/cli/manage_db.sh init
 
 # Download latest database from Google Drive
-bash ./src/bash/manage_db.sh download
+bash ./src/cli/manage_db.sh download
 
 # Upload database to Google Drive
-bash ./src/bash/manage_db.sh upload
+bash ./src/cli/manage_db.sh upload
 
-# Export database to CSV
-bash ./src/bash/export_db.sh [output_path]
+# Export database to CSV  
+python ./src/post_query/exports/export_queries.py [--output output_path] [--prompts prompt1 prompt2] [--latest-only]
 ```
 
 ### Running Analysis
 ```bash
 # Run benchmark on test transcripts
-bash ./src/bash/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>]
+bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>]
+# Or run Python script directly:
+# python ./src/query_submission/single_queries/populate_benchmarking_data.py <prompt_name> [options]
 
 # Process batch of companies
-bash ./src/bash/run_batch.sh <company_ids> <prompt_name> [options]
+bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> [options]
 
 # Run large-scale batch processing
-bash ./src/bash/run_big_batch.sh <prompt_name> <operation>  # operation: create, submit, or all
+bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> <operation>  # operation: create, submit, or all
 
 # Update leaderboard
-bash ./src/bash/update_leaderboard.sh [--sort <metric>]
+bash ./src/post_query/benchmarking/update_leaderboard.sh [--sort <metric>]
 
 # Calculate F1 scores and comprehensive metrics
-bash ./src/bash/calculate_f1_scores.sh [options]
+python ./src/post_query/benchmarking/calculate_f1_scores.py [options]
 # Options:
 #   --prompt <name>           Specific prompt to analyze
 #   --threshold <value>       LLM score threshold (default: 75.0)
@@ -64,7 +97,23 @@ bash ./src/bash/calculate_f1_scores.sh [options]
 #   --analysis-threshold <val> Analysis validation threshold (default: 75.0)
 #   --detailed               Show detailed metrics
 # Example:
-bash ./src/bash/calculate_f1_scores.sh --prompt SimpleCapacityV8.1.1 --threshold 50 --joe-threshold 50 --analysis-threshold 75 --detailed
+python ./src/post_query/benchmarking/calculate_f1_scores.py --prompt SimpleCapacityV8.1.1 --threshold 50 --joe-threshold 50 --analysis-threshold 75 --detailed
+
+# Unified data export (NEW)
+bash ./src/post_query/exports/unified_export.sh --type <type> [options]
+# Types: queries, analysis, companies, tokens, visualizer, all
+# Examples:
+#   Export all queries as CSV:
+#   bash ./src/post_query/exports/unified_export.sh --type queries
+#
+#   Export analysis with specific prompt as Excel:
+#   bash ./src/post_query/exports/unified_export.sh --type analysis --analysis-prompt SimpleExcerptAnalyzer --format excel
+#
+#   Export everything except slow operations:
+#   bash ./src/post_query/exports/unified_export.sh --type all --output-dir exports/batch_export/
+#
+#   Create visualization Excel for high scores:
+#   bash ./src/post_query/exports/unified_export.sh --type visualizer
 ```
 
 ### Testing
@@ -82,15 +131,15 @@ pytest --cov=modules tests/
 ### LaTeX Manuscript Compilation
 ```bash
 # Compile the manuscript with bibliography
-bash ./src/bash/compile_manuscript.sh
+bash ./src/tex_scripts/compile_manuscript.sh
 
 # The script handles the full pdflatex + biber workflow automatically
 # Output PDF: manuscript/manuscript.pdf
 
 # Auto-compile on file changes (watches .tex, .bib, .sty files)
-bash ./src/bash/watch_manuscript.sh      # Uses fswatch (more efficient)
+bash ./src/tex_scripts/watch_manuscript.sh      # Uses fswatch (more efficient)
 # OR
-bash ./src/bash/watch_manuscript_simple.sh  # Simple polling method
+bash ./src/tex_scripts/watch_manuscript_simple.sh  # Simple polling method
 
 # The watcher will:
 # - Run initial compilation
@@ -106,7 +155,7 @@ bash ./src/bash/watch_manuscript_simple.sh  # Simple polling method
 - **`modules/batch_processor.py`**: Handles OpenAI batch API operations
 - **`modules/queries_db.py`**: Database operations and query management
 - **`modules/capiq.py`**: Capital IQ data interface
-- **`modules/utils.py`**: Utility functions for data processing
+- **`modules/utils.py`**: Utility functions for data processing (includes `extract_score_from_unstructured_response`)
 - **`modules/db_manager.py`**: High-level database management
 
 ## Important Patterns
@@ -115,6 +164,7 @@ bash ./src/bash/watch_manuscript_simple.sh  # Simple polling method
 - Environment variables loaded from `.env` file (OPENAI_API_KEY, WRDS_USERNAME, WRDS_PASSWORD, ROOT)
 - `config.py` ensures working directory is always project root
 - Prompts stored in `assets/prompts.json`
+- LLM model specifications in `assets/llm_config.json`
 
 ### Database Schema
 - **queries table**: Stores LLM analysis results for transcripts
@@ -146,23 +196,23 @@ bash ./src/bash/watch_manuscript_simple.sh  # Simple polling method
 - Input tokens: $0.075 per 1M tokens
 - Output tokens: $0.3 per 1M tokens
 - Average transcript: ~10K tokens
-- Use `bash ./src/bash/export_token_sizes.sh` to analyze token usage
+- Use `bash ./src/post_query/exports/export_token_sizes.sh` to analyze token usage
 
 ## Common Workflows
 
 ### Adding a New Prompt
 1. Add prompt definition to `assets/prompts.json`
-2. Test with benchmark: `bash ./src/bash/run_benchmark.sh <prompt_name>`
+2. Test with benchmark: `bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name>`
 3. Review leaderboard results
 4. If satisfactory, run batch processing
 
 ### Analyzing Results
-1. Export results: `bash ./src/bash/export_analysis.sh`
-2. High score analysis: `bash ./src/bash/analyze_high_scores.sh`
+1. Export results: `bash ./src/post_query/exports/export_analysis.sh`
+2. High score analysis: `bash ./src/query_submission/analysis_queries/analyze_high_scores.sh`
 3. Use notebooks in `src/notebooks/` for custom analysis
 
 ### Debugging Failed Batches
-1. Check batch status in output/batch-tracker.csv
+1. Check batch status in data/intermediaries/batch-tracker.csv
 2. Retrieve error file if batch failed
 3. Resume processing with same command - it will skip completed batches
 

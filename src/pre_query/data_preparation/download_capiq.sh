@@ -3,7 +3,7 @@
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Get the project root directory (two levels up from the script)
-PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../.." && pwd )"
 
 # Change to project root directory
 cd "$PROJECT_ROOT"
@@ -16,4 +16,4 @@ echo "Virtual environment activated."
 export PYTHONPATH="$PROJECT_ROOT"
 
 # Run the Python script
-python3 src/py/make/make_visualizer.py 
+python3 src/pre_query/data_preparation/download_capiq_details.py

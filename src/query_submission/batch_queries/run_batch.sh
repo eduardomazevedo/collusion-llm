@@ -3,7 +3,7 @@
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Get the project root directory (two levels up from the script)
-PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../.." && pwd )"
 
 # Change to project root directory
 cd "$PROJECT_ROOT"
@@ -37,6 +37,6 @@ shift 2
 export PYTHONPATH="$PROJECT_ROOT"
 
 # Run the Python script
-python src/py/batch_processor_runner.py "$COMPANY_IDS" "$PROMPT_NAME" "$@"
+python src/query_submission/batch_queries/batch_processor_runner.py "$COMPANY_IDS" "$PROMPT_NAME" "$@"
 
 echo "Batch processing complete!" 
