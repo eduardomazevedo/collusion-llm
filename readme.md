@@ -12,9 +12,9 @@ bash ./src/setup/setup.sh
 rclone config  # Create remote named 'collusion-llm'
 
 # 3. Download existing database or initialize new one
-bash ./src/cli/manage_db.sh download  # Get latest database
+bash ./src/cli/db_manager.sh download  # Get latest database
 # OR
-bash ./src/cli/manage_db.sh init     # Start fresh
+bash ./src/cli/db_manager.sh init     # Start fresh
 
 # 4. Run analysis pipeline
 source .venv/bin/activate
@@ -30,12 +30,12 @@ ROOT=/Users/sauron/projects/collusion-llm
 # Pipeline
   - Setup: `bash ./src/setup/setup.sh`
   - Database management:
-    - Initialize new database: `bash ./src/cli/manage_db.sh init`
-    - Or get latest: `bash ./src/cli/manage_db.sh download`
-    - Check status: `bash ./src/cli/manage_db.sh status`
+    - Initialize new database: `bash ./src/cli/db_manager.sh init`
+    - Or get latest: `bash ./src/cli/db_manager.sh download`
+    - Check status: `bash ./src/cli/db_manager.sh status`
   - Run prompts on transcripts: `bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>]`
     - Assess prompt performance: "data/outputs/benchmarking/leaderboard.csv" updates every time benchmark runs
-  - Upload database: `bash ./src/cli/manage_db.sh upload`
+  - Upload database: `bash ./src/cli/db_manager.sh upload`
 
 ### Updating Leaderboard with New Threshold
 To update the leaderboard with a new threshold value:

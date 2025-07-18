@@ -14,7 +14,8 @@ SCRIPTS=(
     "$SCRIPT_DIR/download_credentials.sh"
     "$PROJECT_ROOT/src/pre_query/data_preparation/download_capiq.sh"
     "$PROJECT_ROOT/src/pre_query/data_preparation/download_human_ratings.sh"
-    "$PROJECT_ROOT/src/post_query/exports/export_companies.sh"
+    "$PROJECT_ROOT/src/pre_query/data_preparation/export_companies.sh"
+    "$PROJECT_ROOT/src/pre_query/data_preparation/format_human_ratings.sh"
 )
 
 # Iterate over the scripts and execute each one
@@ -27,9 +28,3 @@ for SCRIPT_PATH in "${SCRIPTS[@]}"; do
         echo "Script $SCRIPT_PATH not found"
     fi
 done
-
-# Format human ratings
-echo "Formatting human ratings..."
-source .venv/bin/activate
-export PYTHONPATH="$PROJECT_ROOT"
-python3 src/pre_query/data_preparation/format_human_ratings.py

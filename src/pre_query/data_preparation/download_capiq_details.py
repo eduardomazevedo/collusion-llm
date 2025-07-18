@@ -2,6 +2,7 @@
 import config
 import wrds
 import pandas as pd
+import os
 
 # Connect
 conn = wrds.Connection(wrds_username=config.WRDS_USERNAME, password=config.WRDS_PASSWORD)
@@ -46,4 +47,5 @@ df = eliminate_duplicate_transcripts(df)
 
 #%%
 # Save
+os.makedirs(os.path.dirname(config.TRANSCRIPT_DETAIL_PATH), exist_ok=True)
 df.to_feather(config.TRANSCRIPT_DETAIL_PATH)

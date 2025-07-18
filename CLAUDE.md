@@ -13,7 +13,7 @@ The project follows a pipeline architecture organized by workflow stages:
 ### Directory Structure
 ```
 src/
-├── cli/              # Command-line interfaces (manage_db.sh)
+├── cli/              # Command-line interfaces (db_manager.sh)
 ├── setup/            # Setup and initialization scripts
 ├── pre_query/        # Data preparation and prompt testing
 │   ├── data_preparation/
@@ -60,13 +60,13 @@ source .venv/bin/activate
 ### Database Management
 ```bash
 # Initialize new database
-bash ./src/cli/manage_db.sh init
+bash ./src/cli/db_manager.sh init
 
 # Download latest database from Google Drive
-bash ./src/cli/manage_db.sh download
+bash ./src/cli/db_manager.sh download
 
 # Upload database to Google Drive
-bash ./src/cli/manage_db.sh upload
+bash ./src/cli/db_manager.sh upload
 
 # Export database to CSV  
 python ./src/post_query/exports/export_queries.py [--output output_path] [--prompts prompt1 prompt2] [--latest-only]
