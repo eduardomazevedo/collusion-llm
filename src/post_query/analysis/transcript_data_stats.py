@@ -5,11 +5,11 @@ import yaml
 from datetime import datetime
 
 # Load the transcript detail data
-data_path = os.path.join(config.DATA_DIR, 'transcript_detail.feather')
+data_path = config.TRANSCRIPT_DETAIL_PATH
 df = pd.read_feather(data_path)
 
 # Print the variable names (column names)
-print("Variable names in transcript-detail.feather:")
+print("Variable names in transcript_detail.feather:")
 print(df.columns.tolist())
 
 # Also print basic info about the dataset
@@ -93,7 +93,7 @@ for key, value in stats.items():
 # Save to YAML file
 output_dir = os.path.join(config.OUTPUT_DIR, 'yaml')
 os.makedirs(output_dir, exist_ok=True)
-output_path = os.path.join(output_dir, 'transcript-stats.yaml')
+output_path = os.path.join(output_dir, 'transcript_stats.yaml')
 
 with open(output_path, 'w') as f:
     yaml.dump(stats, f, default_flow_style=False, sort_keys=False)

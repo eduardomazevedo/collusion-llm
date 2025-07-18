@@ -55,7 +55,7 @@ The following shell scripts should be kept because their Python counterparts don
 4. **src/pre_query/data_preparation/download_*.sh** - These perform file operations with rclone, not just Python calls
 5. **src/setup/*.sh** - Setup scripts with complex logic
 6. **src/tex_scripts/*.sh** - LaTeX compilation scripts with complex logic
-7. **src/cli/manage_db.sh** - Complex database management with multiple operations
+7. **src/cli/db_manager.sh** - Complex database management with multiple operations
 
 ## Recommendation
 

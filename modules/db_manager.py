@@ -23,16 +23,28 @@ def verify_database(db_path: str) -> bool:
         # Check if queries table exists and has expected columns
         cursor.execute("PRAGMA table_info(queries)")
         columns = [col[1] for col in cursor.fetchall()]
-        expected_columns = {
+        expected_queries_columns = {
             'query_id', 'prompt_name', 'transcriptid', 'date', 'response',
             'LLM_provider', 'model_name', 'call_type', 'temperature',
             'max_response', 'input_tokens', 'output_tokens'
         }
         
-        if not all(col in columns for col in expected_columns):
+        if not all(col in columns for col in expected_queries_columns):
+            return False
+        
+        # Check if analysis_queries table exists and has expected columns
+        cursor.execute("PRAGMA table_info(analysis_queries)")
+        columns = [col[1] for col in cursor.fetchall()]
+        expected_analysis_columns = {
+            'analysis_query_id', 'reference_query_id', 'prompt_name', 'date', 
+            'response', 'LLM_provider', 'model_name', 'call_type', 
+            'temperature', 'max_response', 'input_tokens', 'output_tokens'
+        }
+        
+        if columns and not all(col in columns for col in expected_analysis_columns):
             return False
             
-        # Check if table has any data
+        # Check if queries table has any data
         cursor.execute("SELECT COUNT(*) FROM queries")
         count = cursor.fetchone()[0]
         
@@ -70,7 +82,7 @@ def download_database() -> bool:
     if not check_remote_database_exists():
         print("\nDatabase not found in Google Drive!")
         print("You have two options:")
-        print("1. Create a new database: python ./src/py/make/initialize_db.py")
+        print("1. Create a new database: bash ./src/cli/db_manager.sh init")
         print("2. Get the database from another team member")
         return False
     
@@ -112,4 +124,70 @@ def upload_database() -> bool:
         
     except subprocess.CalledProcessError as e:
         print(f"Error uploading database: {e}")
+        return False
+
+def initialize_database() -> bool:
+    """
+    Create the database and tables if they don't exist.
+    
+    Returns:
+        bool: True if initialization was successful, False otherwise
+    """
+    # Check if database exists in Google Drive
+    if check_remote_database_exists():
+        print("\nWarning: Database already exists in Google Drive!")
+        print("To avoid losing data, please download the existing database using:")
+        print("bash ./src/cli/db_manager.sh download")
+        print("\nIf you're sure you want to create a new database, delete the existing one from Google Drive first.")
+        return False
+
+    print("\nCreating new database...")
+    try:
+        with sqlite3.connect(config.DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            
+            # Create queries table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS queries (
+                    query_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    prompt_name TEXT NOT NULL,
+                    transcriptid INTEGER NOT NULL,
+                    date TEXT NOT NULL,
+                    response TEXT NOT NULL,
+                    LLM_provider TEXT,
+                    model_name TEXT,
+                    call_type TEXT,
+                    temperature REAL,
+                    max_response INTEGER,
+                    input_tokens INTEGER,
+                    output_tokens INTEGER
+                )
+            ''')
+            
+            # Create analysis_queries table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS analysis_queries (
+                    analysis_query_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reference_query_id INTEGER NOT NULL,
+                    prompt_name TEXT NOT NULL,
+                    date TEXT NOT NULL,
+                    response TEXT NOT NULL,
+                    LLM_provider TEXT,
+                    model_name TEXT,
+                    call_type TEXT,
+                    temperature REAL,
+                    max_response INTEGER,
+                    input_tokens INTEGER,
+                    output_tokens INTEGER,
+                    FOREIGN KEY (reference_query_id) REFERENCES queries (query_id)
+                )
+            ''')
+            
+            conn.commit()
+            
+        print("Database created successfully!")
+        return True
+        
+    except sqlite3.Error as e:
+        print(f"Error creating database: {e}")
         return False 

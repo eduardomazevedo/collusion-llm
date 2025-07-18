@@ -17,13 +17,14 @@ OPENAI_MODEL = "o4-mini-2025-04-16"
 ROOT = os.getenv('ROOT')
 
 # Paths
-DATABASE_PATH = os.path.join(ROOT, "data/queries.sqlite")
+DATABASE_PATH = os.path.join(ROOT, "data/datasets/queries.sqlite")
 PROMPTS_PATH = os.path.join(ROOT, "assets/prompts.json")
-TRANSCRIPT_DETAIL_PATH = os.path.join(ROOT, "data/transcript_detail.feather")
-ACL_SCORES_PATH = os.path.join(ROOT, "data/raw/acl_scores.csv")
-JOE_SCORES_PATH = os.path.join(ROOT, "data/raw/joe_scores.csv")
-HUMAN_RATINGS_PATH = os.path.join(ROOT, "data/human_ratings.csv")
-OUTPUT_DIR = os.path.join(ROOT, "output")
+TRANSCRIPT_DETAIL_PATH = os.path.join(ROOT, "data/datasets/transcript_detail.feather")
+ACL_SCORES_PATH = os.path.join(ROOT, "data/raw/human_ratings/acl_scores.csv")
+JOE_SCORES_PATH = os.path.join(ROOT, "data/raw/human_ratings/joe_scores.csv")
+HUMAN_RATINGS_PATH = os.path.join(ROOT, "data/datasets/human_ratings.csv")
+COMPANIES_TRANSCRIPTS_PATH = os.path.join(ROOT, "data/intermediaries/companies_transcripts.csv")
+OUTPUTS_DIR = os.path.join(ROOT, "data/outputs")
 DATA_DIR = os.path.join(ROOT, "data")
 
 # rclone
