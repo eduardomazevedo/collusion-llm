@@ -16,6 +16,8 @@ import json
 import argparse
 from typing import Dict, List, Tuple, Optional
 import config
+import os
+from modules.utils import extract_score_from_unstructured_response
 
 
 def calculate_comprehensive_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
@@ -69,14 +71,19 @@ def load_human_ratings() -> pd.DataFrame:
 
 
 def extract_score_from_response(response_str: str) -> Optional[float]:
-    """Extract score from JSON response string."""
+    """Extract score from response string, with fallback for unstructured responses."""
     try:
+        # First try to parse as JSON
         response_dict = json.loads(response_str)
         if isinstance(response_dict, dict):
-            return response_dict.get('score', None)
+            score = response_dict.get('score', None)
+            if score is not None:
+                return float(score)
         return None
-    except:
-        return None
+    except (json.JSONDecodeError, ValueError):
+        # If JSON parsing fails, use the robust parser from utils
+        score = extract_score_from_unstructured_response(response_str)
+        return float(score) if score is not None else None
 
 
 def get_all_llm_responses() -> pd.DataFrame:
@@ -139,7 +146,7 @@ def get_analysis_responses() -> pd.DataFrame:
     return df
 
 
-def convert_to_binary(scores: pd.Series, threshold: float = 75.0) -> pd.Series:
+def convert_to_binary(scores: pd.Series, threshold) -> pd.Series:
     """Convert continuous scores to binary using threshold."""
     return (scores >= threshold).astype(int)
 
@@ -147,7 +154,7 @@ def convert_to_binary(scores: pd.Series, threshold: float = 75.0) -> pd.Series:
 def calculate_metrics_for_subsample(
     llm_scores: pd.Series, 
     human_labels: pd.Series,
-    threshold: float = 75.0
+    threshold: float = config.LLM_SCORE_THRESHOLD
 ) -> Dict[str, float]:
     """Calculate comprehensive metrics for a subsample."""
     # Convert LLM scores to binary
@@ -171,8 +178,8 @@ def process_non_interactive_single(
     human_ratings: pd.DataFrame,
     prompt_name: str,
     model_name: str,
-    threshold: float = 75.0,
-    joe_threshold: float = 50.0
+    threshold: float = config.LLM_SCORE_THRESHOLD,
+    joe_threshold: float = config.JOE_SCORE_THRESHOLD
 ) -> Dict[str, float]:
     """
     Process non-interactive single response approach.
@@ -250,8 +257,8 @@ def process_non_interactive_average(
     human_ratings: pd.DataFrame,
     prompt_name: str,
     model_name: str,
-    threshold: float = 75.0,
-    joe_threshold: float = 50.0
+    threshold: float = config.LLM_SCORE_THRESHOLD,
+    joe_threshold: float = config.JOE_SCORE_THRESHOLD
 ) -> Dict[str, float]:
     """
     Process non-interactive average approach.
@@ -330,8 +337,8 @@ def process_agentic_repeated_high(
     human_ratings: pd.DataFrame,
     prompt_name: str,
     model_name: str,
-    threshold: float = 75.0,
-    joe_threshold: float = 50.0
+    threshold: float = config.LLM_SCORE_THRESHOLD,
+    joe_threshold: float = config.JOE_SCORE_THRESHOLD
 ) -> Dict[str, float]:
     """
     Process agentic repeated high-scoring approach.
@@ -341,6 +348,7 @@ def process_agentic_repeated_high(
     empty_metrics = get_empty_metrics()
     
     # Check if model is eligible
+    # This is based on the fact that we ran the big batch using gpt-4o-mini and only re-ran those that scored high then
     if not model_name.startswith('gpt-4o-mini'):
         return empty_metrics
     
@@ -438,9 +446,9 @@ def process_agentic_analysis(
     human_ratings: pd.DataFrame,
     original_prompt_name: str,
     model_name: str,
-    threshold: float = 75.0,
-    joe_threshold: float = 50.0,
-    analysis_threshold: float = 75.0
+    threshold: float = config.LLM_SCORE_THRESHOLD,
+    joe_threshold: float = config.JOE_SCORE_THRESHOLD,
+    analysis_threshold: float = config.ANALYSIS_SCORE_THRESHOLD
 ) -> Dict[str, float]:
     """
     Process agentic analysis approach.
@@ -570,93 +578,6 @@ def process_agentic_analysis(
     return results
 
 
-def process_agentic_analysis_filtered(
-    analysis_responses: pd.DataFrame,
-    human_ratings: pd.DataFrame,
-    original_prompt_name: str,
-    model_name: str,
-    threshold: float = 75.0,
-    joe_threshold: float = 50.0,
-    analysis_threshold: float = 75.0
-) -> Dict[str, float]:
-    """
-    Process agentic analysis filtered approach.
-    Uses original query scores but only for transcripts where analysis score >= threshold.
-    """
-    # Filter for specific original prompt and model
-    df = analysis_responses[
-        (analysis_responses['original_prompt_name'] == original_prompt_name) & 
-        (analysis_responses['model_name'] == model_name)
-    ].copy()
-    
-    empty_metrics = get_empty_metrics()
-    
-    if len(df) == 0:
-        return empty_metrics
-    
-    # Filter to only keep transcripts where analysis score >= analysis_threshold
-    high_analysis_df = df[df['analysis_score'] >= analysis_threshold]
-    
-    if len(high_analysis_df) == 0:
-        return empty_metrics
-    
-    # Average original scores per transcript (in case of multiple analyses)
-    avg_original_scores = high_analysis_df.groupby('transcriptid')['original_score'].mean().reset_index()
-    avg_original_scores.columns = ['transcriptid', 'filtered_original_score']
-    
-    # Merge with human ratings
-    merged = pd.merge(avg_original_scores, human_ratings, on='transcriptid', how='inner')
-    
-    results = {}
-    
-    # Joe's subsample
-    joe_data = merged[merged['joe_score'].notna()]
-    if len(joe_data) > 0:
-        joe_binary = convert_to_binary(joe_data['joe_score'], joe_threshold)
-        joe_metrics = calculate_metrics_for_subsample(joe_data['filtered_original_score'], joe_binary, threshold)
-        results.update({f'joe_{k}': v for k, v in joe_metrics.items()})
-    else:
-        results.update({k: v for k, v in empty_metrics.items() if k.startswith('joe_')})
-    
-    # ACL's subsample
-    acl_data = merged[merged['acl_manual_flag'].notna()]
-    if len(acl_data) > 0:
-        acl_metrics = calculate_metrics_for_subsample(
-            acl_data['filtered_original_score'], 
-            acl_data['acl_manual_flag'], 
-            threshold
-        )
-        results.update({f'acl_{k}': v for k, v in acl_metrics.items()})
-    else:
-        results.update({k: v for k, v in empty_metrics.items() if k.startswith('acl_')})
-    
-    # Pooled sample
-    pooled_data = merged[(merged['joe_score'].notna()) | (merged['acl_manual_flag'].notna())]
-    if len(pooled_data) > 0:
-        # Create unified labels
-        pooled_labels = []
-        pooled_scores = []
-        
-        for _, row in pooled_data.iterrows():
-            # Use ACL label if available, otherwise convert Joe's score
-            if pd.notna(row['acl_manual_flag']):
-                pooled_labels.append(int(row['acl_manual_flag']))
-            else:
-                pooled_labels.append(int(row['joe_score'] >= joe_threshold))
-            pooled_scores.append(row['filtered_original_score'])
-        
-        pooled_binary_pred = convert_to_binary(pd.Series(pooled_scores), threshold)
-        pooled_metrics = calculate_comprehensive_metrics(
-            np.array(pooled_labels), 
-            pooled_binary_pred.values
-        )
-        results.update({f'pooled_{k}': v for k, v in pooled_metrics.items()})
-    else:
-        results.update({k: v for k, v in empty_metrics.items() if k.startswith('pooled_')})
-    
-    return results
-
-
 def get_unique_prompt_model_combinations(llm_responses: pd.DataFrame) -> List[Tuple[str, str]]:
     """Get unique combinations of prompt_name and model_name that have responses."""
     combinations = llm_responses[['prompt_name', 'model_name']].drop_duplicates()
@@ -675,10 +596,10 @@ def get_analysis_prompt_names(analysis_responses: pd.DataFrame, prompt_name: str
 def main():
     parser = argparse.ArgumentParser(description='Calculate comprehensive metrics for LLM approaches')
     parser.add_argument('--prompt', type=str, help='Specific prompt name to analyze (default: all prompts)')
-    parser.add_argument('--threshold', type=float, default=75.0, help='Threshold for LLM score binary conversion (default: 75.0)')
-    parser.add_argument('--joe-threshold', dest='joe_threshold', type=float, default=50.0, help='Threshold for Joe\'s score binary conversion (default: 50.0)')
-    parser.add_argument('--analysis-threshold', dest='analysis_threshold', type=float, default=75.0, help='Threshold for analysis score validation (default: 75.0)')
-    parser.add_argument('--output', type=str, default='data/comprehensive_metrics.csv', help='Output CSV file path')
+    parser.add_argument('--threshold', type=float, default=config.LLM_SCORE_THRESHOLD, help='Threshold for LLM score binary conversion')
+    parser.add_argument('--joe-threshold', dest='joe_threshold', type=float, default=config.JOE_SCORE_THRESHOLD, help='Threshold for Joe\'s score binary conversion')
+    parser.add_argument('--analysis-threshold', dest='analysis_threshold', type=float, default=config.ANALYSIS_SCORE_THRESHOLD, help='Threshold for analysis score validation')
+    parser.add_argument('--output', type=str, default=config.BENCHMARKING_PATH, help='Output CSV file path')
     parser.add_argument('--detailed', action='store_true', help='Print detailed metrics including confusion matrices')
     
     args = parser.parse_args()
@@ -772,18 +693,6 @@ def main():
                     'followup': analysis_prompt,
                     **analysis_results
                 })
-                
-                # Agentic analysis filtered (original scores filtered by analysis threshold)
-                filtered_results = process_agentic_analysis_filtered(
-                    filtered_analysis, human_ratings, prompt_name, model_name, args.threshold, args.joe_threshold, args.analysis_threshold
-                )
-                results.append({
-                    'model': model_name,
-                    'prompt': prompt_name,
-                    'approach': 'agentic-analysis-filtered',
-                    'followup': analysis_prompt,
-                    **filtered_results
-                })
     
     # Create DataFrame and save
     results_df = pd.DataFrame(results)
@@ -795,6 +704,9 @@ def main():
     numeric_cols = [col for col in results_df.columns if any(metric in col for metric in ['precision', 'recall', 'f1', 'specificity'])]
     for col in numeric_cols:
         results_df[col] = results_df[col].round(3)
+    
+    # Create output directory if it doesn't exist
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     
     # Save to CSV
     results_df.to_csv(args.output, index=False)

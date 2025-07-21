@@ -12,7 +12,7 @@ cd "$PROJECT_ROOT"
 SCRIPTS=(
     "$SCRIPT_DIR/setup_venv.sh"
     "$SCRIPT_DIR/download_credentials.sh"
-    "$PROJECT_ROOT/src/pre_query/data_preparation/download_capiq.sh"
+    "$PROJECT_ROOT/src/pre_query/data_preparation/download_capiq_details.sh"
     "$PROJECT_ROOT/src/pre_query/data_preparation/download_human_ratings.sh"
     "$PROJECT_ROOT/src/pre_query/data_preparation/export_companies.sh"
     "$PROJECT_ROOT/src/pre_query/data_preparation/format_human_ratings.sh"

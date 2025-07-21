@@ -7,7 +7,7 @@ This script:
 2. Gets queries from the queries table for SimpleCapacityV8.1.1 prompt
 3. Aggregates queries by transcriptid with required variables
 4. Merges follow-up analysis data from analysis_queries table
-5. Merges company name and date from transcript-detail.feather
+5. Merges company name and date from transcript_detail.feather
 """
 
 import sys
@@ -21,11 +21,12 @@ import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../'))
 
 import config
+from modules.utils import extract_score_from_unstructured_response, extract_invalid_response
 
 
 def extract_from_response(response: str, field: str, default=None):
     """
-    Extract a field from a response string using JSON parsing.
+    Extract a field from a response string using JSON parsing with robust fallback.
     
     Args:
         response: The response string from the database
@@ -35,12 +36,24 @@ def extract_from_response(response: str, field: str, default=None):
     Returns:
         The extracted field value, or default if not found or invalid JSON
     """
+    # Special handling for score fields - use the specialized function
+    if field == 'score':
+        score = extract_score_from_unstructured_response(response)
+        return score if score is not None else default
+    
+    # For other fields, try JSON parsing first
     try:
         response_dict = json.loads(response)
         if isinstance(response_dict, dict):
             return response_dict.get(field, default)
     except (json.JSONDecodeError, TypeError):
-        pass
+        # If JSON parsing fails, use the robust extraction
+        try:
+            extracted = extract_invalid_response(response, [field])
+            value = extracted.get(field, default)
+            return value if value is not None else default
+        except:
+            pass
     
     return default
 
@@ -53,7 +66,7 @@ def create_top_transcript_data():
     
     # Step 1: Read list of top transcripts
     print("Step 1: Reading top transcripts list...")
-    top_transcripts_path = os.path.join(config.DATA_DIR, "top_transcripts.csv")
+    top_transcripts_path = os.path.join(config.DATA_DIR, "intermediaries", "top_transcripts.csv")
     top_transcripts_df = pd.read_csv(top_transcripts_path)
     top_transcript_ids = top_transcripts_df['transcriptid'].tolist()
     print(f"Found {len(top_transcript_ids)} top transcript IDs")
@@ -105,15 +118,24 @@ def create_top_transcript_data():
     top_query_ids = queries_df['query_id'].tolist()
     
     if top_query_ids:
-        # Query analysis_queries table for follow-up data
-        analysis_placeholders = ','.join(['?'] * len(top_query_ids))
-        analysis_query = f"""
-        SELECT reference_query_id, response
-        FROM analysis_queries 
-        WHERE reference_query_id IN ({analysis_placeholders})
-        """
+        # Query analysis_queries table for follow-up data in batches to avoid SQL limit
+        batch_size = 500  # SQLite typically supports ~999 parameters
+        analysis_dfs = []
         
-        analysis_df = pd.read_sql_query(analysis_query, conn, params=top_query_ids)
+        for i in range(0, len(top_query_ids), batch_size):
+            batch_ids = top_query_ids[i:i + batch_size]
+            analysis_placeholders = ','.join(['?'] * len(batch_ids))
+            analysis_query = f"""
+            SELECT reference_query_id, response
+            FROM analysis_queries 
+            WHERE reference_query_id IN ({analysis_placeholders})
+            """
+            
+            batch_df = pd.read_sql_query(analysis_query, conn, params=batch_ids)
+            analysis_dfs.append(batch_df)
+        
+        # Combine all batches
+        analysis_df = pd.concat(analysis_dfs, ignore_index=True) if analysis_dfs else pd.DataFrame()
         
         # Extract follow-up scores
         analysis_df['follow_up_score'] = analysis_df['response'].apply(lambda x: extract_from_response(x, 'score'))
@@ -186,7 +208,9 @@ def create_top_transcript_data():
     
     # Step 7: Save to CSV
     print("Step 7: Saving to CSV...")
-    output_path = os.path.join(config.DATA_DIR, "top_transcripts_data.csv")
+    # Create outputs directory if it doesn't exist
+    os.makedirs(config.OUTPUTS_DIR, exist_ok=True)
+    output_path = os.path.join(config.OUTPUTS_DIR, "top_transcripts_data.csv")
     final_df.to_csv(output_path, index=False)
     
     print(f"Successfully created {output_path}")
@@ -206,7 +230,7 @@ def create_top_transcript_data():
 
 def extract_excerpts_from_response(response: str) -> str:
     """
-    Extract excerpts from a response string using JSON parsing.
+    Extract excerpts from a response string using JSON parsing with robust fallback.
     Special handling for excerpts since they might be a list that needs to be joined.
     
     Args:
@@ -215,6 +239,7 @@ def extract_excerpts_from_response(response: str) -> str:
     Returns:
         str: The extracted excerpts as a string, or empty string if not found or invalid JSON
     """
+    # Try JSON parsing first
     try:
         response_dict = json.loads(response)
         if isinstance(response_dict, dict):
@@ -223,7 +248,27 @@ def extract_excerpts_from_response(response: str) -> str:
                 return '; '.join(excerpts)
             return str(excerpts)
     except (json.JSONDecodeError, TypeError):
-        pass
+        # If JSON parsing fails, use the robust extraction
+        try:
+            extracted = extract_invalid_response(response, ['excerpts'])
+            excerpts = extracted.get('excerpts', '')
+            
+            # The extracted excerpts might still be a string representation of a list
+            # Try to clean it up
+            if excerpts:
+                # Remove brackets if present
+                excerpts = excerpts.strip()
+                if excerpts.startswith('[') and excerpts.endswith(']'):
+                    excerpts = excerpts[1:-1]
+                # Clean up quotes and split by common delimiters
+                excerpts = excerpts.replace('"', '').replace("'", '')
+                # If there are multiple excerpts separated by commas, join them with semicolons
+                if ',' in excerpts:
+                    parts = [part.strip() for part in excerpts.split(',')]
+                    return '; '.join(parts)
+                return excerpts
+        except:
+            pass
     
     return ''
 

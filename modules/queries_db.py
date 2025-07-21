@@ -35,13 +35,13 @@ def insert_analysis_result(
     reference_query_id: int,
     prompt_name: str,
     response: str,
-    llm_provider: str = "openai",
-    model_name: str = "o4-mini-2025-04-16",
-    call_type: str = "single",
-    temperature: float = None,
-    max_response: int = None,
-    input_tokens: int = None,
-    output_tokens: int = None
+    llm_provider: str,
+    model_name: str,
+    call_type: str,
+    temperature: float,
+    max_response: int,
+    input_tokens: int,
+    output_tokens: int
 ):
     """
     Insert a new analysis result into the analysis_queries table.
@@ -82,13 +82,13 @@ def insert_query_result(
     prompt_name: str,
     transcriptid: int,
     response: str,
-    llm_provider: str = "openai",
-    model_name: str = "o4-mini-2025-04-16",
-    call_type: str = "single",
-    temperature: float = None,
-    max_response: int = None,
-    input_tokens: int = None,
-    output_tokens: int = None
+    llm_provider: str,
+    model_name: str,
+    call_type: str,
+    temperature: float,
+    max_response: int,
+    input_tokens: int,
+    output_tokens: int
 ):
     """
     Insert a new query result into the database using an open connection.
@@ -274,7 +274,7 @@ def extract_excerpts_from_response(response: str) -> str:
 def analyze_queries_above_threshold(
     prompt_name: str,
     analysis_prompt_name: str,
-    score_threshold: int = 75,
+    score_threshold: int,
     llm_query_instance=None
 ):
     """

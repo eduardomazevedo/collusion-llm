@@ -7,7 +7,7 @@ This guide establishes naming conventions for the collusion-llm project to ensur
 ### Rule: Use snake_case (underscores) for all file names
 
 **Examples:**
-- ✅ `calculate_f1_scores.py`
+- ✅ `calculate_benchmark.py`
 - ✅ `batch_tracker.csv`
 - ✅ `companies_transcripts.csv`
 - ❌ `calculate-f1-scores.py`
@@ -100,7 +100,7 @@ insert_query_result(transcriptid=12345, ...)  # Parameter matches DB column
 
 | Context | Example | Rule |
 |---------|---------|------|
-| Python files | `calculate_f1_scores.py` | snake_case |
+| Python files | `calculate_benchmark.py` | snake_case |
 | Data files | `companies_transcripts.csv` | snake_case |
 | Database columns (IDs) | `transcriptid`, `companyid` | lowercase, no underscore |
 | Database columns (other) | `prompt_name`, `input_tokens` | snake_case |

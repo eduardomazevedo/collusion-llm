@@ -54,7 +54,7 @@ bash ./src/setup/setup.sh
 source .venv/bin/activate
 
 # Note: Many Python scripts can now be run directly after activating the virtual environment
-# Example: python src/post_query/benchmarking/calculate_f1_scores.py --help
+# Example: python src/post_query/benchmarking/calculate_benchmark.py --help
 ```
 
 ### Database Management
@@ -89,7 +89,7 @@ bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> <operat
 bash ./src/post_query/benchmarking/update_leaderboard.sh [--sort <metric>]
 
 # Calculate F1 scores and comprehensive metrics
-python ./src/post_query/benchmarking/calculate_f1_scores.py [options]
+python ./src/post_query/benchmarking/calculate_benchmark.py [options]
 # Options:
 #   --prompt <name>           Specific prompt to analyze
 #   --threshold <value>       LLM score threshold (default: 75.0)
@@ -97,7 +97,7 @@ python ./src/post_query/benchmarking/calculate_f1_scores.py [options]
 #   --analysis-threshold <val> Analysis validation threshold (default: 75.0)
 #   --detailed               Show detailed metrics
 # Example:
-python ./src/post_query/benchmarking/calculate_f1_scores.py --prompt SimpleCapacityV8.1.1 --threshold 50 --joe-threshold 50 --analysis-threshold 75 --detailed
+python ./src/post_query/benchmarking/calculate_benchmark.py --prompt SimpleCapacityV8.1.1 --threshold 50 --joe-threshold 50 --analysis-threshold 75 --detailed
 
 # Unified data export (NEW)
 bash ./src/post_query/exports/unified_export.sh --type <type> [options]
@@ -172,7 +172,7 @@ bash ./src/tex_scripts/watch_manuscript_simple.sh  # Simple polling method
 - Foreign key relationships maintained between tables
 
 ### Naming Conventions
-- **File naming**: Use underscores in file names (e.g., `calculate_f1_scores.py`, not `calculate-f1-scores.py`)
+- **File naming**: Use underscores in file names (e.g., `calculate_benchmark.py`, not `calculate-benchmark.py`)
 - **Database fields**: Use `transcriptid` and `companyid` (no underscore) to match WRDS/CapIQ naming conventions
 - **Python variables**: Use snake_case (e.g., `transcript_id`, `company_id`) when working within Python code
 
