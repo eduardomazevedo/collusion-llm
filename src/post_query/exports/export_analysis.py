@@ -3,7 +3,7 @@
 Script to export analysis results to CSV without running analysis again.
 
 Usage:
-    python src/py/export_analysis.py [--analysis-prompt NAME] [--output PATH]
+    python src/post_query/exports/export_analysis.py [--analysis-prompt NAME] [--output PATH]
 """
 
 import sys

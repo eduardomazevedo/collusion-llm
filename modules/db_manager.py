@@ -2,6 +2,7 @@ import os
 import sqlite3
 import subprocess
 import config
+from modules.queries_db import export_to_csv, export_analysis_to_csv
 
 def verify_database(db_path: str) -> bool:
     """
@@ -190,4 +191,100 @@ def initialize_database() -> bool:
         
     except sqlite3.Error as e:
         print(f"Error creating database: {e}")
-        return False 
+        return False
+
+def export_queries(output_path=None, prompt_names=None, latest_only=False):
+    """
+    Export queries database to CSV.
+    
+    Args:
+        output_path: Optional custom output path for CSV file
+        prompt_names: Optional list of prompt names to filter by
+        latest_only: If True, only export the latest query result for each transcript
+        
+    Returns:
+        str: Path to the exported CSV file
+    """
+    try:
+        export_path = export_to_csv(
+            output_path=output_path,
+            prompt_names=prompt_names,
+            latest_only=latest_only
+        )
+        print(f"Queries exported successfully to: {export_path}")
+        return export_path
+    except Exception as e:
+        print(f"Error exporting queries: {e}")
+        return None
+
+def export_analysis(output_path=None, analysis_prompt_name=None, include_original=True):
+    """
+    Export analysis results to CSV.
+    
+    Args:
+        output_path: Optional custom output path for CSV file
+        analysis_prompt_name: Optional analysis prompt name to filter by
+        include_original: If True, include original query data in export
+        
+    Returns:
+        str: Path to the exported CSV file
+    """
+    try:
+        export_path = export_analysis_to_csv(
+            output_path=output_path,
+            analysis_prompt_name=analysis_prompt_name,
+            include_original=include_original
+        )
+        print(f"Analysis results exported successfully to: {export_path}")
+        return export_path
+    except Exception as e:
+        print(f"Error exporting analysis: {e}")
+        return None
+
+def get_database_info():
+    """
+    Get information about the database.
+    
+    Returns:
+        dict: Dictionary with database statistics or None if error
+    """
+    if not verify_database(config.DATABASE_PATH):
+        print("Database not found or invalid.")
+        return None
+        
+    try:
+        conn = sqlite3.connect(config.DATABASE_PATH)
+        cursor = conn.cursor()
+        
+        info = {}
+        
+        # Get queries count
+        cursor.execute("SELECT COUNT(*) FROM queries")
+        info['total_queries'] = cursor.fetchone()[0]
+        
+        # Get unique transcripts count
+        cursor.execute("SELECT COUNT(DISTINCT transcriptid) FROM queries")
+        info['unique_transcripts'] = cursor.fetchone()[0]
+        
+        # Get unique prompts
+        cursor.execute("SELECT DISTINCT prompt_name FROM queries")
+        info['prompts'] = [row[0] for row in cursor.fetchall()]
+        
+        # Get latest query date
+        cursor.execute("SELECT MAX(date) FROM queries")
+        info['latest_query_date'] = cursor.fetchone()[0]
+        
+        # Get analysis queries count
+        cursor.execute("SELECT COUNT(*) FROM analysis_queries")
+        info['total_analysis_queries'] = cursor.fetchone()[0]
+        
+        # Get unique analysis prompts
+        cursor.execute("SELECT DISTINCT prompt_name FROM analysis_queries")
+        info['analysis_prompts'] = [row[0] for row in cursor.fetchall()]
+        
+        conn.close()
+        return info
+        
+    except sqlite3.Error as e:
+        print(f"Error getting database info: {e}")
+        return None 
