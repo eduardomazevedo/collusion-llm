@@ -1,9 +1,6 @@
 """
 Script to export the queries database to CSV.
 
-Usage:
-    python src/py/export_queries.py [--output OUTPUT_PATH] [--prompts PROMPT1 PROMPT2 ...] [--latest-only]
-
 Options:
     --output OUTPUT_PATH    Path where to save the CSV file
     --prompts PROMPT1 ...   List of prompt names to filter by

@@ -5,7 +5,7 @@ This script:
 1. Queries the database for only SimpleCapacityV8.1.1 prompts
 2. For each transcriptid, keeps only the smallest query_id (earliest query)
 3. Extracts the "score" field from the JSON response
-4. Keeps only rows with score >= 75
+4. Keeps only rows with score >= LLM_SCORE_THRESHOLD (from config)
 5. Saves only the transcriptid column to data/top_transcripts.csv
 """
 
@@ -19,6 +19,7 @@ import json
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../'))
 
 import config
+from modules.utils import extract_score_from_unstructured_response
 
 
 def extract_top_transcripts():
@@ -26,7 +27,7 @@ def extract_top_transcripts():
     Extract SimpleCapacityV8.1.1 prompts from the database,
     keeping only the earliest query for each transcriptid,
     extracting the score from JSON response,
-    filtering for score >= 75,
+    filtering for score >= LLM_SCORE_THRESHOLD,
     and save only transcriptid to a CSV file.
     """
     try:
@@ -54,41 +55,37 @@ def extract_top_transcripts():
         # Close the connection
         conn.close()
         
-        # Extract score from JSON response
+        # Extract score from JSON response using robust extraction
         scores = []
         for response in df['response']:
-            try:
-                response_data = json.loads(response)
-                score = response_data.get('score', 0)
-                scores.append(score)
-            except (json.JSONDecodeError, KeyError, TypeError):
-                scores.append(0)
+            score = extract_score_from_unstructured_response(response)
+            scores.append(score if score is not None else 0)
         
         # Add score column
         df['score'] = scores
         
-        # Filter for score >= 75
-        df_filtered = df[df['score'] >= 75].copy()
+        # Filter for score >= LLM_SCORE_THRESHOLD
+        df_filtered = df[df['score'] >= config.LLM_SCORE_THRESHOLD].copy()
         
         # Sort by score descending
         df_filtered = df_filtered.sort_values('score', ascending=False)
         
         # Save only transcriptid to CSV
-        output_path = os.path.join(config.DATA_DIR, "top_transcripts.csv")
+        output_path = os.path.join(config.DATA_DIR, "intermediaries", "top_transcripts.csv")
         df_filtered[['transcriptid']].to_csv(output_path, index=False)
         
         print(f"Extracted {len(df)} total rows from SimpleCapacityV8.1.1 prompts")
-        print(f"Filtered to {len(df_filtered)} rows with score >= 75")
+        print(f"Filtered to {len(df_filtered)} rows with score >= {config.LLM_SCORE_THRESHOLD}")
         print(f"Saved transcriptids to: {output_path}")
         
         # Show a preview of the data
-        print("\nPreview of extracted data (score >= 75):")
+        print(f"\nPreview of extracted data (score >= {config.LLM_SCORE_THRESHOLD}):")
         print("=" * 50)
         print(df_filtered[['transcriptid', 'score']].head())
         
         # Show unique transcript count
         unique_transcripts = df_filtered['transcriptid'].nunique()
-        print(f"\nUnique transcripts with score >= 75: {unique_transcripts}")
+        print(f"\nUnique transcripts with score >= {config.LLM_SCORE_THRESHOLD}: {unique_transcripts}")
         
         # Show score statistics
         if len(df_filtered) > 0:

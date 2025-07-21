@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to export token sizes for all transcripts in companies_transcripts.csv.
-Usage:
-    python export_token_sizes.py
+
 """
 
 import os
@@ -12,7 +11,7 @@ import config
 
 def main():
     # Read the companies_transcripts.csv file
-    csv_path = os.path.join(config.DATA_DIR, 'companies_transcripts.csv')
+    csv_path = config.COMPANIES_TRANSCRIPTS_PATH
     try:
         df = pd.read_csv(csv_path, header=0, names=['companyid', 'companyname', 'transcriptid', 'headline'])
     except FileNotFoundError:
@@ -25,7 +24,7 @@ def main():
     print(f"Found {total_transcripts} unique transcripts")
 
     # Check if transcript_tokens.csv exists and load it
-    output_path = os.path.join(config.DATA_DIR, 'transcript_tokens.csv')
+    output_path = os.path.join(config.DATA_DIR, 'datasets', 'transcript_tokens.csv')
     if os.path.exists(output_path):
         try:
             results_df = pd.read_csv(output_path, header=0, names=['transcriptid', 'tokensize'])

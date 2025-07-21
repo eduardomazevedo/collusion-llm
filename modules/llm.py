@@ -10,11 +10,9 @@ Example usage:
     # Define transcript IDs
     transcript_ids = [23993]
     
-    # Apply a prompt to transcripts and return responses
-    responses = llm_query.apply_prompt_to_transcripts("SimpleCapacityV8", transcript_ids)
+    # Apply a prompt to transcripts, return responses and save to database
+    responses = llm_query.apply_prompt_to_transcripts("SimpleCapacityV8.1.1", transcript_ids)
 
-    # Save responses to database
-    responses = llm_query.apply_prompt_to_transcripts("SimpleCapacityV8", transcript_ids, save_to_db=True)
 """
 
 from openai import OpenAI
@@ -23,28 +21,32 @@ import json
 import config
 import modules.capiq as capiq
 from modules.queries_db import insert_query_result
+import os
+from datetime import datetime
+from typing import Dict, List, Any
 
 
 class LLMQuery:
     """Class to manage LLM queries across multiple providers."""
 
-    def __init__(self, provider="openai", model=None, prompts_path=None, temperature=1.0, max_tokens=2000):
+    def __init__(self, provider=None, model=None, prompts_path=None, temperature=None, max_tokens=None):
         """
         Initializes the LLMQuery class.
 
-        :param provider: The LLM provider (default: "openai").
-        :param model: LLM model name, defaults to OpenAI's model or config.OPENAI_MODEL.
-        :param prompts_path: Path to JSON file containing system prompts.
-        :param temperature: Temperature setting for the model (default: 1.0).
-        :param max_tokens: Maximum number of tokens in the response (default: 500).
+        :param provider: The LLM provider (str)
+        :param model: LLM model name (str)
+        :param prompts_path: Path to JSON file containing system prompts (str)
+        :param temperature: Temperature setting for the model (float)
+        :param max_tokens: Maximum number of tokens in the response (int)
         """
-        self.provider = provider.lower()
-        self.model = model or getattr(config, "OPENAI_MODEL", "o4-mini-2025-04-16")
+        self.provider = provider.lower() if provider else config.PROVIDER
+        self.model = model or config.OPENAI_MODEL
         self.prompts_path = prompts_path or config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
-        self.temperature = temperature
-        self.max_tokens = max_tokens
+        self.temperature = temperature or config.TEMPERATURE
+        self.max_tokens = max_tokens or config.MAX_TOKENS
+        self.model_config = self._load_model_config()
 
     def _load_prompts(self):
         """Loads the prompts from the JSON file."""
@@ -55,6 +57,22 @@ class LLMQuery:
             raise FileNotFoundError(f"Prompt file not found at {self.prompts_path}")
         except json.JSONDecodeError:
             raise ValueError(f"Error decoding JSON in {self.prompts_path}")
+    
+    def _load_model_config(self) -> Dict[str, Any]:
+        """Load model configuration from llm_config.json."""
+        config_path = os.path.join(config.ROOT, "assets", "llm_config.json")
+        try:
+            with open(config_path, "r") as file:
+                config_data = json.load(file)
+                models = config_data.get("providers", {}).get(self.provider, {}).get("models", {})
+                return models.get(self.model, {})
+        except (FileNotFoundError, json.JSONDecodeError):
+            # Return default config if file doesn't exist or is invalid
+            return {
+                "supports_structured_output": False,
+                "supports_json_output": False,
+                "supports_batch": False
+            }
 
     def _get_prompt(self, prompt_name):
         """Fetches a prompt configuration from stored prompts."""
@@ -76,37 +94,134 @@ class LLMQuery:
         if response_model is None:
             raise ValueError(f"Invalid response format: {prompt_config['response_format']}")
 
+        # Check model capabilities
+        supports_structured = self.model_config.get("supports_structured_output", False)
+        supports_json = self.model_config.get("supports_json_output", False)
+        
+        # Prepare messages
         messages = [
             {"role": "system", "content": prompt_config["system_message"]},
             {"role": "user", "content": user_input},
         ]
-
-        # Determine which parameter to use based on model
-        # Newer models (o1, o4, etc.) use max_completion_tokens
+        
+        # Base completion parameters
         completion_params = {
             "model": self.model,
             "messages": messages,
-            "response_format": response_model,  # Directly pass Pydantic model
-            "temperature": self.temperature,
+            "temperature": self.temperature
         }
         
-        # Check if this is a newer model that requires max_completion_tokens
-        if self.model.startswith(('o1', 'o4', 'gpt-4o-2024-08-06')):
+        # Handle max tokens parameter based on model type
+        if self.model.startswith('o'):
+            # o1 models use max_completion_tokens
             completion_params["max_completion_tokens"] = self.max_tokens
         else:
+            # All other models use max_tokens
             completion_params["max_tokens"] = self.max_tokens
 
-        # Use OpenAI's `.parse()` method with a Pydantic model
-        completion = self.client.beta.chat.completions.parse(**completion_params)
-
-        # Extract token usage
-        usage = completion.usage
-        token_info = {
-            'input_tokens': usage.prompt_tokens,
-            'output_tokens': usage.completion_tokens
-        }
-
-        return completion.choices[0].message.parsed.model_dump_json(), token_info
+        # Handle response format based on model capabilities
+        if supports_structured:
+            # Use structured output with Pydantic model
+            completion_params["response_format"] = response_model
+            completion = self.client.beta.chat.completions.parse(**completion_params)
+            
+            # Extract token usage
+            usage = completion.usage
+            token_info = {
+                'input_tokens': usage.prompt_tokens,
+                'output_tokens': usage.completion_tokens
+            }
+            
+            return completion.choices[0].message.parsed.model_dump_json(), token_info
+            
+        elif supports_json:
+            # Use JSON mode with explicit format instructions
+            completion_params["response_format"] = {"type": "json_object"}
+            
+            # Get expected fields from the Pydantic model
+            expected_fields = list(response_model.model_fields.keys())
+            
+            # Build detailed JSON schema instructions
+            json_instructions = "\n\nYou must respond with a valid JSON object containing these fields:"
+            for field_name, field_info in response_model.model_fields.items():
+                field_type = field_info.annotation
+                if field_name == "score":
+                    json_instructions += f'\n- "{field_name}": integer between 0 and 100'
+                elif field_name == "reasoning":
+                    json_instructions += f'\n- "{field_name}": string explaining your analysis'
+                elif field_name == "excerpts":
+                    json_instructions += f'\n- "{field_name}": array of relevant transcript quotes'
+                elif field_type == bool:
+                    json_instructions += f'\n- "{field_name}": boolean (true/false)'
+                elif field_type == str:
+                    json_instructions += f'\n- "{field_name}": string'
+                elif field_type == int:
+                    json_instructions += f'\n- "{field_name}": integer'
+                else:
+                    json_instructions += f'\n- "{field_name}": appropriate value'
+            
+            json_instructions += f"\n\nExample format: {json.dumps({field: '...' for field in expected_fields})}"
+            completion_params["messages"][0]["content"] += json_instructions
+            
+            # Make the API call
+            completion = self.client.chat.completions.create(**completion_params)
+            
+            # Extract token usage
+            usage = completion.usage
+            token_info = {
+                'input_tokens': usage.prompt_tokens,
+                'output_tokens': usage.completion_tokens
+            }
+            
+            # Return the response content directly
+            return completion.choices[0].message.content, token_info
+            
+        else:
+            # No JSON support - use text mode with formatting instructions
+            # Get expected fields from the Pydantic model
+            expected_fields = list(response_model.model_fields.keys())
+            
+            # Add detailed formatting instructions
+            format_instructions = "\n\nPlease format your response as a JSON-like structure with the following fields:"
+            for field_name, field_info in response_model.model_fields.items():
+                field_type = field_info.annotation
+                if field_name == "score":
+                    format_instructions += f'\n"{field_name}": [a number between 0 and 100]'
+                elif field_name == "reasoning":
+                    format_instructions += f'\n"{field_name}": [your detailed explanation]'
+                elif field_name == "excerpts":
+                    format_instructions += f'\n"{field_name}": [list of relevant quotes from the transcript]'
+                elif field_type == bool:
+                    format_instructions += f'\n"{field_name}": [true or false]'
+                elif field_type == str:
+                    format_instructions += f'\n"{field_name}": [text value]'
+                elif field_type == int:
+                    format_instructions += f'\n"{field_name}": [number]'
+                else:
+                    format_instructions += f'\n"{field_name}": [appropriate value]'
+            
+            format_instructions += "\n\nEnsure your response follows this exact structure for proper parsing."
+            completion_params["messages"][0]["content"] += format_instructions
+            
+            # Make the API call
+            completion = self.client.chat.completions.create(**completion_params)
+            
+            # Extract token usage
+            usage = completion.usage
+            token_info = {
+                'input_tokens': usage.prompt_tokens,
+                'output_tokens': usage.completion_tokens
+            }
+            
+            # For text responses, try to parse into expected format
+            response_content = completion.choices[0].message.content
+            
+            # Try to extract fields and create JSON
+            from modules.utils import extract_invalid_response
+            extracted_data = extract_invalid_response(response_content, expected_fields)
+            
+            # Convert to JSON string
+            return json.dumps(extracted_data), token_info
 
     def apply_prompt_to_transcripts(self, prompt_name, transcriptids):
         """

@@ -17,7 +17,7 @@ from pathlib import Path
 from datetime import datetime
 import re
 from typing import Any, Dict, Union
-
+import config
 
 def format_number_with_commas(num: Union[int, float]) -> str:
     """Format number with thousands separators."""
@@ -140,9 +140,8 @@ def process_yaml_data(data: Dict[str, Any], base_constants_path: Path, yaml_file
 def main():
     """Main function to process all YAML files."""
     # Set up paths
-    project_root = Path(__file__).parent.parent.parent.parent
-    yaml_dir = project_root / "output" / "yaml"
-    constants_dir = project_root / "output" / "constants"
+    yaml_dir = Path(os.path.join(config.DATA_DIR, 'yaml'))
+    constants_dir = Path(os.path.join(config.DATA_DIR, 'constants'))
     
     # Create constants directory if it doesn't exist
     constants_dir.mkdir(parents=True, exist_ok=True)

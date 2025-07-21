@@ -24,8 +24,8 @@ The following shell scripts are simple wrappers that only activate the virtual e
 - Has full argparse with all options
 - Shell script duplicates argument parsing
 
-### 5. **src/post_query/benchmarking/calculate_f1_scores.sh**
-- Python script: `src/post_query/benchmarking/calculate_f1_scores.py`
+### 5. **src/post_query/benchmarking/calculate_benchmark.sh**
+- Python script: `src/post_query/benchmarking/calculate_benchmark.py`
 - Has full argparse CLI interface
 - Shell script duplicates all the argument parsing logic
 

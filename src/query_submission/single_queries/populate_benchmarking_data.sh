@@ -8,14 +8,17 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../.." && pwd )"
 # Change to project root directory
 cd "$PROJECT_ROOT"
 
-# Activate the virtual environment
-source .venv/bin/activate
+# Activate virtual environment
+if [ -d ".venv" ]; then
+    source .venv/bin/activate
+else
+    echo "Error: Virtual environment not found at .venv"
+    echo "Please run setup.sh first to create the virtual environment"
+    exit 1
+fi
 
 # Set PYTHONPATH to the current directory
 export PYTHONPATH="$PROJECT_ROOT"
 
-# Run the Python script
-python3 src/post_query/exports/export_token_sizes.py
-
-# Deactivate the virtual environment
-deactivate 
+# Run the Python script with all arguments
+python src/query_submission/single_queries/populate_benchmarking_data.py "$@"

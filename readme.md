@@ -90,7 +90,7 @@ The leaderboard is sorted by `combined_accuracy` in descending order by default,
 Calculate comprehensive performance metrics (precision, recall, F1, specificity) against human-reviewed datasets:
 
 ```bash
-python ./src/post_query/benchmarking/calculate_f1_scores.py [options]
+python ./src/post_query/benchmarking/calculate_benchmark.py [options]
 ```
 
 ### Options
@@ -104,7 +104,7 @@ python ./src/post_query/benchmarking/calculate_f1_scores.py [options]
 ### Example
 ```bash
 # Compare different threshold configurations
-python ./src/post_query/benchmarking/calculate_f1_scores.py --prompt SimpleCapacityV8.1.1 --threshold 75 --joe-threshold 50 --analysis-threshold 50 --detailed
+python ./src/post_query/benchmarking/calculate_benchmark.py --prompt SimpleCapacityV8.1.1 --threshold 75 --joe-threshold 50 --analysis-threshold 50 --detailed
 ```
 
 The benchmarking evaluates multiple approaches:
@@ -184,7 +184,7 @@ Note: a bit sloppy atm
 ## Naming Conventions
 
 ### File Naming
-- Python scripts and shell scripts use underscores: `calculate_f1_scores.py`, `run_benchmark.sh`
+- Python scripts and shell scripts use underscores: `calculate_benchmark.py`, `run_benchmark.sh`
 - Avoid hyphens in file names
 
 ### Database Fields

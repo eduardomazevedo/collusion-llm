@@ -18,7 +18,7 @@ print(f"Number of rows: {df.shape[0]}")
 print(f"Number of columns: {df.shape[1]}")
 
 # Filter to transcripts with transcriptid in the transcriptid in
-# the query database data/queries.sqlite
+# the query database data/datasets/queries.sqlite
 import sqlite3
 
 # Connect to the queries database and get unique transcript IDs
@@ -91,7 +91,7 @@ for key, value in stats.items():
     print(f"{key}: {value}")
 
 # Save to YAML file
-output_dir = os.path.join(config.OUTPUT_DIR, 'yaml')
+output_dir = os.path.join(config.DATA_DIR, 'yaml')
 os.makedirs(output_dir, exist_ok=True)
 output_path = os.path.join(output_dir, 'transcript_stats.yaml')
 
