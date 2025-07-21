@@ -16,13 +16,20 @@ export PYTHONPATH="$PROJECT_ROOT"
 
 # Function to display usage
 show_usage() {
-    echo "Usage: $0 <command>"
+    echo "Usage: $0 <command> [options]"
     echo "Commands:"
-    echo "  init      - Initialize a new database (if none exists in Google Drive)"
-    echo "  download  - Download the latest database from Google Drive"
-    echo "  upload    - Upload the current database to Google Drive"
-    echo "  status    - Show the current database status"
-    echo "  help      - Show this help message"
+    echo "  init            - Initialize a new database (if none exists in Google Drive)"
+    echo "  download        - Download the latest database from Google Drive"
+    echo "  upload          - Upload the current database to Google Drive"
+    echo "  status          - Show the current database status"
+    echo "  info            - Show detailed database information"
+    echo "  export-queries  - Export queries to CSV"
+    echo "  export-analysis - Export analysis results to CSV"
+    echo "  help            - Show this help message"
+    echo ""
+    echo "Export options:"
+    echo "  export-queries [--output PATH] [--prompts PROMPT1 PROMPT2 ...] [--latest-only]"
+    echo "  export-analysis [--output PATH] [--analysis-prompt NAME] [--no-original]"
     exit 1
 }
 
@@ -66,6 +73,113 @@ except Exception as e:
 "
 }
 
+# Function to show database info
+show_info() {
+    echo "Getting database information..."
+    python3 -c "
+from modules.db_manager import get_database_info
+import json
+
+info = get_database_info()
+if info:
+    print(f\"\\nDatabase Statistics:\")
+    print(f\"  Total queries: {info['total_queries']:,}\")
+    print(f\"  Unique transcripts: {info['unique_transcripts']:,}\")
+    print(f\"  Total analysis queries: {info['total_analysis_queries']:,}\")
+    print(f\"  Latest query date: {info['latest_query_date']}\")
+    print(f\"\\nPrompts ({len(info['prompts'])}):\")
+    for prompt in info['prompts']:
+        print(f\"    - {prompt}\")
+    if info['analysis_prompts']:
+        print(f\"\\nAnalysis prompts ({len(info['analysis_prompts'])}):\")
+        for prompt in info['analysis_prompts']:
+            print(f\"    - {prompt}\")
+"
+}
+
+# Function to handle export-queries command
+export_queries() {
+    shift # Remove 'export-queries' from arguments
+    
+    # Build Python command with arguments
+    python_cmd="from modules.db_manager import export_queries; export_queries("
+    args=()
+    
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --output)
+                args+=("output_path='$2'")
+                shift 2
+                ;;
+            --prompts)
+                shift
+                prompts="["
+                while [[ $# -gt 0 && ! "$1" =~ ^-- ]]; do
+                    prompts+="'$1',"
+                    shift
+                done
+                prompts="${prompts%,}]"
+                args+=("prompt_names=$prompts")
+                ;;
+            --latest-only)
+                args+=("latest_only=True")
+                shift
+                ;;
+            *)
+                echo "Unknown option: $1"
+                show_usage
+                ;;
+        esac
+    done
+    
+    # Join arguments with commas
+    arg_string=$(IFS=,; echo "${args[*]}")
+    python_cmd+="$arg_string)"
+    
+    echo "Exporting queries to CSV..."
+    python3 -c "$python_cmd"
+}
+
+# Function to handle export-analysis command
+export_analysis() {
+    shift # Remove 'export-analysis' from arguments
+    
+    # Build Python command with arguments
+    python_cmd="from modules.db_manager import export_analysis; export_analysis("
+    args=()
+    include_original="True"
+    
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --output)
+                args+=("output_path='$2'")
+                shift 2
+                ;;
+            --analysis-prompt)
+                args+=("analysis_prompt_name='$2'")
+                shift 2
+                ;;
+            --no-original)
+                include_original="False"
+                shift
+                ;;
+            *)
+                echo "Unknown option: $1"
+                show_usage
+                ;;
+        esac
+    done
+    
+    args+=("include_original=$include_original")
+    
+    # Join arguments with commas
+    arg_string=$(IFS=,; echo "${args[*]}")
+    python_cmd+="$arg_string)"
+    
+    echo "Exporting analysis results to CSV..."
+    python3 -c "$python_cmd"
+}
+
 # Main command handling
 case "$1" in
     "init")
@@ -84,6 +198,15 @@ case "$1" in
         ;;
     "status")
         show_status
+        ;;
+    "info")
+        show_info
+        ;;
+    "export-queries")
+        export_queries "$@"
+        ;;
+    "export-analysis")
+        export_analysis "$@"
         ;;
     "help"|"--help"|"-h")
         show_usage

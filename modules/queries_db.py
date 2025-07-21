@@ -3,7 +3,6 @@ import sqlite3
 from datetime import datetime, timezone
 import pandas as pd
 import json
-from modules.db_manager import download_database as download_db, upload_database as upload_db
 from modules.utils import extract_invalid_response
 
 # Open a persistent connection when the module loads
@@ -184,7 +183,7 @@ def export_to_csv(output_path: str = None, prompt_names: list[str] = None, lates
     """
     if output_path is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = f"output/visualize_db_{timestamp}.csv"
+        output_path = f"data/outputs/visualize_db_{timestamp}.csv"
     
     # Fetch queries based on filters
     if prompt_names:
@@ -209,14 +208,6 @@ def export_to_csv(output_path: str = None, prompt_names: list[str] = None, lates
 def close_db():
     """Close the database connection. Call this when shutting down."""
     conn.close()
-
-def upload_db():
-    """Uploads the database to Google Drive using rclone with safety checks."""
-    return upload_db()
-
-def download_db():
-    """Downloads the latest database from Google Drive using rclone with safety checks."""
-    return download_db()
 
 def extract_score_from_response(response: str) -> int:
     """
@@ -462,7 +453,7 @@ def export_analysis_to_csv(output_path: str = None, analysis_prompt_name: str = 
     if output_path is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         prompt_suffix = f"_{analysis_prompt_name}" if analysis_prompt_name else ""
-        output_path = f"output/analysis_results{prompt_suffix}_{timestamp}.csv"
+        output_path = f"data/outputs/analysis_results{prompt_suffix}_{timestamp}.csv"
     
     # Fetch analysis data
     if include_original:
