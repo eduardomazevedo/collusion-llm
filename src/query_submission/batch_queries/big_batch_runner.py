@@ -60,7 +60,7 @@ def get_company_transcripts() -> pd.DataFrame:
     Returns:
         DataFrame with companyid, companyname, transcriptid, and headline columns
     """
-    csv_path = os.path.join(config.DATA_DIR, 'companies_transcripts.csv')
+    csv_path = os.path.join(config.DATA_DIR, 'intermediaries', 'companies_transcripts.csv')
     try:
         return pd.read_csv(csv_path)
     except FileNotFoundError:
@@ -77,7 +77,7 @@ def get_transcript_tokens() -> Dict[int, int]:
     Returns:
         Dictionary mapping transcript IDs to their token sizes
     """
-    csv_path = os.path.join(config.DATA_DIR, 'transcript_tokens.csv')
+    csv_path = os.path.join(config.DATA_DIR, 'datasets', 'transcript_tokens.csv')
     try:
         print("\nReading transcript_tokens.csv...")
         df = pd.read_csv(csv_path)
@@ -179,7 +179,7 @@ def create_batches(prompt_name: str) -> List[str]:
     Returns:
         List of paths to created batch input files
     """
-    processor = BatchProcessor(temperature=1.0, max_tokens=500)
+    processor = BatchProcessor()
     prompt_config = processor.prompts.get(prompt_name)
     if not prompt_config:
         raise ValueError(f"Prompt '{prompt_name}' not found in prompts")
@@ -199,7 +199,7 @@ def create_batches(prompt_name: str) -> List[str]:
         return []
     
     # Create batches directory
-    batches_dir = os.path.join(config.OUTPUT_DIR, f"{prompt_name}_batches")
+    batches_dir = os.path.join(config.CACHE_DIR, f"{prompt_name}_batches")
     os.makedirs(batches_dir, exist_ok=True)
     
     # Create diagnostic DataFrame
@@ -210,7 +210,7 @@ def create_batches(prompt_name: str) -> List[str]:
     diagnostic_df['text_length'] = 0  # New column for text length
     
     # Save initial diagnostic file
-    diagnostic_path = os.path.join(config.DATA_DIR, 'transcript_diagnostics.csv')
+    diagnostic_path = os.path.join(config.CACHE_DIR, 'transcript_diagnostics.csv')
     diagnostic_df.to_csv(diagnostic_path, index=False)
     print(f"\nCreated diagnostic file at {diagnostic_path}")
     
@@ -310,8 +310,8 @@ class BatchTracker:
             prompt_name: Name of the prompt being used
         """
         self.prompt_name = prompt_name
-        self.batches_dir = os.path.join(config.OUTPUT_DIR, f"{prompt_name}_batches")
-        self.tracking_file = os.path.join(config.DATA_DIR, 'batch_tracker.csv')
+        self.batches_dir = os.path.join(config.CACHE_DIR, f"{prompt_name}_batches")
+        self.tracking_file = os.path.join(config.CACHE_DIR, 'batch_tracker.csv')
         self.client = client
         
         # Get prompt tokens once at initialization

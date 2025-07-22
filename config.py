@@ -28,6 +28,7 @@ JOE_SCORES_PATH = os.path.join(ROOT, "data", "raw", "human_ratings", "joe_scores
 HUMAN_RATINGS_PATH = os.path.join(ROOT, "data", "datasets", "human_ratings.csv")
 COMPANIES_TRANSCRIPTS_PATH = os.path.join(ROOT, "data", "intermediaries", "companies_transcripts.csv")
 OUTPUTS_DIR = os.path.join(ROOT, "data", "outputs")
+CACHE_DIR = os.path.join(ROOT, "data", "cache")
 DATA_DIR = os.path.join(ROOT, "data")
 BENCHMARKING_PATH = os.path.join(DATA_DIR, "benchmarking", "comprehensive_metrics.csv")
 
