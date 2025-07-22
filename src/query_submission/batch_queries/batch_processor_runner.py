@@ -38,7 +38,7 @@ def get_transcript_ids(company_ids):
     company_ids = [str(cid) for cid in company_ids]
     
     # Read the companies_transcripts.csv file
-    csv_path = os.path.join(config.DATA_DIR, 'companies_transcripts.csv')
+    csv_path = os.path.join(config.DATA_DIR, 'intermediaries', 'companies_transcripts.csv')
     try:
         df = pd.read_csv(csv_path, names=['companyid', 'companyname', 'transcriptid', 'headline'])
     except FileNotFoundError:
@@ -60,7 +60,7 @@ def get_transcript_ids(company_ids):
 
 def create_batch_input(company_ids, prompt_name, output_path):
     """Create batch input file for given company IDs."""
-    processor = BatchProcessor(temperature=1.0, max_tokens=500)
+    processor = BatchProcessor()
     transcript_ids = get_transcript_ids(company_ids)
     
     if not transcript_ids:
@@ -76,19 +76,19 @@ def create_batch_input(company_ids, prompt_name, output_path):
 
 def submit_batch(input_file):
     """Submit batch job."""
-    processor = BatchProcessor(temperature=1.0, max_tokens=500)
+    processor = BatchProcessor()
     print("Submitting batch job...")
     return processor.submit_batch(input_file)
 
 def check_batch_status(batch_id):
     """Check batch status."""
-    processor = BatchProcessor(temperature=1.0, max_tokens=500)
+    processor = BatchProcessor()
     print(f"Checking status of batch {batch_id}...")
     return processor.check_batch_status(batch_id)
 
 def process_batch_results(batch_id, prompt_name):
     """Process batch results."""
-    processor = BatchProcessor(temperature=1.0, max_tokens=500)
+    processor = BatchProcessor()
     print(f"Processing results for batch {batch_id}...")
     results = processor.process_batch_results(batch_id, prompt_name)
     if not results:
@@ -99,7 +99,7 @@ def process_batch_results(batch_id, prompt_name):
 
 def check_batch_error(batch_id):
     """Check batch error information."""
-    processor = BatchProcessor(temperature=1.0, max_tokens=500)
+    processor = BatchProcessor()
     print(f"Checking error information for batch {batch_id}...")
     error_info = processor.check_batch_error(batch_id)
     
@@ -118,7 +118,7 @@ def check_batch_error(batch_id):
 
 def list_models():
     """List available models."""
-    processor = BatchProcessor(temperature=1.0, max_tokens=500)
+    processor = BatchProcessor()
     print("\nListing available models...")
     models = processor.list_available_models()
     print("\nAvailable models:")
@@ -148,7 +148,7 @@ def main():
         return
     
     # Set up output directory
-    output_dir = os.path.join(config.OUTPUT_DIR, 'batch_inputs')
+    output_dir = config.CACHE_DIR
     os.makedirs(output_dir, exist_ok=True)
     
     if args.operation == 'create':

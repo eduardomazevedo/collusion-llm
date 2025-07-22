@@ -44,23 +44,23 @@ RESPONSE_FORMAT_CLASSES = {
 class BatchProcessor:
     """Class to manage batch processing of transcripts."""
 
-    def __init__(self, provider="openai", model=None, prompts_path=None, temperature=1.0, max_tokens=500):
+    def __init__(self, provider=None, model=None, prompts_path=None, temperature=None, max_tokens=None):
         """
         Initializes the BatchProcessor class.
 
-        :param provider: The LLM provider (default: "openai").
-        :param model: LLM model name, defaults to OpenAI's model or config.OPENAI_MODEL.
+        :param provider: The LLM provider.
+        :param model: LLM model name.
         :param prompts_path: Path to JSON file containing system prompts.
-        :param temperature: Temperature setting for the model (default: 1.0).
-        :param max_tokens: Maximum tokens in the response (default: 500).
+        :param temperature: Temperature setting for the model.
+        :param max_tokens: Maximum tokens in the response.
         """
-        self.provider = provider.lower()
-        self.model = model or getattr(config, "OPENAI_MODEL", "gpt-4o-mini")
-        self.prompts_path = prompts_path or config.PROMPTS_PATH
+        self.provider = provider.lower() if provider else config.PROVIDER
+        self.model = config.OPENAI_MODEL
+        self.prompts_path =config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
-        self.temperature = temperature
-        self.max_tokens = max_tokens
+        self.temperature = config.TEMPERATURE
+        self.max_tokens = config.MAX_TOKENS
 
     def _load_prompts(self):
         """Load prompts from the prompts JSON file."""

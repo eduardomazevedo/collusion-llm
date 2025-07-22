@@ -2,9 +2,9 @@
 #%%
 """
 Script to rerun batch processing for top transcripts using SimpleCapacityV8.1.1 prompt.
-We start from data/top_transcripts.csv list, which has the transcripts with score >= 75 in the first run (about 4500).
+We start from data/intermediaries/top_transcripts.csv list, which has the transcripts with score >= 75 in the first run (about 4500).
 Then run 10 queries on each otherm and upload to the database.
-Run interactively, as we have to wait for the batch to complete to get the results. Took about 3 hours in 2025-06-26.
+Run interactively, as we have to wait for the batch to complete to get the results. Took about 3 hours on 2025-06-26.
 """
 
 import os
@@ -24,12 +24,12 @@ if os.getcwd() != config.ROOT:
     print(f"Changed to root directory: {os.getcwd()}")
 
 # Create output directory for batch files
-batch_output_dir = os.path.join(config.OUTPUT_DIR, 'batch_inputs')
+batch_output_dir = os.path.join(config.CACHE_DIR, 'batch_inputs')
 os.makedirs(batch_output_dir, exist_ok=True)
 print(f"Batch output directory: {batch_output_dir}")
 
 #%% Load transcript IDs
-csv_path = os.path.join(config.DATA_DIR, 'top_transcripts.csv')
+csv_path = os.path.join(config.DATA_DIR, 'intermediaries', 'top_transcripts.csv')
 print(f"Loading transcript IDs from: {csv_path}")
 
 df = pd.read_csv(csv_path)
@@ -51,7 +51,7 @@ print(f"First batch: {batches[0]}")
 
 #%% Create batch input file
 prompt_name = "SimpleCapacityV8.1.1"
-processor = BatchProcessor(temperature=1.0, max_tokens=500)
+processor = BatchProcessor(temperature=config.TEMPERATURE, max_tokens=config.MAX_TOKENS)
 
 print(f"Creating batch input files for {len(batches)} batches...")
 print(f"Prompt: {prompt_name}")

@@ -29,7 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description='Analyze queries above a score threshold')
     parser.add_argument('original_prompt', help='Name of the original prompt used to create entries')
     parser.add_argument('analysis_prompt', help='Name of the analysis prompt to use for analyzing outputs')
-    parser.add_argument('--threshold', type=int, default=75, help='Score threshold (default: 75)')
+    parser.add_argument('--threshold', type=int, default=config.LLM_SCORE_THRESHOLD, help='LLM score threshold')
     parser.add_argument('--export', action='store_true', help='Export results to CSV after analysis')
     parser.add_argument('--export-path', help='Custom path for CSV export')
     

@@ -46,7 +46,7 @@ export PYTHONPATH="$PROJECT_ROOT"
 # Function to check if batches exist for a prompt
 check_batches_exist() {
     local prompt_name=$1
-    local batches_dir="$PROJECT_ROOT/output/${prompt_name}_batches"
+    local batches_dir="$PROJECT_ROOT/data/cache/${prompt_name}_batches"
     echo "Checking directory: $batches_dir"
     if [ -d "$batches_dir" ] && [ -n "$(find "$batches_dir" -name "*.jsonl" -print -quit)" ]; then
         return 0  # Batches exist
@@ -57,7 +57,7 @@ check_batches_exist() {
 
 # Function to check if tracking file exists
 check_tracking_file() {
-    local tracking_file="$PROJECT_ROOT/data/batch_tracker.csv"
+    local tracking_file="$PROJECT_ROOT/data/cache/batch_tracker.csv"
     if [ -f "$tracking_file" ]; then
         return 0  # Tracking file exists
     else
@@ -73,7 +73,7 @@ case "$OPERATION" in
         if [ $? -eq 0 ]; then
             echo "Batch creation completed successfully"
             if check_batches_exist "$PROMPT_NAME"; then
-                echo "Batches are ready in: output/${PROMPT_NAME}_batches"
+                echo "Batches are ready in: data/cache/${PROMPT_NAME}_batches"
             else
                 echo "Warning: No batches were created"
             fi
@@ -102,7 +102,7 @@ case "$OPERATION" in
         if [ $? -eq 0 ]; then
             echo "Batch submission completed successfully"
             if check_tracking_file; then
-                echo "Progress is being tracked in: data/batch_tracker.csv"
+                echo "Progress is being tracked in: data/cache/batch_tracker.csv"
             fi
             echo "Full submission log saved to: $LOG_FILE"
         else
@@ -145,7 +145,7 @@ case "$OPERATION" in
         if [ $? -eq 0 ]; then
             echo "Batch submission completed successfully"
             if check_tracking_file; then
-                echo "Progress is being tracked in: data/batch_tracker.csv"
+                echo "Progress is being tracked in: data/cache/batch_tracker.csv"
             fi
         else
             echo "Error: Batch submission failed"
@@ -155,5 +155,5 @@ case "$OPERATION" in
 esac
 
 # Make the script executable
-chmod +x src/bash/run_big_batch.sh
+chmod +x src/query_submission/batch_queries/run_big_batch.sh
 
