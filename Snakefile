@@ -53,6 +53,19 @@ rule company_year_dataset:
     shell:
         "python src/pre_query/compustat/company_year_dataset.py"
 
+rule create_top_transcripts:
+    """
+    Extract top transcript list from queries database.
+    Queries SimpleCapacityV8.1.1 prompts, keeps earliest query per transcript,
+    filters by LLM_SCORE_THRESHOLD, and saves transcriptids to CSV.
+    """
+    input:
+        "data/datasets/queries.sqlite"
+    output:
+        "data/intermediaries/top_transcripts.csv"
+    shell:
+        "python src/post_query/analysis/top_transcript_list.py"
+
 rule main_dataset:
     """
     Create the main analysis dataset at the transcript level.
@@ -91,7 +104,7 @@ rule transcript_data_stats:
     Analyzes transcript details and creates YAML output with key metrics.
     """
     input:
-        transcript_detail="data/datasets/transcript-detail.feather",
+        transcript_detail="data/datasets/transcript_detail.feather",
         queries_db="data/datasets/queries.sqlite"
     output:
         "data/yaml/transcript_stats.yaml"
