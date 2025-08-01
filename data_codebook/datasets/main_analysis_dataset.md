@@ -1,0 +1,4 @@
+Original file: main_analysis_dataset.feather
+File type: Feather file
+Shape: 569,624 rows x 42 columns
+Columns: companyid, keydevid, transcriptid, headline, mostimportantdateutc, mostimportanttimeutc, keydeveventtypeid, keydeveventtypename, companyname, transcriptcollectiontypeid, transcriptcollectiontypename, transcriptpresentationtypeid, transcriptpresentationtypename, transcriptcreationdate_utc, transcriptcreationtime_utc, audiolengthsec, benchmark_human_flag, llm_flag, transcript_year, conm, consol, costat, curcd, datadate, datafmt, emp, fic, fyear, ggroup, gind, gsector, gsubind, gvkey, indfmt, loc, mkvalt, naics, naicsh, sic, sich, spcindcd, spcseccd

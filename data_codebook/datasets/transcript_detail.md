@@ -1,0 +1,3 @@
+Original file: transcript_detail.feather
+File type: Feather file
+Columns: companyid, keydevid, transcriptid, headline, mostimportantdateutc, mostimportanttimeutc, keydeveventtypeid, keydeveventtypename, companyname, transcriptcollectiontypeid, transcriptcollectiontypename, transcriptpresentationtypeid, transcriptpresentationtypename, transcriptcreationdate_utc, transcriptcreationtime_utc, audiolengthsec
