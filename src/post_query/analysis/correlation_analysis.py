@@ -97,7 +97,7 @@ summary_stats = {
     'mkvalt_missing_observations': int(df['mkvalt'].isna().sum()),
     'mkvalt_missing_tag_rate': float(df[df['mkvalt'].isna()]['llm_flag'].mean() * 100)
 }
-with open(yaml_dir / "summary_stats.yaml", "w") as f:
+with open(yaml_dir / "correlates_collusive_communication.yaml", "w") as f:
     yaml.dump(summary_stats, f)
 
 #%%
@@ -126,7 +126,6 @@ ax.errorbar(
     yerr=[mv_stats['llm_tag_pct'] - mv_stats['ci_low'], mv_stats['ci_high'] - mv_stats['llm_tag_pct']],
     fmt='o-', capsize=4
 )
-ax.set_title("LLM Tag Rate by Market Value Decile")
 ax.set_xlabel("Market Value Decile")
 ax.set_ylabel("LLM Tagged Collusive (%)")
 save_figure("market_value_deciles", "LLM tag rate by market value decile. Produced by correlation_analysis.py", fig)
@@ -167,7 +166,6 @@ ax.barh(
 ax.set_yticks(np.arange(len(sector_sorted)))
 ax.set_yticklabels(sector_sorted['sector_name'])
 ax.set_xlabel("LLM Tagged Collusive (%)")
-ax.set_title("LLM Tag Rate by Sector")
 plt.tight_layout()
 save_figure("sector_tag_rates", "LLM tag rate by sector (horizontal bar chart). Produced by correlation_analysis.py", fig)
 
@@ -197,7 +195,6 @@ ax.errorbar(
     yerr=[year_stats['llm_tag_pct'] - year_stats['ci_low'], year_stats['ci_high'] - year_stats['llm_tag_pct']],
     fmt='o-', capsize=4
 )
-ax.set_title("LLM Tag Rate by Year")
 ax.set_xlabel("Year")
 ax.set_ylabel("LLM Tagged Collusive (%)")
 save_figure("year_tag_rates", "LLM tag rate by year. Produced by correlation_analysis.py", fig)

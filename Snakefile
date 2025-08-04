@@ -12,7 +12,7 @@ rule all:
         "data/datasets/main_analysis_dataset.feather",
         "data/outputs/top_transcripts_data.csv",
         "data/yaml/transcript_stats.yaml",
-        "data/yaml/summary_stats.yaml",
+        "data/yaml/correlates_collusive_communication.yaml",
         "data/outputs/tables/market_value_deciles.csv",
         "data/outputs/tables/sector_tag_rates.csv", 
         "data/outputs/tables/year_tag_rates.csv",
@@ -127,7 +127,7 @@ rule correlation_analysis:
     input:
         "data/datasets/main_analysis_dataset.feather"
     output:
-        yaml="data/yaml/summary_stats.yaml",
+        yaml="data/yaml/correlates_collusive_communication.yaml",
         mv_table="data/outputs/tables/market_value_deciles.csv",
         sector_table="data/outputs/tables/sector_tag_rates.csv",
         year_table="data/outputs/tables/year_tag_rates.csv",
@@ -144,7 +144,7 @@ rule populate_constants:
     """
     input:
         "data/yaml/transcript_stats.yaml",
-        "data/yaml/summary_stats.yaml"
+        "data/yaml/correlates_collusive_communication.yaml"
     output:
         "data/constants/.populated"
     shell:

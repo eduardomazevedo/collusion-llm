@@ -111,7 +111,7 @@ bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> all
 ## Downstream analysis coding guidelines
 - The downstream analysis produces the final assets that we use for the paper and human reading. Goes in `data/outputs/` with subfolders `tables/`, `figures/`.
 - Most tables should be output as csv and latex. The exception are large tables like `data/outputs/top_transcripts_data.csv` which are only meant to be read in spreadsheets and not for publication.
-- Figures should be output as .pdf and .png, in both 1:1 and 16:9 formats.
+- Figures should be output as .pdf and .png, in both 1:1 and 16:9 formats. Figures and tables should not have titles because we will add them in latex.
 - The code producing each figure or table should also output a .txt file in the same location in `data/outputs` with same filename but txt extension with a terse description of the asset and what script produces it.
 - Scripts that calculate stats that do not fit neatly into a table should output a yaml file in `data/yaml/`. These include basic stats like number of observations, etc.
 - Analysis scripts should be written sequentially, without unecessary definitions of functions, without pointless main blocks. Instead it should be data science friendly, with #%% blocks that can be run interactively.
@@ -120,6 +120,20 @@ bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> all
 ## Latex
 - The paper manuscript files are in `./manuscript/`.
 - The main latex file defines command `\newcommand{\data}[1]{\input{../data/constants/#1.txt}\unskip}` to read the constants in `data/constants/`.
+- Figures and table floats should include detailed notes in the bottom with footnote size, that make the latex skimmable. Here is an example:
+```latex
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\columnwidth]{../data/outputs/figures/market_value_deciles_16x9.pdf}
+    \caption{LLM Tag Rate by Market Value Decile}
+    \label{fig:market_value_deciles}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across market value deciles, representing firm size. The chart displays how collusive communication detection varies with company size. Data includes \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis.
+    \end{minipage}
+\end{figure}
+```
 
 ### Snakemake Pipeline
 The downstream analysis (once queries database is done) uses Snakemake for reproducible data processing:
