@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to create top_transcripts_data.csv with aggregated query data and follow-up analysis.
+This file is going to be used for inspection by Joe Harrington.
 
 This script:
 1. Reads list of top transcripts from top_transcripts.csv
