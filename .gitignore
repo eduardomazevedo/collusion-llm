@@ -57,6 +57,7 @@ scratch.py
 *.log
 *.out
 *.synctex.gz
+*.synctex(busy)
 *.toc
 *.lof
 *.lot
