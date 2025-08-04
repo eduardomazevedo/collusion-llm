@@ -70,7 +70,7 @@ rule main_dataset:
     """
     Create the main analysis dataset at the transcript level.
     Combines transcript details, human ratings, LLM flags, and Compustat data.
-    Creates binary flags for human and LLM collusion detection.
+    Creates binary flags for human and LLM collusion detection and for whether it is in human benchmark sample.
     """
     input:
         transcript_detail="data/datasets/transcript_detail.feather",
@@ -100,7 +100,7 @@ rule top_transcript_data:
 
 rule transcript_data_stats:
     """
-    Generate summary statistics for transcript data.
+    Generate summary statistics for transcript data (in the subset with queries).
     Analyzes transcript details and creates YAML output with key metrics.
     """
     input:

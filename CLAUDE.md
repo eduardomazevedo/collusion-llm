@@ -11,8 +11,16 @@ This is a research project that uses Large Language Models (LLMs) to detect pote
 - Scripts are in subdirectories of `./src/`. Modules are in `./modules`. We always run all scripts from root, which is done in `config.py` to avoid boilerplate.
 - The project has three parts.
 - 1) Download basic data on the universe of corporate communication transcripts available from the capital iq dataset. This is handled by `./src/setup/setup.sh`.
+  - The most important datasets here are `data/datasets/transcript_detail.feather` which has data on the transcripts in the WRDS capital IQ data and `data/datasets/human_ratings.csv` which has human ratings for a benchmark sample of transcripts.
 - 2) Using that data, we interactively used our tools to run LLM queries that were saved to our database `data/datasets/queries.sqlite`. We occasionally use a project instance to make further queries and add to the database. But most of the time we just download the version of the database on our Google Drive storage remote `bash ./src/cli/db_manager.sh download` and perform downstream analysis.
 - 3) The downstream analysis is reproducible using our `./Snakefile`
+  - We use some rules to tag the top trasncripts according to the LLM collusion detection.
+  - We download additional data on companies from WRDS.
+  - Merge this to create an analysis dataset.
+  - Perform an analysis of the correlates of collusive communication.
+  - Will do basic stats and human validation of the results.
+  - Save this downstream output to be used in the paper and slides.
+  - Evaluate the performance of different models and query methodologies on the human benchmark sample.
 
 ## Common Development Commands
 
