@@ -2,199 +2,129 @@
 
 This project uses Large Language Models (LLMs) to detect potential collusive behavior in corporate earnings call transcripts. The system analyzes public company communications to identify signs of price-fixing or capacity limitation coordination between competitors.
 
-## Quick Start
+# Quick Start
+Steps 1-4 can be run upon cloning the repo
 
-```bash
-# 1. Initial setup (creates venv, downloads data, initializes database)
+## 1. Initial setup (creates venv, downloads data, initializes database)
+```
 bash ./src/setup/setup.sh
+```
 
-# 2. Configure rclone for Google Drive sync
-rclone config  # Create remote named 'collusion-llm'
+## 2. Configure rclone for Google Drive sync
+If running for the first time, create remote named 'collusion-llm'.
+This step can be skipped if remote is already set correctly.
+```
+rclone config
+```
 
-# 3. Download existing database or initialize new one
+## 3. Download existing database or initialize new one
+```
 bash ./src/cli/db_manager.sh download  # Get latest database
-# OR
-bash ./src/cli/db_manager.sh init     # Start fresh
+bash ./src/cli/db_manager.sh init     # Initialize queries database with two tables; Don't use if database already exists.
+```
 
-# 4. Run analysis pipeline
+## 4. Run analysis pipeline
+```
 source .venv/bin/activate
 snakemake --cores 2  # For downstream analysis
 ``` 
 
-# Example .env file
+# Testing and Running New Prompts
+
+## Adding a New Prompt
+1. Edit `assets/prompts.json` to add your new prompt with:
+   - A unique prompt name (e.g., "MyNewPromptV1")
+   - The system_message containing your prompt instructions
+   - The response_format (this corresponds to a a class defined in the llm module)
+
+## Testing on Benchmark Dataset
+First test your prompt against human-labeled transcripts to evaluate performance:
+```
+# Basic usage
+bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name>
+
+# With options
+bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> --source joe --balanced 50
+```
+
+This script first calls populate_benchmarking data.py which:
+- Selects transcripts with human ratings from the database
+- Queries the LLM with your prompt for each of those transcripts
+- Saves results to the queries database
+Then calls calculate_benchmark.py which:
+- Updates the performance leaderboard comparing LLM vs human scores
+- Outputs a csv file at BENCHMARKING_PATH (it updates and rewrites the file if it already exists)
+
+Notes:
+- benchmarking uses thresholds for LLM provided scores, Joe's scores, and if available follow up analysis scores according to threshold values set in config.py
+
+## Batch Processing Options
+
+### Individual Batch Processing
+For processing specific companies:
+```
+# Create and submit batch for specific companies
+bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> --operation create
+bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> --operation submit --input-file <path>
+
+# Check status
+bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> --operation status --batch-id <id>
+```
+
+What happens:
+- Fetches transcripts for specified companies from database
+- Creates batch request file for OpenAI API
+- Submits batch for async processing
+- Saves results to the queries database
+
+### Big Batch Processing
+For processing all transcripts in the database:
+```bash
+# Option 1: Create batches only (for review before submission)
+bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> create
+
+# Option 2: Submit existing batches
+bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> submit
+
+# Option 3: Create and submit in one command
+bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> all
+```
+
+What happens:
+
+**Batch Creation Phase:**
+- Loads transcript-company mappings and pre-calculated token sizes
+- Creates diagnostic CSV (`transcript_diagnostics.csv`) tracking each transcript's assignment
+- Groups transcripts by company into JSONL batch files in `data/cache/{prompt_name}_batches/`
+- Validates each batch stays within OpenAI limits (50K requests, 10M tokens)
+- Reports missing transcripts and token usage statistics
+
+**Submission and Monitoring Phase:**
+- Creates/updates `data/cache/batch_tracker.csv` with batch status, estimated costs, and progress
+- Monitors OpenAI's token queue limit (10M tokens max in flight)
+- Submits batches when queue capacity allows, waiting when necessary (batch completion slows down after many consecutive batch jobs; best practice is to pause batch submission for a day if progress is deemed too slow)
+- Long-running process (hours/days) with progress updates every 30 seconds
+- Automatically falls back to individual API calls for failed batches (despite estimating the in-progress batch queue from transcript token sizes and prompt token sizes, the queue at OpenAI might fill up sooner than expected; if a submitted batch goes over the queue limit, it is returned as failed; best practice is to allow "cool down time" by switching to individual API requests, or pausing submissions for a day)
+- Saves completed results directly to queries database
+- Tracks completion status to avoid reprocessing (useful when breaking and resuming processing for "cool down time")
+
+
+## Visualizing Data
+For easy inspection of LLM output use the following:
+```bash
+# To export all queries (or a subset, using options)
+bash src/cli/db_manager.sh --export-queries
+
+# TO export follow up analysis queries (or a subset, using options)
+bash src/cli/db_manager.sh --export-analysis
+``` 
+
+# Example .env file (used for config)
 OPENAI_API_KEY = abc123
 WRDS_USERNAME = sauron
 WRDS_PASSWORD = mordor123
 ROOT=/Users/sauron/projects/collusion-llm
 
-# Pipeline
-  - Setup: `bash ./src/setup/setup.sh`
-  - Database management:
-    - Initialize new database: `bash ./src/cli/db_manager.sh init`
-    - Or get latest: `bash ./src/cli/db_manager.sh download`
-    - Check status: `bash ./src/cli/db_manager.sh status`
-  - Run prompts on transcripts: `bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> [--source <joe|acl>] [--balanced <size>]`
-    - Assess prompt performance: "data/outputs/benchmarking/leaderboard.csv" updates every time benchmark runs
-  - Upload database: `bash ./src/cli/db_manager.sh upload`
 
-### Updating Leaderboard with New Threshold
-To update the leaderboard with a new threshold value:
-1. Change the `binary_threshold` default value in `src/post_query/benchmarking/create_leaderboard.py`
-2. Run: `bash ./src/post_query/benchmarking/update_leaderboard.sh`
 
-You can also sort the leaderboard by any available metric using the `--sort` option:
-```bash
-bash ./src/post_query/benchmarking/update_leaderboard.sh --sort <metric>
-```
 
-Available metrics for sorting:
-- `combined_accuracy` (default)
-- `joe_accuracy`
-- `acl_accuracy`
-- `joe_pos_precision`
-- `joe_pos_recall`
-- `joe_neg_precision`
-- `joe_neg_recall`
-- `acl_pos_precision`
-- `acl_pos_recall`
-- `acl_neg_precision`
-- `acl_neg_recall`
-
-For example, to sort by ACL positive precision:
-```bash
-bash ./src/post_query/benchmarking/update_leaderboard.sh --sort acl_pos_precision
-```
-
-## Leaderboard Interpretation
-
-### Overall Metrics
-- `combined_accuracy`: Weighted average of Joe's accuracy (50%) and ACL accuracy (50%)
-- `joe_accuracy`: Accuracy on Joe's dataset (continuous scores 0-100)
-- `acl_accuracy`: Accuracy on ACL dataset (binary classification)
-
-### Dataset Metrics
-- `_pos_precision`: How many of the predicted positive cases (score ≥ threshold) are actually positive
-- `_pos_recall`: How many of the actual positive cases were correctly identified
-- `_neg_precision`: How many of the predicted negative cases (score < threshold) are actually negative
-- `_neg_recall`: How many of the actual negative cases were correctly identified
-
-### Interpreting the Metrics
-- A prompt with high positive precision but low positive recall is conservative in identifying collusion
-- A prompt with high positive recall but low positive precision tends to over-predict collusion
-- The same principles apply to negative cases (non-collusion)
-
-The leaderboard is sorted by `combined_accuracy` in descending order by default, but you can sort by any other metric using the `--sort` option. For example, if false positives are more costly than false negatives, you might want to sort by precision metrics.
-
-## Benchmarking LLM Performance
-
-Calculate comprehensive performance metrics (precision, recall, F1, specificity) against human-reviewed datasets:
-
-```bash
-python ./src/post_query/benchmarking/calculate_benchmark.py [options]
-```
-
-### Options
-- `--prompt <name>`: Analyze specific prompt (default: all prompts)
-- `--threshold <value>`: LLM score threshold for binary conversion (default: 75.0)
-- `--joe-threshold <value>`: Joe's score threshold for binary conversion (default: 50.0)
-- `--analysis-threshold <value>`: Analysis validation threshold (default: 75.0)
-- `--detailed`: Show detailed metrics including confusion matrices
-- `--output <path>`: Output CSV file path (default: data/f1_scores.csv)
-
-### Example
-```bash
-# Compare different threshold configurations
-python ./src/post_query/benchmarking/calculate_benchmark.py --prompt SimpleCapacityV8.1.1 --threshold 75 --joe-threshold 50 --analysis-threshold 50 --detailed
-```
-
-The benchmarking evaluates multiple approaches:
-- **Non-interactive**: Single response or averaged responses
-- **Agentic**: Repeated high-scoring responses, analysis-based validation
-
-Results include metrics for Joe's subsample, ACL's subsample, and pooled data.
-
-## Database Export (for review)
-The project uses SQLite for storing query results. The database is stored in `data/datasets/queries.sqlite`. To export the database to CSV:
-
-```bash
-python ./src/post_query/exports/export_queries.py [--output output_path]
-```
-If no output path is specified, it will create a timestamped file in the `data/outputs` directory.
-
-## Running Batches
-`bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> [options]`
-
-### Required Arguments
-- `company_ids`: Single company ID or comma-separated list (e.g., "12345" or "12345,67890")
-- `prompt_name`: Name of the prompt from prompts config (e.g., "ComprehensiveV1")
-
-### Operations
-Use `--operation` flag with:
-- `create`: Generate batch input file
-- `submit`: Submit batch to OpenAI
-- `status`: Check batch progress
-- `process`: Save completed results to database
-- `error`: Check batch error information
-- `models`: List available OpenAI models
-
-### Optional Arguments
-- `--batch-id <id>`: Required for `status`, `process`, and `error` operations
-- `--input-file <path>`: Custom input (relative) file path for `submit` operation (default: `data/cache/batch_inputs/<prompt_name>_input.jsonl`)
-
-## Running Big Batches (All Companies)
-`bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> <operation>`
-
-Process all companies in the Capital IQ sample using the big batch runner. This handles OpenAI's size limits automatically and provides robust error handling with fallback to individual API calls.
-
-### Required Arguments
-- `prompt_name`: Name of the prompt from prompts config (e.g., "ComprehensiveV1")
-- `operation`: One of the following:
-  - `create`: Create batch files for all companies
-  - `submit`: Submit and monitor all batches
-  - `all`: Create and submit batches in sequence
-
-### Features
-- **Automatic batching**: Creates one batch per company to stay within OpenAI limits
-- **Token management**: Tracks queue usage and waits when limits are reached
-- **Error recovery**: Falls back to individual API calls if batch API fails
-- **Progress tracking**: Monitors all batches and saves results to database
-- **Resume capability**: Can restart from where it left off if interrupted
-
-### Example Usage
-```bash
-# Create batches for all companies
-bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 create
-
-# Submit and monitor all batches
-bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 submit
-
-# Create and submit in one command
-bash ./src/query_submission/batch_queries/run_big_batch.sh SimpleCapacityV8.1.1 all
-```
-
-Progress is tracked in `data/intermediaries/batch-tracker.csv` and results are automatically saved to the database as batches complete.
-
-Recommentations:
-- Run the create procedure individually first, and then the submission.
-- Resume submit procedure if necessary to accommodate rate limitations in batch or individual API submissions
-
-## Exporting high scorer excel sheet with transcript information
-Note: a bit sloppy atm
-
-## Naming Conventions
-
-### File Naming
-- Python scripts and shell scripts use underscores: `calculate_benchmark.py`, `run_benchmark.sh`
-- Avoid hyphens in file names
-
-### Database Fields
-- Use `transcriptid` and `companyid` (no underscore) to match WRDS/CapIQ conventions
-- This maintains consistency with the original data sources
-
-### Python Variables
-- Use snake_case: `transcript_id`, `company_id`
-- Convert from database field names when loading data into Python
-
-### CSV Files
-- May use either `transcript_id` or `transcriptid` for historical reasons
-- New exports should prefer the underscore format for consistency with Python conventions

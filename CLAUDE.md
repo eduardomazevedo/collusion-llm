@@ -4,100 +4,103 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a research project that uses Large Language Models to detect potential collusive behavior in corporate earnings call transcripts. The system analyzes public company communications to identify signs of price-fixing or capacity limitation coordination between competitors.
+This is a research project that uses Large Language Models (LLMs) to detect potential collusive behavior in corporate earnings call transcripts. The system analyzes public company communications to identify signs of price-fixing or capacity limitation coordination between competitors.
 
-## Key Commands
+## Common Development Commands
 
-### Setup and Environment
+### Environment Setup
 ```bash
-# Initial project setup
+# Initial setup (creates venv, downloads data, initializes database)
 bash ./src/setup/setup.sh
 
 # Activate virtual environment
 source .venv/bin/activate
-
-# Database management
-bash ./src/cli/db_manager.sh init      # Initialize new database
-bash ./src/cli/db_manager.sh download  # Get latest from Google Drive
-bash ./src/cli/db_manager.sh upload    # Upload to Google Drive
-bash ./src/cli/db_manager.sh status    # Check sync status
 ```
 
-### Running Analysis
+### Database Operations
+```bash
+# Download latest database from Google Drive
+bash ./src/cli/db_manager.sh download
+
+# Initialize new queries database (only if doesn't exist)
+bash ./src/cli/db_manager.sh init
+
+# Export query results for visualization
+bash ./src/cli/db_manager.sh --export-queries
+bash ./src/cli/db_manager.sh --export-analysis
+```
+
+### Running Analysis Pipeline
+```bash
+# Run downstream analysis with Snakemake
+snakemake --cores 2
+```
+
+### Testing Prompts
 ```bash
 # Test prompt on benchmark dataset
 bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name>
 
-# Run batch processing (operations: test, run, check, download)
-bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> <operation>
-
-# Calculate performance metrics
-python ./src/post_query/benchmarking/calculate_benchmark.py --prompt <prompt_name>
-
-# Run full analysis pipeline
-snakemake --cores 2
+# With options
+bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> --source joe --balanced 50
 ```
 
-### Development and Testing
+### Batch Processing
 ```bash
-# Run tests (using pytest)
-pytest
+# Individual batch processing
+bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> --operation create
+bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> --operation submit --input-file <path>
 
-# No specific linting command configured - check with user if needed
+# Big batch processing (all transcripts)
+bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> create
+bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> submit
+bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> all
 ```
 
-## Architecture and Code Structure
+## Architecture Overview
 
-### Directory Organization
-- `src/cli/` - Command-line interfaces and database management
-- `src/setup/` - Project initialization and configuration
-- `src/pre_query/` - Data preparation and preprocessing
-- `src/query_submission/` - LLM query execution (single and batch)
-- `src/post_query/` - Analysis, benchmarking, and exports
-- `data/datasets/` - SQLite databases (queries.sqlite, company_transcript_data.sqlite)
-- `data/outputs/` - Analysis results and exports
-- `assets/prompts.json` - All prompt variations for testing
+### Core Modules
+- **modules/llm.py**: Main LLM interface for synchronous API calls. Handles prompt management and response parsing using Pydantic models.
+- **modules/batch_processor.py**: Manages asynchronous batch processing with OpenAI's Batch API. Handles large-scale transcript processing.
+- **modules/queries_db.py**: Database interface for storing and retrieving LLM query results.
+- **modules/capiq.py**: Interface to Capital IQ data for fetching transcript content.
+- **modules/db_manager.py**: Database management utilities for backup/restore operations.
 
-### Key Technical Details
-- **Primary Model**: OpenAI gpt-4o-mini via batch API
-- **Database**: SQLite with two main tables: `queries` and `analysis_queries`
-- **Package Manager**: UV (not pip) - always use `uv add` for new dependencies
-- **Python Version**: 3.13+
-- **Config**: Central `config.py` file manages all paths and settings
-- **Environment**: Requires `.env` file with OPENAI_API_KEY and WRDS credentials
+### Data Flow
+1. **Pre-query stage**: Download and prepare data (Compustat, human ratings, transcript details)
+2. **Query submission**: Process transcripts through LLM using either synchronous or batch APIs
+3. **Post-query analysis**: Generate analysis datasets, calculate benchmarks, export results
 
-### Important Patterns
-1. **Naming Conventions**:
-   - Python files: Use underscores (`calculate_benchmark.py`)
-   - Database fields: No underscores (`transcriptid`, not `transcript_id`)
-   - Variables in code: Snake case (`transcript_id`)
+### Key Configuration
+- All paths and settings are centralized in `config.py`
+- Environment variables required: `OPENAI_API_KEY`, `WRDS_USERNAME`, `WRDS_PASSWORD`, `ROOT`
+- Prompts are defined in `assets/prompts.json`
+- Model configurations in `assets/llm_config.json`
 
-2. **LLM Integration**:
-   - Uses Pydantic models for structured responses
-   - Batch API for cost efficiency (~$0.075 per 1M input tokens)
-   - Automatic chunking for 50K request limit
-   - Token tracking in database
+### Database Schema
+- Main database: `data/datasets/queries.sqlite`
+- Tables: `queries` (LLM results), `follow_up_analysis` (additional analysis)
+- Transcript details stored in `data/datasets/transcript_detail.feather`
 
-3. **Error Handling**:
-   - Fallback parsing for malformed LLM responses
-   - Retry logic for API failures
-   - Comprehensive logging throughout
+### Snakemake Pipeline
+The project uses Snakemake for reproducible data processing:
+- Downloads Compustat data
+- Maps company IDs to GVKEYs
+- Creates analysis datasets
+- Generates summary statistics
+- All rules defined in `Snakefile`
 
-### Common Development Tasks
+### Prompt Development Workflow
+1. Add new prompt to `assets/prompts.json` with unique name, system_message, and response_format
+2. Test on benchmark dataset using `run_benchmark.sh`
+3. Review performance metrics in benchmarking output
+4. Run batch processing for full dataset once satisfied with performance
 
-When modifying prompts:
-1. Edit `assets/prompts.json` to add/modify prompts
-2. Test with `run_benchmark.sh` against human benchmarks
-3. Calculate metrics with `calculate_benchmark.py`
-4. Update leaderboard to compare performance
+### Important Thresholds
+- `JOE_SCORE_THRESHOLD`: 75
+- `LLM_SCORE_THRESHOLD`: 75
+- `ANALYSIS_SCORE_THRESHOLD`: 75
+These thresholds are used for binary classification in benchmarking and analysis.
 
-When processing new transcripts:
-1. Ensure transcript data is in the SQLite database
-2. Use batch runner for large-scale processing
-3. Monitor token usage and costs
-4. Run downstream analysis with Snakemake
-
-When analyzing results:
-1. Use tools in `src/post_query/analysis/` for deep dives
-2. Export data using scripts in `src/post_query/exports/`
-3. Generate LaTeX tables/figures for manuscript
+## Git preference
+Whenever asking Claude to commit and push with a message of choice, we only want that message, without any credit to Claude Code.

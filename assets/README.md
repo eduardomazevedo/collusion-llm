@@ -29,37 +29,9 @@ Contains configuration data for various LLM providers and models, specifically f
 Contains a comprehensive collection of prompt variations for collusion detection analysis in earnings call transcripts.
 
 ### Structure:
-- **30+ Prompt Variations**: Each with a unique identifier
+- **Many Prompt Variations**: Each with a unique name used to identify the corresponding class.
 - **Two Main Components per Prompt**:
-  - `system_message`: Instructions for the LLM to analyze transcripts
-  - `response_format`: Expected response structure
+  - `system_message`: Instructions for the LLM to analyze transcripts. This is the actual prompt text passed to a LLM.
+  - `response_format`: Expected response structure. Corresponding classes are defined in the llm module to include a set of variables.
 
-### Prompt Categories:
-
-#### 1. Price-Capacity Combined Prompts
-- Focus on both price-fixing and capacity limitation
-- Versions: PriceCapacity_V1 through V6
-
-#### 2. Capacity-Focused Prompts
-- Target capacity discipline and supply limitation
-- Versions: SimpleCapacity_V1 through V8.4
-
-#### 3. Price-Focused Prompts
-- Target price coordination and increases
-- Versions: SimplePrice_V1 through V9
-
-#### 4. Specialized Prompts
-- **Signal Detection**: Look for various signals of collusive intent
-- **Contingent Behavior**: Focus on conditional market responses (V1-V2)
-- **Comprehensive Analysis**: Include excerpts and detailed reasoning (V1-V3)
-- **Binary Detection**: Simple yes/no collusion detection
-- **Special Formats**: Indicators, JSON output, and other structured formats
-
-### Response Formats:
-- `PriceCapacity`: Combined price and capacity scores
-- `CapacityScoreReasoning`: Capacity score with explanation
-- `SimplePrice`: Price coordination score only
-- `ComprehensiveAnalysis`: Detailed analysis with excerpts
-- Various other specialized formats
-
-Each prompt is designed to detect different aspects of potential collusive behavior in corporate communications, with varying levels of sophistication and focus areas.
+One response_format might work for many prompts. The response_format variables just need to correspond to what the prompt asks for.

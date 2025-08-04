@@ -20,16 +20,17 @@ TEMPERATURE = 1.0
 ROOT = os.getenv('ROOT')
 
 # Paths
-DATABASE_PATH = os.path.join(ROOT, "data", "datasets", "queries.sqlite")
-PROMPTS_PATH = os.path.join(ROOT, "assets", "prompts.json")
-TRANSCRIPT_DETAIL_PATH = os.path.join(ROOT, "data", "datasets", "transcript_detail.feather")
-ACL_SCORES_PATH = os.path.join(ROOT, "data", "raw", "human_ratings", "acl_scores.csv")
-JOE_SCORES_PATH = os.path.join(ROOT, "data", "raw", "human_ratings", "joe_scores.csv")
-HUMAN_RATINGS_PATH = os.path.join(ROOT, "data", "datasets", "human_ratings.csv")
-COMPANIES_TRANSCRIPTS_PATH = os.path.join(ROOT, "data", "intermediaries", "companies_transcripts.csv")
-OUTPUTS_DIR = os.path.join(ROOT, "data", "outputs")
-CACHE_DIR = os.path.join(ROOT, "data", "cache")
 DATA_DIR = os.path.join(ROOT, "data")
+DATABASE_PATH = os.path.join(DATA_DIR, "datasets", "queries.sqlite")
+PROMPTS_PATH = os.path.join(ROOT, "assets", "prompts.json")
+TRANSCRIPT_DETAIL_PATH = os.path.join(DATA_DIR, "datasets", "transcript_detail.feather")
+ACL_SCORES_PATH = os.path.join(DATA_DIR, "raw", "human_ratings", "acl_scores.csv")
+JOE_SCORES_PATH = os.path.join(DATA_DIR, "raw", "human_ratings", "joe_scores.csv")
+HUMAN_RATINGS_PATH = os.path.join(DATA_DIR, "datasets", "human_ratings.csv")
+COMPANIES_TRANSCRIPTS_PATH = os.path.join(DATA_DIR, "intermediaries", "companies_transcripts.csv")
+OUTPUTS_DIR = os.path.join(DATA_DIR, "outputs")
+CACHE_DIR = os.path.join(DATA_DIR, "cache")
+
 BENCHMARKING_PATH = os.path.join(DATA_DIR, "benchmarking", "comprehensive_metrics.csv")
 
 # Thresholds
