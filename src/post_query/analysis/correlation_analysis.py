@@ -1,6 +1,31 @@
+"""
+Correlation Analysis of LLM Tagged Transcripts
+
+This script conducts a correlation analysis between LLM-detected collusive transcripts 
+using logistic regression. It performs the following key tasks:
+
+- Loads the main analysis dataset from a Feather file.
+- Explores and prepares the dataset by creating derived variables such as log market value and 
+  recoding categorical predictors (sector, country, year).
+- Calculates summary statistics for the number and proportion of transcripts flagged as collusive 
+  by LLM and human benchmarks.
+- Runs separate logistic regressions predicting LLM tagging using:
+    1. Log market value
+    2. Sector
+    3. Country (limited to the top 5 countries)
+    4. Year (restricted to 2008 and later)
+- Saves summary statistics to a YAML file.
+- Prints results to the console, including coefficients, standard errors, p-values, odds ratios, and 
+  confidence intervals.
+
+Intended for use in identifying patterns in collusive language detection and benchmarking LLM outputs 
+against human-coded labels.
+"""
+
 import pandas as pd
 import numpy as np
 import yaml
+import config
 import os
 from pathlib import Path
 import statsmodels.api as sm

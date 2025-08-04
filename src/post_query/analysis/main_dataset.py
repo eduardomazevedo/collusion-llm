@@ -4,6 +4,7 @@ This is at the level of the transcript.
 Start with transcript-detail data.
 Keep only transcripts that are also in the queries database.
 We create dummies for:
+    - benchmark_sample (whether transcript is in the benchmark sample)
     - benchmark_human_flag (whether transcript was tagged as collusion by humans)
     - llm_flag (whether tagged as collution in the main LLM run)
 Merge in compustat data at the company-year level.
@@ -11,6 +12,7 @@ Merge in compustat data at the company-year level.
 #%%
 import config
 import pandas as pd
+import numpy as np
 import os
 
 # Load datasets
@@ -36,13 +38,20 @@ human_ratings_df.loc[human_ratings_df['joe_score'] >= config.JOE_SCORE_THRESHOLD
 human_ratings_df.loc[human_ratings_df['acl_manual_flag'] == 1, 'collusion'] = True
 
 transcript_ids_flagged_by_humans = human_ratings_df[human_ratings_df['collusion']]['transcriptid'].unique()
+transcript_ids_in_benchmark = human_ratings_df['transcriptid'].unique()
 
 
 #%% List of llm flagged transcripts
 transcript_ids_flagged_by_llm = top_transcripts_df['transcriptid'].unique()
 
 #%% Create dummies for collusion flags
+# Create benchmark_sample flag for whether transcript is in the benchmark sample
+df['benchmark_sample'] = df['transcriptid'].isin(transcript_ids_in_benchmark).astype(int)
+
+# Create benchmark_human_flag: 1 if flagged as collusion, 0 if in benchmark but not flagged, NA if not in benchmark
 df['benchmark_human_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_humans).astype(int)
+# Set to NA for transcripts not in benchmark sample
+df.loc[~df['transcriptid'].isin(transcript_ids_in_benchmark), 'benchmark_human_flag'] = pd.NA
 df['llm_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_llm).astype(int)
 
 

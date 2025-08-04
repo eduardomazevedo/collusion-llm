@@ -146,4 +146,5 @@ dependencies = [
     "zipp==3.21.0",
     "tooldantic @ git+https://github.com/nicholishen/tooldantic.git",
     "snakemake>=9.7.1",
+    "statsmodels>=0.14.5",
 ]
