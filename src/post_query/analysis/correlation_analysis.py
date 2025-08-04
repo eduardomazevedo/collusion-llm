@@ -67,6 +67,12 @@ df['year'] = df['fyear'].astype('category')
 #%%
 # Summary statistics
 benchmark_df = df[df['benchmark_sample'] == 1]
+
+# Statistics for non-missing observations by variable
+sector_valid = df[df['gsector'].notna()]
+year_valid = df[df['fyear'].notna()]
+mkvalt_valid = df[df['mkvalt'].notna()]
+
 summary_stats = {
     'total_transcripts': len(df),
     'llm_tagged_collusive': int(df['llm_flag'].sum()),
@@ -75,7 +81,21 @@ summary_stats = {
     'benchmark_llm_tagged_collusive': int(benchmark_df['llm_flag'].sum()),
     'benchmark_llm_tagged_collusive_pct': float(benchmark_df['llm_flag'].mean() * 100),
     'benchmark_human_tagged_collusive': int(df['benchmark_human_flag'].sum()),
-    'benchmark_human_tagged_collusive_pct': float(df['benchmark_human_flag'].mean() * 100)
+    'benchmark_human_tagged_collusive_pct': float(df['benchmark_human_flag'].mean() * 100),
+    
+    # Non-missing observations statistics
+    'sector_valid_observations': len(sector_valid),
+    'sector_valid_tag_rate': float(sector_valid['llm_flag'].mean() * 100),
+    'year_valid_observations': len(year_valid),
+    'year_valid_tag_rate': float(year_valid['llm_flag'].mean() * 100),
+    'mkvalt_valid_observations': len(mkvalt_valid),
+    'mkvalt_valid_tag_rate': float(mkvalt_valid['llm_flag'].mean() * 100),
+    
+    # Missing observations statistics
+    'sector_missing_observations': int(df['gsector'].isna().sum()),
+    'year_missing_observations': int(df['fyear'].isna().sum()),
+    'mkvalt_missing_observations': int(df['mkvalt'].isna().sum()),
+    'mkvalt_missing_tag_rate': float(df[df['mkvalt'].isna()]['llm_flag'].mean() * 100)
 }
 with open(yaml_dir / "summary_stats.yaml", "w") as f:
     yaml.dump(summary_stats, f)
@@ -113,6 +133,10 @@ save_figure("market_value_deciles", "LLM tag rate by market value decile. Produc
 
 #%%
 # Sector table and plot (horizontal bars)
+# Load GICS sector mapping
+with open(Path("assets/gics_sectors.yaml"), "r") as f:
+    gics_sectors = yaml.safe_load(f)
+
 sector_stats = (
     df.groupby('sector')['llm_flag']
     .agg(['mean', 'count', 'sum'])
@@ -120,12 +144,15 @@ sector_stats = (
     .reset_index()
 )
 sector_stats['llm_tag_pct'] *= 100
+# Map sector codes to names
+sector_stats['sector_name'] = sector_stats['sector'].map(gics_sectors)
 sector_stats[['ci_low', 'ci_high']] = sector_stats.apply(
     lambda r: proportion_ci(r['num_hits'], r['n']), axis=1, result_type='expand'
 )
-sector_sorted = sector_stats.sort_values("llm_tag_pct")
+# Sort from most to least collusive
+sector_sorted = sector_stats.sort_values("llm_tag_pct", ascending=False)
 save_table(
-    sector_sorted[['sector', 'llm_tag_pct', 'ci_low', 'ci_high', 'n']],
+    sector_sorted[['sector_name', 'llm_tag_pct', 'ci_low', 'ci_high', 'n']],
     "sector_tag_rates",
     "LLM tagging rate by sector with 95% CI. Produced by correlation_analysis.py"
 )
@@ -138,9 +165,10 @@ ax.barh(
     capsize=4, color='skyblue'
 )
 ax.set_yticks(np.arange(len(sector_sorted)))
-ax.set_yticklabels(sector_sorted['sector'])
+ax.set_yticklabels(sector_sorted['sector_name'])
 ax.set_xlabel("LLM Tagged Collusive (%)")
 ax.set_title("LLM Tag Rate by Sector")
+plt.tight_layout()
 save_figure("sector_tag_rates", "LLM tag rate by sector (horizontal bar chart). Produced by correlation_analysis.py", fig)
 
 #%%
