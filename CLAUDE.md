@@ -113,6 +113,7 @@ bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> all
 - Most tables should be output as csv and latex. The exception are large tables like `data/outputs/top_transcripts_data.csv` which are only meant to be read in spreadsheets and not for publication.
 - Figures should be output as .pdf and .png, in both 1:1 and 16:9 formats.
 - The code producing each figure or table should also output a .txt file in the same location in `data/outputs` with same filename but txt extension with a terse description of the asset and what script produces it.
+- Scripts that calculate stats that do not fit neatly into a table should output a yaml file in `data/yaml/`. These include basic stats like number of observations, etc.
 - Analysis scripts should be written sequentially, without unecessary definitions of functions, without pointless main blocks. Instead it should be data science friendly, with #%% blocks that can be run interactively.
 - Every script should have a docstring that explains what it does tersely at the top.
 
