@@ -1,75 +1,31 @@
 \subsection{Data Sources}
 
-\subsubsection{Corporate Communication Transcripts}
 Our primary data source consists of transcripts from public corporate communications obtained through S\&P Capital IQ. Importantly, this dataset encompasses all available public calls, not solely quarterly earnings calls. This comprehensive coverage includes earnings calls, investor day presentations, industry conferences, analyst meetings, and other public corporate communications where company executives discuss business strategy, market conditions, and operational decisions.
 
 The transcripts span from \data{transcript_stats/first_date_date} to \data{transcript_stats/last_date_date}, covering \data{transcript_stats/n_companies_int} companies across diverse industries and sectors. Our dataset comprises \data{transcript_stats/n_transcripts_int} transcripts in total. The average call lasts \data{transcript_stats/mean_length_description}. In total, it would take \data{transcript_stats/total_length_description} of uninterrupted audio to listen to all calls. Capital IQ provides verbatim transcriptions of these calls, including both the prepared remarks by company executives and the subsequent question-and-answer sessions with analysts and investors. This broader scope beyond traditional earnings calls is particularly valuable for detecting potential collusive behavior, as discussions of competitive dynamics and capacity decisions may occur in various corporate communication settings.
 
-Each transcript in our dataset includes metadata such as the company identifier, call date, call type, participating executives, and the full text of the discussion. The inclusion of diverse call types strengthens our analysis by capturing a wider range of contexts in which executives might inadvertently signal competitive intentions or discuss market coordination.
+Each transcript in our dataset includes metadata such as the company identifier, call date, call type, participating executives, and the full text of the discussion. The inclusion of diverse call types strengthens our analysis by capturing a wider range of contexts in which executives might inadvertently signal anti-competitive intentions or discuss market coordination.
 
-\subsubsection{Human Expert Annotations}
-% TODO: Describe the two human-annotated datasets:
-% - Joe's dataset: scoring methodology (0-100), number of transcripts, annotation process
-% - ACL dataset: binary classification (0/1), focus on airline industry, number of transcripts
+\subsection{Extracting Data from Transcripts}
 
-\subsection{Sample Selection}
-% TODO: Explain how companies/transcripts were selected for analysis, any exclusion criteria, final sample size
+Our approach leverages Large Language Models to systematically identify potential collusive intent in corporate communications at scale. The core challenge lies in replicating the nuanced judgment of human experts who can detect subtle signals of anti-competitive coordination. While human reviewers possess the expertise to identify collusive language in earnings calls, manually reviewing nearly half a million transcripts would be prohibitively resource-intensive. Conversely, automated analysis through LLMs offers computational efficiency but requires carefully crafted prompts that capture the complexity of collusive signaling while producing reliable, interpretable outputs.
 
-\subsection{Methodology}
+We employ zero-shot prompting, where the LLM analyzes each transcript without explicit input-output examples. Initial prompt iterations revealed the importance of specification clarity. A basic prompt such as ``Does the following transcript show evidence of potential collusive intent?'' proved inadequate for several reasons: it fails to define collusive intent operationally, does not specify how such intent manifests in corporate communications, and lacks guidance on output structure (binary classification, continuous scale, or extracted evidence).
 
-\subsubsection{LLM-Based Detection System}
-% TODO: Describe the overall approach - using LLMs to analyze transcripts for collusive language
+Through iterative refinement, we developed prompts that incorporate insights from the industrial organization literature on tacit collusion. The literature emphasizes that firms may signal coordination through discussions of capacity discipline, pricing intentions, and conditional statements linking their actions to competitor behavior. We examined outputs from a small set of transcripts to identify which prompt elements effectively captured these nuances while maintaining consistency across diverse industry contexts.
 
-\subsubsection{Prompt Development}
-% TODO: Explain the iterative process of developing prompts, mention the 40+ variations tested, focus on SimpleCapacityV8.1.1 as the primary prompt
+Following established prompting best practices from both LLM providers and the research community, we structured our prompts to request three key outputs: a collusion severity score ranging from 0 to 100, providing a continuous measure of intent strength; a concise reasoning statement explaining the score assignment; and specific excerpts from the transcript supporting the assessment. This multi-faceted output enables both quantitative analysis and qualitative validation of the LLM's determinations.
 
-\subsubsection{Analysis Pipeline}
-% TODO: Describe the technical pipeline:
-% 1. Data ingestion from Capital IQ
-% 2. Text preprocessing (if any)
-% 3. LLM analysis using OpenAI API
-% 4. Structured output extraction (score, reasoning, excerpts)
-% 5. Database storage and management
+Prompt refinement proceeded through systematic benchmarking against human expert assessments. We utilized two validation datasets: conference call transcripts from U-Haul reviewed by Joe Harrington, who provided collusion severity scores on a 0-100 scale, and airline industry transcripts flagged by \textcite{aryal2022coordinated} for collusive content. To enable comparison, we converted continuous scores to binary classifications using intuitive thresholds (e.g. score: 75) and evaluated performance using standard metrics such as F1 scores. Qualitative review of discrepancies between LLM and human assessments informed further prompt adjustments, particularly in cases where the model either over-detected competitive language as collusive or missed subtle coordination signals.
 
-\subsubsection{Scoring Methodology}
-% TODO: Explain the 0-100 scoring system, what the scores represent, how they map to collusion risk
+Our final prompt instructs:
+\begin{quote}
+You’re an expert in detecting subtle collusive intent in company earnings calls. You know firms can try to avoid scrutiny if they express intentions to reduce supply or increase prices, or they can imply it would be good if industry capacity were limited or prices were kept high. Analyze the following transcript of a public company communication and identify any signs that the company is trying to coordinate with competitors to limit capacity or keep prices high. Provide a score from 0 to 100, where 0 means no evidence of collusive intent and 100 means strong evidence of collusive intent. Additionally, provide a very brief explanation of your assessment. Also provide a list of excerpts that support your assessment.
+\end{quote}
 
-\subsubsection{Two-Stage Analysis Approach}
-% TODO: Describe the follow-up analysis for high-scoring transcripts:
-% - Initial full transcript analysis
-% - Secondary analysis of excerpts only for transcripts scoring ≥75
-% - Purpose of this validation step
+With the prompt finalized, we processed the complete corpus of transcripts through OpenAI's API using their batch processing infrastructure. This approach enabled efficient parallel processing while respecting API rate limits. The processing took several days, but could run continuously in the background without manual intervention. Once the processing finished, we had the LLM response strings stored in a large database, structured such that we could easily clean them up and extract the score, reasoning and set of excerpts for analysis.
 
-\subsection{Performance Evaluation}
-
-\subsubsection{Benchmark Datasets}
-% TODO: Describe how Joe's and ACL's annotations serve as ground truth
-
-\subsubsection{Evaluation Metrics}
-% TODO: List the metrics used:
-% - Precision, Recall, F1 Score, Specificity
-% - Threshold selection (75 for LLM, 50 for Joe's scores)
-% - Separate evaluation on Joe's, ACL's, and pooled samples
-
-\subsubsection{Evaluation Approaches}
-% TODO: Describe the different evaluation strategies:
-% - Non-interactive: single response, average of multiple responses
-% - Agentic: repeated high-confidence, analysis-corrected, analysis-filtered
-
-\subsection{Implementation Details}
-
-\subsubsection{Technical Infrastructure}
-% TODO: Mention key technical aspects:
-% - OpenAI GPT-4o-mini as primary model
-% - Batch processing for large-scale analysis
-% - SQLite database for result storage
-% - Python-based implementation
-
-\subsubsection{Cost and Efficiency Considerations}
-% TODO: Discuss token usage, batch processing benefits, cost per transcript
-
-\subsection{Limitations}
-% TODO: Acknowledge any limitations in the data or methodology
-
-\subsection{Data Availability}
-% TODO: Statement about data availability, reproducibility
+% Possible things to add:
+% - something about the compustat data(?)
+% - prompt appendix that talks breifly about why certain things work for making a good prompt, vs some things that don't, also maybe zero-shot vs few-shot
+% - tech footnote or appendix that mentions what LLM exactly we use, very briefly why that one and a few words on how it works just for the purpose of the stuff we ask in the prompts
