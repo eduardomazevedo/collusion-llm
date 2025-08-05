@@ -7,6 +7,7 @@ We create dummies for:
     - benchmark_sample (whether transcript is in the benchmark sample)
     - benchmark_human_flag (whether transcript was tagged as collusion by humans)
     - llm_flag (whether tagged as collution in the main LLM run)
+    - human_audit_flag (whether transcript was flagged as collusive in human audit, T=True, F/U=False, NA if not audited)
 Merge in compustat data at the company-year level.
 """
 #%%
@@ -19,6 +20,7 @@ import os
 compustat_df = pd.read_parquet(os.path.join(config.DATA_DIR, 'datasets', 'company_year_compustat.parquet'))
 human_ratings_df = pd.read_csv(config.HUMAN_RATINGS_PATH)
 top_transcripts_df = pd.read_csv(os.path.join(config.DATA_DIR, 'intermediaries', 'top_transcripts.csv'))
+human_audit_df = pd.read_csv(os.path.join('assets', 'human_audit_top_transcripts.csv'))
 df = pd.read_feather(config.TRANSCRIPT_DETAIL_PATH)
 
 # Load transcriptid from queries database
@@ -44,15 +46,27 @@ transcript_ids_in_benchmark = human_ratings_df['transcriptid'].unique()
 #%% List of llm flagged transcripts
 transcript_ids_flagged_by_llm = top_transcripts_df['transcriptid'].unique()
 
+#%% Process human audit data
+# Create boolean from T/F/U categorical: T=True, F and U=False
+human_audit_df['human_audit_flag'] = human_audit_df['human_audit_rating'] == 'T'
+
 #%% Create dummies for collusion flags
 # Create benchmark_sample flag for whether transcript is in the benchmark sample
-df['benchmark_sample'] = df['transcriptid'].isin(transcript_ids_in_benchmark).astype(int)
+df['benchmark_sample'] = df['transcriptid'].isin(transcript_ids_in_benchmark)
 
-# Create benchmark_human_flag: 1 if flagged as collusion, 0 if in benchmark but not flagged, NA if not in benchmark
-df['benchmark_human_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_humans).astype(int)
+# Create benchmark_human_flag: True if flagged as collusion, False if in benchmark but not flagged, NA if not in benchmark
+df['benchmark_human_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_humans)
 # Set to NA for transcripts not in benchmark sample
 df.loc[~df['transcriptid'].isin(transcript_ids_in_benchmark), 'benchmark_human_flag'] = pd.NA
-df['llm_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_llm).astype(int)
+df['llm_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_llm)
+
+# Merge human audit flag
+df = df.merge(
+    human_audit_df[['transcript_id', 'human_audit_flag']],
+    left_on='transcriptid',
+    right_on='transcript_id',
+    how='left'
+).drop('transcript_id', axis=1)
 
 
 # %% Merge compustat
