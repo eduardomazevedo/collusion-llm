@@ -1,0 +1,22 @@
+% ========= TABLE: Sample Definitions =========
+\begin{table}[htbp]
+\centering
+\caption{Transcript Samples Used in the Analysis}
+\label{tab:samples}
+\begin{tabularx}{\textwidth}{l X c}
+\toprule
+\textbf{Sample} & \textbf{Description} & \textbf{Obs.} \\ 
+\midrule
+Human-labeled collusion benchmark & Ground-truth benchmark combining Aryal et al.\ material and U-Haul transcripts, intentionally oversampling likely collusive exchanges. & \textit{TBD} \\[0.4em]
+
+Full transcript dataset (Capital IQ) & Universe of $\sim$500{,}000 corporate earnings-call transcripts from Capital IQ to which we apply the selected LLM model. & \textit{TBD} \\[0.4em]
+
+LLM-flagged transcripts (score $\ge 75$) & Subset of the full dataset that the best-performing LLM flagged with an initial collusion score of at least 75. & \textit{TBD} \\[0.4em]
+
+LLM-validated transcripts (10-query avg $\ge 75$) & Top LLM-flagged transcripts re-scored with ten prompt variants; we keep only those whose \emph{average} score remains $\ge 75$. & \textit{TBD} \\[0.4em]
+
+Human-audited LLM-flagged transcripts & Manual audit of the highest-scoring $\sim$200 transcripts; audits indicate roughly one-third true positives. & \textit{TBD} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+% ================================================
