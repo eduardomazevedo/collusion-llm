@@ -8,7 +8,7 @@ rule all:
         "data/raw/compustat/readme.md",
         "data/intermediaries/gvkey_table.feather",
         "data/intermediaries/gvkey_list.txt",
-        "data/datasets/company_year_compustat.parquet",
+        "data/datasets/company_year_compustat.feather",
         "data/datasets/main_analysis_dataset.feather",
         "data/datasets/top_transcripts_data.csv",
         "data/outputs/top_transcript_data_for_joe.csv",
@@ -58,7 +58,7 @@ rule company_year_dataset:
         global_csv="data/raw/compustat/compustat_global.csv",
         gvkey_table="data/intermediaries/gvkey_table.feather"
     output:
-        "data/datasets/company_year_compustat.parquet"
+        "data/datasets/company_year_compustat.feather"
     shell:
         "python src/pre_query/compustat/company_year_dataset.py"
 
@@ -83,7 +83,7 @@ rule main_dataset:
     """
     input:
         transcript_detail="data/datasets/transcript_detail.feather",
-        compustat="data/datasets/company_year_compustat.parquet",
+        compustat="data/datasets/company_year_compustat.feather",
         human_ratings="data/datasets/human_ratings.csv",
         top_transcripts="data/intermediaries/top_transcripts.csv",
         queries_db="data/datasets/queries.sqlite"
