@@ -3,20 +3,40 @@
 \centering
 \caption{Transcript Samples Used in the Analysis}
 \label{tab:samples}
-\begin{tabularx}{\textwidth}{l X c}
-\toprule
-\textbf{Sample} & \textbf{Description} & \textbf{Obs.} \\ 
-\midrule
-Human-labeled collusion benchmark & Ground-truth benchmark combining Aryal et al.\ material and U-Haul transcripts, intentionally oversampling likely collusive exchanges. & \textit{TBD} \\[0.4em]
+\begin{minipage}{\textwidth}
+\raggedright
+\hrule height 0.8pt
+\vspace{0.2em}
+\hrule height 0.8pt
+\vspace{0.5em}
+\textbf{Human-labeled collusion benchmark} (N = \textit{TBD}) \\
+Ground-truth benchmark combining Aryal et al.\ material and U-Haul transcripts, intentionally oversampling likely collusive exchanges.
 
-Full transcript dataset (Capital IQ) & Universe of $\sim$500{,}000 corporate earnings-call transcripts from Capital IQ to which we apply the selected LLM model. & \textit{TBD} \\[0.4em]
+\vspace{1em}
+\textbf{Full transcript dataset (Capital IQ)} (N = \textit{TBD}) \\
+Universe of $\sim$500{,}000 corporate earnings-call transcripts from Capital IQ to which we apply the selected LLM model.
 
-LLM-flagged transcripts (score $\ge 75$) & Subset of the full dataset that the best-performing LLM flagged with an initial collusion score of at least 75. & \textit{TBD} \\[0.4em]
+\vspace{1em}
+\textbf{LLM-flagged transcripts (score $\ge 75$)} (N = \textit{TBD}) \\
+Subset of the full dataset that the best-performing LLM flagged with an initial collusion score of at least 75.
 
-LLM-validated transcripts (10-query avg $\ge 75$) & Top LLM-flagged transcripts re-scored with ten prompt variants; we keep only those whose \emph{average} score remains $\ge 75$. & \textit{TBD} \\[0.4em]
+\vspace{1em}
+\textbf{LLM-validated transcripts (10-query avg $\ge 75$)} (N = \textit{TBD}) \\
+Top LLM-flagged transcripts re-scored with ten prompt variants; we keep only those whose \emph{average} score remains $\ge 75$.
 
-Human-audited LLM-flagged transcripts & Manual audit of the highest-scoring $\sim$200 transcripts; audits indicate roughly one-third true positives. & \textit{TBD} \\
-\bottomrule
-\end{tabularx}
+\vspace{1em}
+\textbf{Human-audited LLM-flagged transcripts} (N = \textit{TBD}) \\
+Manual audit of the highest-scoring $\sim$200 transcripts; audits indicate roughly one-third true positives.
+
+\vspace{0.5em}
+\hrule height 0.8pt
+\vspace{0.2em}
+\hrule height 0.8pt
+\end{minipage}
+\begin{minipage}{\textwidth}
+    \vspace{1em}
+    \footnotesize
+    \textit{Notes:} Detailed description of transcript samples used throughout the analysis.
+\end{minipage}
 \end{table}
 % ================================================
