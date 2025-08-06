@@ -12,6 +12,7 @@ rule all:
         "data/datasets/main_analysis_dataset.feather",
         "data/outputs/top_transcripts_data.csv",
         "data/yaml/transcript_stats.yaml",
+        "data/yaml/llm_tagged_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
         "data/outputs/tables/market_value_deciles.csv",
         "data/outputs/tables/sector_tag_rates.csv", 
@@ -118,6 +119,19 @@ rule transcript_data_stats:
     shell:
         "python src/post_query/analysis/transcript_data_stats.py"
 
+rule llm_tagged_stats:
+    """
+    Generate basic statistics of LLM collusion detection performance.
+    Analyzes LLM tagging performance based on benchmark sample and human audit data.
+    Creates comprehensive statistics with confidence intervals for validation.
+    """
+    input:
+        "data/datasets/main_analysis_dataset.feather"
+    output:
+        "data/yaml/llm_tagged_stats.yaml"
+    shell:
+        "python src/post_query/analysis/llm_tagged_stats.py"
+
 rule correlation_analysis:
     """
     Analyze LLM collusion tagging patterns and correlations.
@@ -144,6 +158,7 @@ rule populate_constants:
     """
     input:
         "data/yaml/transcript_stats.yaml",
+        "data/yaml/llm_tagged_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml"
     output:
         "data/constants/.populated"
