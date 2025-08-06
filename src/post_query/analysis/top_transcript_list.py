@@ -1,5 +1,5 @@
 """
-Script to extract top transcript list from the database.
+Script to extract the flagged transcripts from the initial llm run.
 
 This script:
 1. Queries the database for only SimpleCapacityV8.1.1 prompts

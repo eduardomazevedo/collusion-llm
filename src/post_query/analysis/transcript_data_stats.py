@@ -1,3 +1,23 @@
+""""
+Script to calculate summary statistics for transcripts that have been processed through LLM queries.
+
+Filters transcript_detail.feather to only include transcripts with entries in the queries database,
+then calculates and saves descriptive statistics to transcript_stats.yaml.
+
+Output Statistics Created:
+- n_transcripts: Total number of transcripts that have been processed through LLM queries
+- n_companies: Number of unique companies represented in the processed transcripts
+- first_date: Earliest transcript date in the filtered dataset (YYYY-MM-DD format)
+- last_date: Latest transcript date in the filtered dataset (YYYY-MM-DD format)  
+- mean_length_seconds: Average audio length across all transcripts in seconds
+- mean_length_description: Human-readable average length (e.g., "45 minutes 30 seconds")
+- total_length_description: Human-readable total audio duration (e.g., "2.5 years", "150 days", "48 hours")
+- total_length_years: Total audio duration converted to years (float)
+
+The output YAML file is saved to data/yaml/transcript_stats.yaml for use in downstream analysis
+and can be referenced in LaTeX using the \data{} command.
+"""
+
 import config
 import pandas as pd
 import os
