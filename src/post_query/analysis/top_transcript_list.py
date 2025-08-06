@@ -40,6 +40,7 @@ def extract_top_transcripts():
         SELECT query_id, prompt_name, transcriptid, response
         FROM queries 
         WHERE prompt_name = 'SimpleCapacityV8.1.1' 
+        AND model_name = 'gpt-4o-mini'
         AND query_id IN (
             SELECT MIN(query_id) 
             FROM queries 
