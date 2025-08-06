@@ -17,7 +17,7 @@ import numpy as np
 import os
 
 # Load datasets
-compustat_df = pd.read_parquet(os.path.join(config.DATA_DIR, 'datasets', 'company_year_compustat.parquet'))
+compustat_df = pd.read_feather(os.path.join(config.DATA_DIR, 'datasets', 'company_year_compustat.feather'))
 human_ratings_df = pd.read_csv(config.HUMAN_RATINGS_PATH)
 top_transcripts_df = pd.read_csv(os.path.join(config.DATA_DIR, 'intermediaries', 'top_transcripts.csv'))
 human_audit_df = pd.read_csv(os.path.join('assets', 'human_audit_top_transcripts.csv'))

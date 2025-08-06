@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create a dataset of Compustat data in data/datasets/company_year_compustat.parquet.
+Create a dataset of Compustat data in data/datasets/company_year_compustat.feather.
 
 This script:
 1. Loads US and Global Compustat data
@@ -25,7 +25,7 @@ def main():
     us_file = os.path.join(DATA_DIR, "raw", "compustat", "compustat_us.csv")
     global_file = os.path.join(DATA_DIR, "raw", "compustat", "compustat_global.csv")
     gvkey_table_file = os.path.join(DATA_DIR, "intermediaries", "gvkey_table.feather")
-    output_file = os.path.join(DATA_DIR, "datasets", "company_year_compustat.parquet")
+    output_file = os.path.join(DATA_DIR, "datasets", "company_year_compustat.feather")
     
     print("Loading Compustat US data...")
     us_df = pd.read_csv(us_file)
@@ -97,9 +97,9 @@ def main():
     print(f"Year range: {final_df['fyear'].min()} - {final_df['fyear'].max()}")
     print(f"Columns: {len(final_df.columns)}")
     
-    # Save to parquet
+    # Save to feather
     print(f"\nSaving to {output_file}...")
-    final_df.to_parquet(output_file, index=False)
+    final_df.to_feather(output_file)
     print("Dataset saved successfully!")
     
     # Display sample of the data
