@@ -82,6 +82,7 @@ def create_top_transcript_data():
     SELECT query_id, transcriptid, response, date
     FROM queries 
     WHERE prompt_name = 'SimpleCapacityV8.1.1' 
+    AND model_name = 'gpt-4o-mini'
     AND transcriptid IN ({placeholders})
     ORDER BY query_id
     """
@@ -101,16 +102,45 @@ def create_top_transcript_data():
     # Sort by query_id to ensure we get the first query for each transcript
     queries_df = queries_df.sort_values('query_id')
     
-    # Group by transcriptid and aggregate
-    aggregated_df = queries_df.groupby('transcriptid').agg({
-        'score': ['first', 'mean'],  # first score as original_score, mean as mean_score
-        'reasoning': 'first',        # reasoning from first query
-        'excerpts': 'first',         # excerpts from first query
-        'query_id': 'count'          # count of queries
-    }).reset_index()
+    # Custom aggregation function to handle the specific mean calculations
+    def custom_aggregation(group):
+        n_queries = len(group)
+        
+        # Original score (first query)
+        original_score = group['score'].iloc[0]
+        
+        # Mean score of all repeats
+        mean_score_all_repeats = group['score'].mean()
+        
+        # Mean score of first 11 queries (first + 10 repeats)
+        if n_queries >= 11:
+            mean_score_ten_repeats = group['score'].iloc[:11].mean()
+        else:
+            mean_score_ten_repeats = np.nan
+            
+        # Other fields from first query
+        reasoning = group['reasoning'].iloc[0]
+        excerpts = group['excerpts'].iloc[0]
+        
+        return pd.Series({
+            'original_score': original_score,
+            'mean_score_ten_repeats': mean_score_ten_repeats,
+            'mean_score_all_repeats': mean_score_all_repeats,
+            'reasoning': reasoning,
+            'excerpts': excerpts,
+            'n_queries': n_queries
+        })
     
-    # Flatten column names
-    aggregated_df.columns = ['transcriptid', 'original_score', 'mean_score', 'reasoning', 'excerpts', 'n_queries']
+    # Apply custom aggregation
+    aggregated_df = queries_df.groupby('transcriptid').apply(custom_aggregation, include_groups=False).reset_index()
+    
+    # Check for transcripts with fewer than 11 queries and raise warning
+    transcripts_with_few_queries = aggregated_df[aggregated_df['n_queries'] < 11]
+    if len(transcripts_with_few_queries) > 0:
+        print(f"WARNING: {len(transcripts_with_few_queries)} transcripts have fewer than 11 queries:")
+        for _, row in transcripts_with_few_queries.iterrows():
+            print(f"  - Transcript {row['transcriptid']}: {row['n_queries']} queries")
+        print("  mean_score_ten_repeats will be set to NA for these transcripts.")
     
     # Step 5: Get follow-up analysis data
     print("Step 5: Getting follow-up analysis data...")
@@ -195,7 +225,8 @@ def create_top_transcript_data():
         'companyname',
         'mostimportantdateutc',
         'original_score',
-        'mean_score',
+        'mean_score_ten_repeats',
+        'mean_score_all_repeats',
         'mean_follow_up_score',
         'n_queries',
         'n_follow_up_queries',
@@ -215,14 +246,45 @@ def create_top_transcript_data():
     final_df.to_csv(output_path, index=False)
     
     print(f"Successfully created {output_path}")
-    print(f"Final dataset has {len(final_df)} rows")
-    print(f"Columns: {list(final_df.columns)}")
+    
+    # Step 8: Save core dataset version without merged variables and text fields
+    print("Step 8: Saving core dataset version...")
+    # Create datasets directory if it doesn't exist
+    datasets_dir = os.path.join(config.DATA_DIR, "datasets")
+    os.makedirs(datasets_dir, exist_ok=True)
+    
+    # Select only core variables (drop companyname, mostimportantdateutc, reasoning, excerpts)
+    core_columns = [
+        'transcriptid',
+        'original_score',
+        'mean_score_ten_repeats',
+        'mean_score_all_repeats',
+        'mean_follow_up_score',
+        'n_queries',
+        'n_follow_up_queries'
+    ]
+    
+    # Filter to only include columns that exist in the dataframe
+    existing_core_columns = [col for col in core_columns if col in final_df.columns]
+    core_df = final_df[existing_core_columns].copy()
+    
+    # Save core dataset
+    core_output_path = os.path.join(datasets_dir, "top_transcripts_data.csv")
+    core_df.to_csv(core_output_path, index=False)
+    
+    print(f"Successfully created {core_output_path}")
+    print(f"Core dataset has {len(core_df)} rows and {len(core_df.columns)} columns")
+    print(f"Core columns: {list(core_df.columns)}")
+    
+    print(f"Full dataset has {len(final_df)} rows")
+    print(f"Full columns: {list(final_df.columns)}")
     
     # Show summary statistics
     print("\nSummary statistics:")
     print(f"Transcripts with follow-up analysis: {final_df['n_follow_up_queries'].sum()}")
     print(f"Average original score: {final_df['original_score'].mean():.2f}")
-    print(f"Average mean score: {final_df['mean_score'].mean():.2f}")
+    print(f"Average mean score (ten repeats): {final_df['mean_score_ten_repeats'].mean():.2f}")
+    print(f"Average mean score (all repeats): {final_df['mean_score_all_repeats'].mean():.2f}")
     if not final_df['mean_follow_up_score'].isna().all():
         print(f"Average follow-up score: {final_df['mean_follow_up_score'].mean():.2f}")
     

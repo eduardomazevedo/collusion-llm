@@ -10,6 +10,7 @@ rule all:
         "data/intermediaries/gvkey_list.txt",
         "data/datasets/company_year_compustat.parquet",
         "data/datasets/main_analysis_dataset.feather",
+        "data/datasets/top_transcripts_data.csv",
         "data/outputs/top_transcript_data_for_joe.csv",
         "data/yaml/transcript_stats.yaml",
         "data/yaml/llm_tagged_stats.yaml",
@@ -94,15 +95,17 @@ rule main_dataset:
 rule top_transcript_data:
     """
     Create top_transcript_data_for_joe.csv with aggregated query data and follow-up analysis.
+    Also creates top_transcripts_data.csv core dataset with essential score variables only.
     Aggregates SimpleCapacityV8.1.1 prompt results by transcriptid with follow-up scores.
-    Includes company names, dates, and excerpt data for detailed analysis.
+    Includes company names, dates, and excerpt data for detailed analysis in full version.
     """
     input:
         top_transcripts="data/intermediaries/top_transcripts.csv",
         queries_db="data/datasets/queries.sqlite",
         transcript_detail="data/datasets/transcript_detail.feather"
     output:
-        "data/outputs/top_transcript_data_for_joe.csv"
+        full="data/outputs/top_transcript_data_for_joe.csv",
+        core="data/datasets/top_transcripts_data.csv"
     shell:
         "python src/post_query/analysis/top_transcript_data.py"
 
