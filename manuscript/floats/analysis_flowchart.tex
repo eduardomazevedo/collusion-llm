@@ -63,6 +63,11 @@
 
 \end{tikzpicture}
 \end{adjustbox}
-\caption{End-to-end methodology for detecting collusive corporate communications. Stage 1 develops and evaluates prompts/models using the human-labeled benchmark. Stage 2 applies the chosen model at scale, refines high-scoring transcripts with multiple queries, and audits the top hits.}
+\caption{Analysis Workflow}
 \label{fig:workflow_two_column_scaled}
+\begin{minipage}{\textwidth}
+    \vspace{1em}
+    \footnotesize
+    \textit{Notes:} This figure illustrates the workflow for detecting collusive corporate communications. Stage 1 develops and evaluates prompts and models using the human-labeled benchmark dataset through cross-validation to select the best-performing combination. Stage 2 applies the chosen model at scale to the full Capital IQ transcript dataset (\data{transcript_stats/n_transcripts_int} transcripts), refines high-scoring transcripts with multiple queries using a 75-point threshold, and conducts human audits of the top-scoring results to validate model performance.
+\end{minipage}
 \end{figure}
