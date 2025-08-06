@@ -18,8 +18,8 @@
 % -----------------------------------------------------
 % Stage 1 (left column)
 % -----------------------------------------------------
-\node (bench)  {Human-labeled\\collusion benchmark\\\small(\textit{N = TBD})};
-\node (dev)    [below=of bench] {Develop \& compare\\prompts \& LLM models\\(cross-validated on benchmark)};
+\node (bench)  {Benchmark sample\\of human-labeled transcripts\\\small(\textit{N = TBD})};
+\node (dev)    [below=of bench] {Develop \& compare\\prompts \& LLM models};
 \node (best)   [below=of dev] {Select best-performing\\prompt + model};
 
 % -----------------------------------------------------
@@ -58,8 +58,8 @@
 % -----------------------------------------------------
 % Stage titles
 % -----------------------------------------------------
-\node[font=\bfseries] at (s1box.north) [yshift=0.7cm] {Stage 1: Prompt \& Model Development};
-\node[font=\bfseries] at (s2box.north) [yshift=0.7cm] {Stage 2: Large-Scale Analysis};
+\node[font=\bfseries] at (s1box.north) [yshift=1.0cm] {Stage 1: Prompt \& Model Development};
+\node[font=\bfseries] at (s2box.north) [yshift=1.0cm] {Stage 2: Large-Scale Analysis};
 
 \end{tikzpicture}
 \end{adjustbox}
