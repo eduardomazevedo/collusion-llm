@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to create top_transcripts_data.csv with aggregated query data and follow-up analysis.
+Script to create top_transcript_data_for_joe.csv with aggregated query data and follow-up analysis.
 This file is going to be used for inspection by Joe Harrington.
 
 This script:
@@ -61,9 +61,9 @@ def extract_from_response(response: str, field: str, default=None):
 
 def create_top_transcript_data():
     """
-    Create top_transcript_data.csv with aggregated query data and follow-up analysis.
+    Create top_transcript_data_for_joe.csv with aggregated query data and follow-up analysis.
     """
-    print("Starting creation of top_transcript_data.csv...")
+    print("Starting creation of top_transcript_data_for_joe.csv...")
     
     # Step 1: Read list of top transcripts
     print("Step 1: Reading top transcripts list...")
@@ -211,7 +211,7 @@ def create_top_transcript_data():
     print("Step 7: Saving to CSV...")
     # Create outputs directory if it doesn't exist
     os.makedirs(config.OUTPUTS_DIR, exist_ok=True)
-    output_path = os.path.join(config.OUTPUTS_DIR, "top_transcripts_data.csv")
+    output_path = os.path.join(config.OUTPUTS_DIR, "top_transcript_data_for_joe.csv")
     final_df.to_csv(output_path, index=False)
     
     print(f"Successfully created {output_path}")
