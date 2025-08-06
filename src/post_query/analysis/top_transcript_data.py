@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to create top_transcript_data_for_joe.csv with aggregated query data and follow-up analysis.
-This file is going to be used for inspection by Joe Harrington.
+Script to create data on the flagged transcripts. Creates a file for data analysis and a file for Joe Harrington to use with more details.
 
 This script:
 1. Reads list of top transcripts from top_transcripts.csv
@@ -9,6 +8,15 @@ This script:
 3. Aggregates queries by transcriptid with required variables
 4. Merges follow-up analysis data from analysis_queries table
 5. Merges company name and date from transcript_detail.feather
+
+Output files:
+1. data/outputs/top_transcript_data_for_joe.csv - Full dataset with all columns including text fields
+   Columns: transcriptid, companyname, mostimportantdateutc, original_score, mean_score_ten_repeats,
+   mean_score_all_repeats, mean_follow_up_score, n_queries, n_follow_up_queries, reasoning, excerpts
+
+2. data/datasets/top_transcripts_data.csv - Core dataset for analysis without text fields
+   Columns: transcriptid, original_score, mean_score_ten_repeats, mean_score_all_repeats,
+   mean_follow_up_score, n_queries, n_follow_up_queries
 """
 
 import sys
