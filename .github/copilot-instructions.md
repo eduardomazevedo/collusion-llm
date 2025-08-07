@@ -139,6 +139,27 @@ Description of the variable, including data type, scale, and any special values 
 ## Latex
 - The paper manuscript files are in `./manuscript/`.
 - The main latex file defines command `\newcommand{\data}[1]{\input{../data/constants/#1.txt}\unskip}` to read the constants in `data/constants/`.
+
+### Using the `\data{}` Command for Constants
+The `\data{}` command automatically imports numerical and text constants from YAML files processed by `src/post_query/exports/populate_constants.py`. The script converts YAML data into multiple format variants for flexible LaTeX usage:
+
+**For numerical values**, the script creates multiple file formats:
+- `_int.txt`: Integer with thousands separators (e.g., "1,234")
+- `_float.txt`: Float with 2 decimals and commas (e.g., "1,234.56")
+- `_percentage.txt`: Percentage with escaped % (e.g., "12.34\%")
+- `_scientific.txt`: Scientific notation (e.g., "1.23e+03")
+
+**For date strings** (YYYY-MM-DD format):
+- `.txt`: Original date string (e.g., "2023-05-15")
+- `_date.txt`: Formatted date (e.g., "May 15th, 2023")
+
+**For regular strings and other types**: Saved as `.txt` with literal content.
+
+**Usage Examples:**
+"Our analysis includes \data{summary_stats/total_transcripts_int} earnings call transcripts spanning \data{summary_stats/time_period_years_int} years."
+"The LLM identified potential collusive communication in \data{correlates_collusive_communication/collusion_rate_percentage} of all transcripts."
+"The average market value was \$\data{correlates_collusive_communication/avg_market_value_float} million, with a standard deviation of \data{correlates_collusive_communication/std_market_value_scientific}."
+
 - Figures and table floats should include detailed notes in the bottom with footnote size, that make the latex skimmable. Here is an example:
 ```latex
 \begin{figure}[ht]

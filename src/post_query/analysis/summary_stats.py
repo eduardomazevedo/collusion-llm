@@ -95,6 +95,7 @@ human_benchmark_rate = human_tagged_benchmark / len(benchmark_df) * 100 if len(b
 llm_validation_available = df['llm_validation_flag'].notna().sum()
 llm_validation_tagged = df['llm_validation_flag'].sum()
 llm_validation_rate = llm_validation_tagged / llm_validation_available * 100 if llm_validation_available > 0 else 0
+llm_validation_rate_overall = llm_validation_tagged / n_transcripts * 100
 
 # Human audit statistics
 human_audit_sample = df['human_audit_sample'].sum()
@@ -126,6 +127,23 @@ benchmark_validation_odds_ratio = (
     (collusive_validation_prob / (1 - collusive_validation_prob)) / 
     (not_collusive_validation_prob / (1 - not_collusive_validation_prob))
 ) if not_collusive_validation_prob > 0 and not_collusive_validation_prob < 1 and collusive_validation_prob < 1 else None
+
+# LLM flagged statistics by human tagging (benchmark sample only)
+# Collusive transcripts in benchmark that are LLM flagged
+benchmark_collusive_flagged_count = int(benchmark_collusive['llm_flag'].sum()) if len(benchmark_collusive) > 0 else 0
+benchmark_collusive_flagged_pct = (benchmark_collusive_flagged_count / len(benchmark_collusive) * 100) if len(benchmark_collusive) > 0 else 0
+
+# Non-collusive transcripts in benchmark that are LLM flagged
+benchmark_not_collusive_flagged_count = int(benchmark_not_collusive['llm_flag'].sum()) if len(benchmark_not_collusive) > 0 else 0
+benchmark_not_collusive_flagged_pct = (benchmark_not_collusive_flagged_count / len(benchmark_not_collusive) * 100) if len(benchmark_not_collusive) > 0 else 0
+
+# Odds ratio of flagging probability for collusive vs non-collusive
+collusive_flagged_prob = benchmark_collusive_flagged_pct / 100
+not_collusive_flagged_prob = benchmark_not_collusive_flagged_pct / 100
+benchmark_flagged_odds_ratio = (
+    (collusive_flagged_prob / (1 - collusive_flagged_prob)) / 
+    (not_collusive_flagged_prob / (1 - not_collusive_flagged_prob))
+) if not_collusive_flagged_prob > 0 and not_collusive_flagged_prob < 1 and collusive_flagged_prob < 1 else None
 
 #%%
 # === CREATE STRUCTURED YAML OUTPUT ===
@@ -173,6 +191,7 @@ summary_stats = {
         'llm_validation_available': int(llm_validation_available),
         'llm_validation_tagged': int(llm_validation_tagged),
         'llm_validation_rate_pct': float(llm_validation_rate),
+        'llm_validation_rate_overall_sample_pct': float(llm_validation_rate_overall),
         'human_audit_sample_count': int(human_audit_sample),
         'human_audit_tagged_count': int(human_audit_tagged),
         'human_audit_rate_pct': float(human_audit_rate),
@@ -181,7 +200,12 @@ summary_stats = {
         'benchmark_collusive_validated_pct': float(benchmark_collusive_validated_pct),
         'benchmark_not_collusive_validated_count': int(benchmark_not_collusive_validated_count),
         'benchmark_not_collusive_validated_pct': float(benchmark_not_collusive_validated_pct),
-        'benchmark_validation_odds_ratio': float(benchmark_validation_odds_ratio) if benchmark_validation_odds_ratio is not None else None
+        'benchmark_validation_odds_ratio': float(benchmark_validation_odds_ratio) if benchmark_validation_odds_ratio is not None else None,
+        'benchmark_collusive_flagged_count': int(benchmark_collusive_flagged_count),
+        'benchmark_collusive_flagged_pct': float(benchmark_collusive_flagged_pct),
+        'benchmark_not_collusive_flagged_count': int(benchmark_not_collusive_flagged_count),
+        'benchmark_not_collusive_flagged_pct': float(benchmark_not_collusive_flagged_pct),
+        'benchmark_flagged_odds_ratio': float(benchmark_flagged_odds_ratio) if benchmark_flagged_odds_ratio is not None else None
     }
 }
 
