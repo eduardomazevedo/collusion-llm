@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Download Compustat US data from WRDS using the list of GVKEYs present in our transcripts.
+Download Compustat Global data from WRDS using the list of GVKEYs present in our transcripts.
 
-This script downloads financial data from comp_na_daily_all.funda and company information
-for all GVKEYs in the gvkey_list.txt file. We mostly want covariates for sector, market value, number of employees.
+This script downloads financial data from comp_global_daily.g_funda and company information
+for all GVKEYs in the gvkey_list.txt file. We mostly want covariates for sector, country, number of employees.
 
 The data is made unique by gvkey-fyear pairs, prioritizing INDL over FS industry format and keeping the latest
 observation for each company-year. 
@@ -21,8 +21,8 @@ Variables produced:
 - gsector: GICS sector
 - gsubind: GICS sub-industry
 - loc: Location/domicile
+- curcd: Currency code
 - emp: Number of employees
-- mkvalt: Market value (millions USD)
 """
 
 #%%
@@ -61,25 +61,24 @@ print(f"Prepared GVKEY list for SQL query (first 10): {gvkey_list_sql[:100]}..."
 # Build the SQL query
 query = f"""
 SELECT
-    comp_na_daily_all.funda.costat,
-    comp_na_daily_all.funda.curcd,
-    comp_na_daily_all.funda.datafmt,
-    comp_na_daily_all.funda.indfmt,
-    comp_na_daily_all.funda.consol,
-    comp_na_daily_all.funda.gvkey,
-    comp_na_daily_all.funda.datadate,
-    comp_na_daily_all.funda.conm,
-    comp_na_daily_all.funda.fyear,
-    comp_na_daily_all.funda.fic,
+    comp_global_daily.g_funda.costat,
+    comp_global_daily.g_funda.curcd,
+    comp_global_daily.g_funda.datafmt,
+    comp_global_daily.g_funda.indfmt,
+    comp_global_daily.g_funda.consol,
+    comp_global_daily.g_funda.gvkey,
+    comp_global_daily.g_funda.datadate,
+    comp_global_daily.g_funda.conm,
+    comp_global_daily.g_funda.fyear,
+    comp_global_daily.g_funda.fic,
     id_table.ggroup,
     id_table.gind,
     id_table.gsector,
     id_table.gsubind,
     id_table.loc,
-    comp_na_daily_all.funda.emp,
-    comp_na_daily_all.funda.mkvalt
+    comp_global_daily.g_funda.emp
 
-FROM comp_na_daily_all.funda
+FROM comp_global_daily.g_funda
 INNER JOIN (
     SELECT
         gvkey,
@@ -88,22 +87,21 @@ INNER JOIN (
         gsector,
         gsubind,
         loc
-    FROM comp_na_daily_all.company
-    WHERE comp_na_daily_all.company.gvkey IN (
+    FROM comp_global_daily.g_company
+    WHERE comp_global_daily.g_company.gvkey IN (
         {gvkey_list_sql}
     )
 ) AS id_table 
 
-ON comp_na_daily_all.funda.gvkey = id_table.gvkey
+ON comp_global_daily.g_funda.gvkey = id_table.gvkey
 
-AND ("comp_na_daily_all"."funda"."consol" = ANY (ARRAY['C']) 
-     AND "comp_na_daily_all"."funda"."indfmt" = ANY (ARRAY['INDL','FS']) 
-     AND "comp_na_daily_all"."funda"."datafmt" = ANY (ARRAY['STD']) 
-     AND "comp_na_daily_all"."funda"."curcd" = 'USD'
-     AND "comp_na_daily_all"."funda"."costat" = ANY (ARRAY['A','I']))
+AND ("comp_global_daily"."g_funda"."consol" = ANY (ARRAY['C']) 
+     AND "comp_global_daily"."g_funda"."indfmt" = ANY (ARRAY['INDL','FS']) 
+     AND "comp_global_daily"."g_funda"."datafmt" = ANY (ARRAY['HIST_STD']) 
+     AND "comp_global_daily"."g_funda"."costat" = ANY (ARRAY['A','I']))
 """
 
-print("Executing Compustat query...")
+print("Executing Compustat Global query...")
 print(f"Query preview: {query[:200]}...")
 
 #%%
@@ -130,7 +128,7 @@ if 'datadate' in df.columns:
     df['datadate'] = pd.to_datetime(df['datadate']).dt.date
 
 # Convert numeric columns to appropriate types
-numeric_columns = ['fyear', 'emp', 'mkvalt']
+numeric_columns = ['fyear', 'emp']
 for col in numeric_columns:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors='coerce')
@@ -148,6 +146,7 @@ print(f"Shape: {df.shape}")
 print(f"Date range: {df['datadate'].min()} to {df['datadate'].max()}")
 print(f"Unique companies (gvkey): {df['gvkey'].nunique()}")
 print(f"Unique years (fyear): {df['fyear'].nunique()}")
+print(f"Unique currencies: {df['curcd'].nunique()}")
 
 print("\nColumns:")
 for col in df.columns:
@@ -174,7 +173,7 @@ assert df.duplicated(subset=['gvkey', 'fyear']).sum() == 0, "Duplicates found af
 #%% 
 # Assert constant columns and drop them
 # These columns should have unique values since we filtered for them in the SQL query
-constant_columns = ['curcd', 'datafmt', 'consol']
+constant_columns = ['datafmt', 'consol']
 for col in constant_columns:
     unique_vals = df[col].nunique()
     print(f"Column {col} has {unique_vals} unique values: {df[col].unique()}")
@@ -200,7 +199,7 @@ output_dir = "data/raw/compustat"
 os.makedirs(output_dir, exist_ok=True)
 
 # Save as feather
-feather_path = os.path.join(output_dir, "compustat_us.feather")
+feather_path = os.path.join(output_dir, "compustat_global.feather")
 print(f"Saving data to {feather_path}")
 df.to_feather(feather_path)
 
