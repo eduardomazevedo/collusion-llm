@@ -2,12 +2,11 @@
 Comprehensive summary statistics for the main analysis dataset.
 
 Produces organized summary statistics covering transcript details, company characteristics,
-temporal coverage, and LLM/human tagging performance. Outputs both structured YAML and
-formatted tables following project specifications.
+temporal coverage, and LLM/human tagging performance. Outputs structured YAML for use
+in LaTeX documents via \\data{} commands.
 
 Output Files Created:
 - data/yaml/summary_stats.yaml: Structured statistics for LaTeX \\data{} commands
-- data/outputs/tables/summary_stats.*: Summary statistics table (CSV, LaTeX, description)
 """
 
 #%%
@@ -20,31 +19,8 @@ from datetime import datetime
 
 #%%
 # Setup paths
-output_dir = Path("data/outputs")
-table_dir = output_dir / "tables"  
 yaml_dir = Path("data/yaml")
-for path in [table_dir, yaml_dir]:
-    path.mkdir(parents=True, exist_ok=True)
-
-def save_table(df, name, description):
-    """Save table in CSV and LaTeX formats with description file."""
-    csv_path = table_dir / f"{name}.csv"
-    tex_path = table_dir / f"{name}.tex"
-    df.to_csv(csv_path, index=False)
-    
-    # Create LaTeX-safe version of the dataframe
-    df_latex = df.copy()
-    for col in df_latex.columns:
-        if df_latex[col].dtype == 'object':
-            df_latex[col] = df_latex[col].astype(str).str.replace('%', r'\%', regex=False)
-            df_latex[col] = df_latex[col].str.replace('$', r'\$', regex=False)
-            df_latex[col] = df_latex[col].str.replace('&', r'\&', regex=False)
-            df_latex[col] = df_latex[col].str.replace('#', r'\#', regex=False)
-            df_latex[col] = df_latex[col].str.replace('_', r'\_', regex=False)
-    
-    df_latex.to_latex(tex_path, index=False, float_format="%.2f", longtable=True, escape=False)
-    with open(table_dir / f"{name}.txt", "w") as f:
-        f.write(description)
+yaml_dir.mkdir(parents=True, exist_ok=True)
 
 #%%
 # Load main analysis dataset
@@ -210,80 +186,13 @@ summary_stats = {
 }
 
 #%%
-# === CREATE SUMMARY TABLE ===
-summary_table_data = []
-
-# Dataset Overview
-summary_table_data.extend([
-    ['Dataset Overview', '', ''],
-    ['Total Transcripts', f'{n_transcripts:,}', ''],
-    ['Unique Companies', f'{n_companies:,}', ''],
-    ['Date Range', f'{first_date.strftime("%Y-%m-%d")} to {last_date.strftime("%Y-%m-%d")}', f'{date_range_years:.1f} years'],
-    ['', '', ''],
-])
-
-# Temporal Coverage
-summary_table_data.extend([
-    ['Temporal Coverage', '', ''],
-    ['Years Covered', f'{year_coverage["min"]} - {year_coverage["max"]}', f'{year_coverage["nunique"]} years'],
-    ['Avg Transcripts/Year', f'{avg_transcripts_per_year:.0f}', ''],
-    ['', '', ''],
-])
-
-# Audio Characteristics  
-summary_table_data.extend([
-    ['Audio Characteristics', '', ''],
-    ['Mean Length', f'{mean_audio_minutes}m {mean_audio_seconds_remainder}s', f'{mean_audio_seconds:.0f} seconds'],
-    ['Total Audio Duration', f'{total_audio_years:.1f} years', f'{total_audio_hours:,.0f} hours'],
-    ['Audio Available', f'{df["audiolengthsec"].notna().mean()*100:.1f}%', f'{df["audiolengthsec"].notna().sum():,} transcripts'],
-    ['', '', ''],
-])
-
-# Company Characteristics
-summary_table_data.extend([
-    ['Company Characteristics', '', ''],
-    ['GICS Sectors', f'{n_sectors}', ''],
-    ['Countries', f'{n_countries}', ''],
-    ['Companies w/ Market Value', f'{n_companies_with_mv:,}', f'{n_companies_with_mv/n_companies*100:.1f}% of companies'],
-    ['Median Market Value', f'${mv_stats["50%"]:,.0f}M' if len(mv_valid) > 0 else 'N/A', ''],
-    ['Companies w/ Employee Data', f'{n_companies_with_emp:,}', f'{n_companies_with_emp/n_companies*100:.1f}% of companies'],
-    ['', '', ''],
-])
-
-# Tagging Performance
-summary_table_data.extend([
-    ['Tagging Performance', '', ''],
-    ['LLM Tagged', f'{llm_tagged:,}', f'{llm_tag_rate:.2f}%'],
-    ['Benchmark Sample', f'{benchmark_sample:,}', f'{benchmark_rate:.2f}%'],
-    ['Human Benchmark Tagged', f'{human_tagged_benchmark:,}', f'{human_benchmark_rate:.1f}% of benchmark'],
-    ['LLM Validation Available', f'{llm_validation_available:,}', f'{llm_validation_rate:.1f}% tagged'],
-    ['Human Audit Sample', f'{human_audit_sample:,}', f'{human_audit_rate:.1f}% tagged'],
-    ['Human Audit False Positive Rate', f'{100 - human_audit_rate:.1f}%', f'{human_audit_sample - human_audit_tagged:,} false positives'],
-    ['Benchmark Collusive Validated', f'{benchmark_collusive_validated_count:,}', f'{benchmark_collusive_validated_pct:.1f}% of collusive'],
-    ['Benchmark Non-Collusive Validated', f'{benchmark_not_collusive_validated_count:,}', f'{benchmark_not_collusive_validated_pct:.1f}% of non-collusive'],
-    ['Validation Odds Ratio', f'{benchmark_validation_odds_ratio:.1f}' if benchmark_validation_odds_ratio is not None else 'N/A', 'Collusive vs Non-Collusive'],
-])
-
-summary_table_df = pd.DataFrame(summary_table_data, columns=['Category', 'Value', 'Additional Info'])
-
-#%%
-# === SAVE OUTPUTS ===
-# Save YAML
+# === SAVE YAML OUTPUT ===
 yaml_path = yaml_dir / "summary_stats.yaml"
 with open(yaml_path, 'w') as f:
     yaml.dump(summary_stats, f, default_flow_style=False, sort_keys=False)
 
-# Save table
-save_table(
-    summary_table_df,
-    "summary_stats",
-    "Comprehensive summary statistics for the main analysis dataset including transcript coverage, company characteristics, temporal span, and tagging performance metrics."
-)
-
 print(f"\nSummary statistics saved to:")
 print(f"  YAML: {yaml_path}")
-print(f"  Table: {table_dir}/summary_stats.csv")
-print(f"         {table_dir}/summary_stats.tex")
 
 print(f"\nKey Statistics:")
 print(f"  Transcripts: {n_transcripts:,}")

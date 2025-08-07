@@ -13,13 +13,13 @@ rule all:
         "data/outputs/top_transcript_data_for_joe.csv",
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
-        "data/outputs/tables/summary_stats.csv",
         "data/outputs/tables/market_value_deciles.csv",
         "data/outputs/tables/sector_tag_rates.csv", 
         "data/outputs/tables/year_tag_rates.csv",
         "data/outputs/figures/market_value_deciles_1x1.png",
         "data/outputs/figures/sector_tag_rates_1x1.png",
         "data/outputs/figures/year_tag_rates_1x1.png",
+        "data/outputs/tables/summary_stats.csv",
         "data/constants/.populated"
 
 rule download_compustat_us:
@@ -119,14 +119,13 @@ rule top_transcript_data:
 rule summary_stats:
     """
     Generate comprehensive summary statistics for the main analysis dataset.
-    Creates organized YAML statistics and formatted summary table covering dataset overview,
+    Creates organized YAML statistics covering dataset overview,
     temporal coverage, audio characteristics, company characteristics, and tagging performance.
     """
     input:
         "data/datasets/main_analysis_dataset.feather"
     output:
-        yaml="data/yaml/summary_stats.yaml",
-        table="data/outputs/tables/summary_stats.csv"
+        yaml="data/yaml/summary_stats.yaml"
     shell:
         "python src/post_query/analysis/summary_stats.py"
 
@@ -148,6 +147,22 @@ rule correlation_analysis:
         year_fig="data/outputs/figures/year_tag_rates_1x1.png"
     shell:
         "python src/post_query/analysis/correlation_analysis.py"
+
+rule summary_stats_table:
+    """
+    Generate publication-ready summary statistics table with two panels:
+    Panel A: Continuous variables (mean, median, min, max, N)
+    Panel B: Boolean classification flags (N, count=TRUE, percent=TRUE)
+    Outputs CSV, LaTeX, and description files for manuscript use.
+    """
+    input:
+        "data/datasets/main_analysis_dataset.feather"
+    output:
+        csv="data/outputs/tables/summary_stats.csv",
+        tex="data/outputs/tables/summary_stats.tex",
+        txt="data/outputs/tables/summary_stats.txt"
+    shell:
+        "python src/post_query/analysis/summary_stats_table.py"
 
 rule populate_constants:
     """
