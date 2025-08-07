@@ -3,9 +3,8 @@
 
 rule all:
     input:
-        "data/raw/compustat/compustat_us.csv",
-        "data/raw/compustat/compustat_global.csv",
-        "data/raw/compustat/readme.md",
+        "data/raw/compustat/compustat_us.feather",
+        "data/raw/compustat/compustat_global.feather",
         "data/intermediaries/gvkey_table.feather",
         "data/intermediaries/gvkey_list.txt",
         "data/datasets/company_year_compustat.feather",
@@ -23,17 +22,25 @@ rule all:
         "data/outputs/figures/year_tag_rates_1x1.png",
         "data/constants/.populated"
 
-rule download_compustat:
+rule download_compustat_us:
     """
-    Download Compustat data files from remote storage using rclone.
-    Downloads US and global Compustat data in CSV format plus readme.
+    Download US Compustat data from WRDS database.
+    Creates feather file with US company financial data.
     """
     output:
-        us_csv="data/raw/compustat/compustat_us.csv",
-        global_csv="data/raw/compustat/compustat_global.csv",
-        readme="data/raw/compustat/readme.md"
+        "data/raw/compustat/compustat_us.feather"
     shell:
-        "bash src/pre_query/compustat/download_compustat.sh"
+        "python src/pre_query/compustat/download_compustat_us.py"
+
+rule download_compustat_global:
+    """
+    Download Global Compustat data from WRDS database.
+    Creates feather file with global company financial data.
+    """
+    output:
+        "data/raw/compustat/compustat_global.feather"
+    shell:
+        "python src/pre_query/compustat/download_compustat_global.py"
 
 rule get_gvkey:
     """
@@ -54,8 +61,8 @@ rule company_year_dataset:
     Merges both datasets, adds location info, and maps gvkeys to company IDs.
     """
     input:
-        us_csv="data/raw/compustat/compustat_us.csv",
-        global_csv="data/raw/compustat/compustat_global.csv",
+        us_feather="data/raw/compustat/compustat_us.feather",
+        global_feather="data/raw/compustat/compustat_global.feather",
         gvkey_table="data/intermediaries/gvkey_table.feather"
     output:
         "data/datasets/company_year_compustat.feather"
@@ -85,7 +92,7 @@ rule main_dataset:
         transcript_detail="data/datasets/transcript_detail.feather",
         compustat="data/datasets/company_year_compustat.feather",
         human_ratings="data/datasets/human_ratings.csv",
-        top_transcripts="data/intermediaries/top_transcripts.csv",
+        top_transcripts_data="data/datasets/top_transcripts_data.csv",
         queries_db="data/datasets/queries.sqlite"
     output:
         "data/datasets/main_analysis_dataset.feather"

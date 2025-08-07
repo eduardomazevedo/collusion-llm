@@ -5,11 +5,56 @@ Start with transcript-detail data.
 Keep only transcripts that are also in the queries database.
 We create dummies for:
     - benchmark_sample (whether transcript is in the benchmark sample)
-    - benchmark_human_flag (whether transcript was tagged as collusion by humans)
+    - benchmark_human_flag (whether transcript was tagged as collusion by humans in th benchmark sample)
     - llm_flag (whether tagged as collution in the main LLM run)
+    - llm_validation_flag (whether transcript was tagged as collusion in the LLM validation run with 10 repeats)
+    - human_audit_sample (whether transcript was audited after being flagged in the llm validation run)    
     - human_audit_flag (whether transcript was flagged as collusive in human audit, T=True, F/U=False, NA if not audited)
 Merge in compustat data at the company-year level.
+
+Variables in the final dataset:
+Core identifiers:
+    - companyid: Capital IQ company identifier
+    - companyname: Company name from transcript data
+    - transcriptid: Unique transcript identifier
+    - keydevid: Key development identifier
+    - transcript_year: Year of the transcript (extracted from mostimportantdateutc)
+    - headline: Transcript headline/title
+
+Classification variables (our constructions):
+    - benchmark_sample: Boolean, whether transcript is in the benchmark sample
+    - benchmark_human_flag: Boolean/NA, whether flagged as collusion by humans (NA if not in benchmark)
+    - llm_flag: Boolean, whether tagged as collusion in the main LLM run
+    - llm_validation_flag: Boolean/NA, whether flagged in LLM validation run (NA if no validation)
+    - human_audit_sample: Boolean, whether transcript was audited after LLM validation flagging
+    - human_audit_flag: Boolean/NA, whether flagged as collusive in human audit (NA if not audited)
+
+Capital IQ transcript variables:
+    - mostimportantdateutc: Date of the transcript
+    - mostimportanttimeutc: Time of the transcript
+    - keydeveventtypeid: Event type identifier
+    - keydeveventtypename: Event type name
+    - transcriptcollectiontypeid: Collection type identifier
+    - transcriptcollectiontypename: Collection type name
+    - transcriptpresentationtypeid: Presentation type identifier
+    - transcriptpresentationtypename: Presentation type name
+    - transcriptcreationdate_utc: Creation date of transcript
+    - transcriptcreationtime_utc: Creation time of transcript
+    - audiolengthsec: Audio length in seconds
+
+Compustat variables (nice names):
+    - market_value_total_mil: Market value of total capital in millions USD
+    - employees_thousands: Number of employees in thousands
+    - gics_sector: GICS sector code
+    - gics_industry: GICS industry code
+    - gics_group: GICS industry group code
+    - gics_subindustry: GICS sub-industry code
+    - incorporation_country: Country of incorporation code
+    - domicile_country: Location/domicile country code
+
+Dataset is sorted by: companyid, mostimportantdateutc, transcriptid
 """
+
 #%%
 import config
 import pandas as pd
@@ -19,7 +64,7 @@ import os
 # Load datasets
 compustat_df = pd.read_feather(os.path.join(config.DATA_DIR, 'datasets', 'company_year_compustat.feather'))
 human_ratings_df = pd.read_csv(config.HUMAN_RATINGS_PATH)
-top_transcripts_df = pd.read_csv(os.path.join(config.DATA_DIR, 'intermediaries', 'top_transcripts.csv'))
+top_transcripts_data_df = pd.read_csv(os.path.join(config.DATA_DIR, 'datasets', 'top_transcripts_data.csv'))
 human_audit_df = pd.read_csv(os.path.join('assets', 'human_audit_top_transcripts.csv'))
 df = pd.read_feather(config.TRANSCRIPT_DETAIL_PATH)
 
@@ -44,9 +89,31 @@ transcript_ids_in_benchmark = human_ratings_df['transcriptid'].unique()
 
 
 #%% List of llm flagged transcripts
-transcript_ids_flagged_by_llm = top_transcripts_df['transcriptid'].unique()
+transcript_ids_flagged_by_llm = top_transcripts_data_df['transcriptid'].unique()
+
+#%% List of validation run transcripts  
+# Transcripts that went through validation runs (have mean_score_ten_repeats)
+transcript_ids_with_validation = top_transcripts_data_df[top_transcripts_data_df['mean_score_ten_repeats'].notna()]['transcriptid'].unique()
+
+# Check if any transcripts in top_transcripts_data do not have validation
+transcripts_without_validation = top_transcripts_data_df[top_transcripts_data_df['mean_score_ten_repeats'].isna()]
+if len(transcripts_without_validation) > 0:
+    print(f"WARNING: {len(transcripts_without_validation)} transcripts in top_transcripts_data do not have validation runs (mean_score_ten_repeats is NA)")
+    print(f"First few transcript IDs without validation: {transcripts_without_validation['transcriptid'].head().tolist()}")
+
+# Transcripts flagged in validation runs (mean_score_ten_repeats >= LLM_SCORE_THRESHOLD)
+transcript_ids_flagged_in_validation = top_transcripts_data_df[
+    top_transcripts_data_df['mean_score_ten_repeats'] >= config.LLM_SCORE_THRESHOLD
+]['transcriptid'].unique()
+
+#%% Human audit sample transcripts
+transcript_ids_in_human_audit_sample = human_audit_df['transcript_id'].unique()
 
 #%% Process human audit data
+# Assert that human_audit_rating has not NAs and is one of T/F/U
+assert human_audit_df['human_audit_rating'].notna().all(), "human_audit_rating contains NaN values"
+assert set(human_audit_df['human_audit_rating'].unique()).issubset({'T', 'F', 'U'}), "human_audit_rating contains values other than T, F, U"
+
 # Create boolean from T/F/U categorical: T=True, F and U=False
 human_audit_df['human_audit_flag'] = human_audit_df['human_audit_rating'] == 'T'
 
@@ -58,7 +125,18 @@ df['benchmark_sample'] = df['transcriptid'].isin(transcript_ids_in_benchmark)
 df['benchmark_human_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_humans)
 # Set to NA for transcripts not in benchmark sample
 df.loc[~df['transcriptid'].isin(transcript_ids_in_benchmark), 'benchmark_human_flag'] = pd.NA
+
+# Create llm_flag (whether tagged as collusion in the main LLM run)
 df['llm_flag'] = df['transcriptid'].isin(transcript_ids_flagged_by_llm)
+
+# Create llm_validation_flag (whether transcript was tagged as collusion in the LLM validation run with 10 repeats)
+# First, set all to NA
+df['llm_validation_flag'] = pd.NA
+# Set to True/False only for transcripts that had validation runs
+df.loc[df['transcriptid'].isin(transcript_ids_with_validation), 'llm_validation_flag'] = df.loc[df['transcriptid'].isin(transcript_ids_with_validation), 'transcriptid'].isin(transcript_ids_flagged_in_validation)
+
+# Create human_audit_sample flag (whether transcript was audited after being flagged in the llm validation run)
+df['human_audit_sample'] = df['transcriptid'].isin(transcript_ids_in_human_audit_sample)
 
 # Merge human audit flag
 df = df.merge(
@@ -68,18 +146,52 @@ df = df.merge(
     how='left'
 ).drop('transcript_id', axis=1)
 
+# Set human_audit_flag to NA for transcripts not in human audit sample
+df.loc[~df['human_audit_sample'], 'human_audit_flag'] = pd.NA
+
 
 # %% Merge compustat
 # Create transcript_year from mostimportantdateutc
 df['transcript_year'] = pd.to_datetime(df['mostimportantdateutc']).dt.year
 
+# Assert that compustat data has unique rows by (companyid, fiscal_year)
+compustat_duplicates = compustat_df.groupby(['companyid', 'fiscal_year']).size()
+duplicate_pairs = compustat_duplicates[compustat_duplicates > 1]
+assert len(duplicate_pairs) == 0, f"Compustat data contains {len(duplicate_pairs)} duplicate (companyid, fiscal_year) combinations. Expected unique rows. First few duplicates: {duplicate_pairs.head().to_dict()}"
+
 df = df.merge(
     compustat_df,
     left_on=['companyid', 'transcript_year'],
-    right_on=['companyid', 'fyear'],
+    right_on=['companyid', 'fiscal_year'],
     how='left'
 )
 
+# Drop columns that are not needed for analysis
+columns_to_drop = ['fiscal_year', 'company_name', 'company_status', 'gvkey', 'currency_code', 'data_date', 'industry_format']
+# Only drop columns that exist in the dataframe
+columns_to_drop = [col for col in columns_to_drop if col in df.columns]
+df = df.drop(columns=columns_to_drop)
+
+# Reorder columns for better organization
+# 1. Core identifiers
+core_columns = ['companyid', 'companyname', 'transcriptid', 'keydevid', 'transcript_year', 'headline']
+
+# 2. Our constructed classification variables
+classification_columns = ['benchmark_sample', 'benchmark_human_flag', 'llm_flag', 'llm_validation_flag', 'human_audit_sample', 'human_audit_flag']
+
+# 3. Other Capital IQ transcript variables
+capiq_columns = [col for col in df.columns if col not in core_columns + classification_columns and col not in ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']]
+
+# 4. Compustat variables (the remaining ones after dropping)
+compustat_columns = ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']
+
+# Reorder the dataframe
+column_order = core_columns + classification_columns + capiq_columns + compustat_columns
+df = df[column_order]
+
+# Sort the dataframe
+df = df.sort_values(['companyid', 'mostimportantdateutc', 'transcriptid'])
 
 #%% Save
 df.to_feather(os.path.join(config.DATA_DIR, 'datasets', 'main_analysis_dataset.feather'))
+# %%
