@@ -53,6 +53,7 @@ scratch.py
 *.bbl
 *.blg
 *.fdb_latexmk
+manuscript/manuscript.bbl-SAVE-ERROR
 *.fls
 *.log
 *.out

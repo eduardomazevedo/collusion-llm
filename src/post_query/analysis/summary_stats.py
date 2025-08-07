@@ -31,7 +31,18 @@ def save_table(df, name, description):
     csv_path = table_dir / f"{name}.csv"
     tex_path = table_dir / f"{name}.tex"
     df.to_csv(csv_path, index=False)
-    df.to_latex(tex_path, index=False, float_format="%.2f", longtable=True)
+    
+    # Create LaTeX-safe version of the dataframe
+    df_latex = df.copy()
+    for col in df_latex.columns:
+        if df_latex[col].dtype == 'object':
+            df_latex[col] = df_latex[col].astype(str).str.replace('%', r'\%', regex=False)
+            df_latex[col] = df_latex[col].str.replace('$', r'\$', regex=False)
+            df_latex[col] = df_latex[col].str.replace('&', r'\&', regex=False)
+            df_latex[col] = df_latex[col].str.replace('#', r'\#', regex=False)
+            df_latex[col] = df_latex[col].str.replace('_', r'\_', regex=False)
+    
+    df_latex.to_latex(tex_path, index=False, float_format="%.2f", longtable=True, escape=False)
     with open(table_dir / f"{name}.txt", "w") as f:
         f.write(description)
 
@@ -121,6 +132,25 @@ benchmark_both_available = benchmark_df[
     benchmark_df['llm_flag'].notna()
 ]
 
+# Benchmark validation statistics by human tagging
+# Collusive transcripts in benchmark that are LLM validated
+benchmark_collusive = benchmark_df[benchmark_df['benchmark_human_flag'] == True]
+benchmark_collusive_validated_count = int(benchmark_collusive['llm_validation_flag'].sum()) if len(benchmark_collusive) > 0 else 0
+benchmark_collusive_validated_pct = (benchmark_collusive_validated_count / len(benchmark_collusive) * 100) if len(benchmark_collusive) > 0 else 0
+
+# Non-collusive transcripts in benchmark that are LLM validated  
+benchmark_not_collusive = benchmark_df[benchmark_df['benchmark_human_flag'] == False]
+benchmark_not_collusive_validated_count = int(benchmark_not_collusive['llm_validation_flag'].sum()) if len(benchmark_not_collusive) > 0 else 0
+benchmark_not_collusive_validated_pct = (benchmark_not_collusive_validated_count / len(benchmark_not_collusive) * 100) if len(benchmark_not_collusive) > 0 else 0
+
+# Odds ratio of validation probability for collusive vs non-collusive
+collusive_validation_prob = benchmark_collusive_validated_pct / 100
+not_collusive_validation_prob = benchmark_not_collusive_validated_pct / 100
+benchmark_validation_odds_ratio = (
+    (collusive_validation_prob / (1 - collusive_validation_prob)) / 
+    (not_collusive_validation_prob / (1 - not_collusive_validation_prob))
+) if not_collusive_validation_prob > 0 and not_collusive_validation_prob < 1 and collusive_validation_prob < 1 else None
+
 #%%
 # === CREATE STRUCTURED YAML OUTPUT ===
 summary_stats = {
@@ -170,7 +200,12 @@ summary_stats = {
         'human_audit_sample_count': int(human_audit_sample),
         'human_audit_tagged_count': int(human_audit_tagged),
         'human_audit_rate_pct': float(human_audit_rate),
-        'human_audit_false_positive_rate_pct': float(100 - human_audit_rate)
+        'human_audit_false_positive_rate_pct': float(100 - human_audit_rate),
+        'benchmark_collusive_validated_count': int(benchmark_collusive_validated_count),
+        'benchmark_collusive_validated_pct': float(benchmark_collusive_validated_pct),
+        'benchmark_not_collusive_validated_count': int(benchmark_not_collusive_validated_count),
+        'benchmark_not_collusive_validated_pct': float(benchmark_not_collusive_validated_pct),
+        'benchmark_validation_odds_ratio': float(benchmark_validation_odds_ratio) if benchmark_validation_odds_ratio is not None else None
     }
 }
 
@@ -224,6 +259,9 @@ summary_table_data.extend([
     ['LLM Validation Available', f'{llm_validation_available:,}', f'{llm_validation_rate:.1f}% tagged'],
     ['Human Audit Sample', f'{human_audit_sample:,}', f'{human_audit_rate:.1f}% tagged'],
     ['Human Audit False Positive Rate', f'{100 - human_audit_rate:.1f}%', f'{human_audit_sample - human_audit_tagged:,} false positives'],
+    ['Benchmark Collusive Validated', f'{benchmark_collusive_validated_count:,}', f'{benchmark_collusive_validated_pct:.1f}% of collusive'],
+    ['Benchmark Non-Collusive Validated', f'{benchmark_not_collusive_validated_count:,}', f'{benchmark_not_collusive_validated_pct:.1f}% of non-collusive'],
+    ['Validation Odds Ratio', f'{benchmark_validation_odds_ratio:.1f}' if benchmark_validation_odds_ratio is not None else 'N/A', 'Collusive vs Non-Collusive'],
 ])
 
 summary_table_df = pd.DataFrame(summary_table_data, columns=['Category', 'Value', 'Additional Info'])
