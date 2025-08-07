@@ -202,11 +202,14 @@ def analyze_flag_by_year(df, flag_col, flag_name):
     ax.set_xlabel("Year")
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, None)
-    # Set x-axis to show only integer years
+    # Set x-axis to show only integer years and rotate to prevent overlap
     ax.set_xticks(year_stats['transcript_year'])
+    plt.xticks(rotation=45)
+    plt.tight_layout()
     save_figure(f"year_tag_rates_{flag_name}", f"{flag_name} tag rate by year. Produced by correlation_analysis.py", fig)
     
     return len(df_year), float(df_year[flag_col].mean() * 100)
+
 
 #%%
 # Load and prepare data

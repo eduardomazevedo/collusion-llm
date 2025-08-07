@@ -1,41 +1,76 @@
 We now examine the correlates of collusive communication. We will consider three types of correlates: firm sector, firm size, and call year. These covariates are not available for all firms, so the sample sizes for each of these analyses differ somewhat. There are \data{correlates_collusive_communication/sector_valid_observations_int} firms in the sector analysis, \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis, and \data{correlates_collusive_communication/year_valid_observations_int} firms in the year analysis.
 
-We proceed in three measures of collusive communication. First, we consider the probability of LLMs tagging communication as collusive. This measure has the advantage of spanning the entire dataset. However, due to the large amount of false positives, it includes not only the likelihood of actual collusive communications, but also the likelihood that the LLM mistakenly tags a communication as collusive. Second, we consider the fraction of communications that are both found collusive by the LLM and by our human validation. This measure is more precise, but it is limited to the subset of communications that were human validated. Third, we consider the fraction of communications that are LLM flagged, human validated, and subsequently confirmed as collusive through human audit. This is the most stringent measure but covers the smallest subset of data.
+We have thee main measures of collusive communication:
+\begin{enumerate}
+    \item Whether a transcript is in the LLM flagged set.
+    \item Whether a transcript is in the LLM flagged set and also validated as collusive by the followup LLM queries.
+    \item Whether a transcript is in the LLM flagged set, validated as collusive by the followup LLM queries, and also confirmed as collusive by human audit.
+\end{enumerate}
 
-We begin with the fraction of communications tagged as collusive by the LLM in each group. Figures \ref{fig:sector_tag_rates}, \ref{fig:market_value_deciles}, and \ref{fig:year_tag_rates} give the averages and confidence intervals for the fraction of collusive communications by sector, size, and year, respectively.
+Unfortunately, the human audit validated sample is small, so that our estimates are very noisy. Thus, we report results for the first two measures.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\columnwidth]{../data/outputs/figures/sector_tag_rates_llm_16x9.pdf}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../data/outputs/figures/sector_tag_rates_llm_1x1.pdf}
+        \subcaption{LLM Flagged}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../data/outputs/figures/sector_tag_rates_llm_validation_1x1.pdf}
+        \subcaption{LLM Flagged \& Validated}
+    \end{minipage}
     \caption{LLM Tag Rate by Sector}
     \label{fig:sector_tag_rates}
     \begin{minipage}{\textwidth}
         \vspace{1em}
         \footnotesize
-        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across different industry sectors. The horizontal bar chart displays the tag rates with confidence intervals. Data includes \data{correlates_collusive_communication/sector_valid_observations_int} firms in the sector analysis.
+        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across different industry sectors. The left panel shows results for the LLM flagged sample, while the right panel shows results for the LLM flagged and validated sample. The horizontal bar charts display the tag rates with confidence intervals. Data includes \data{correlates_collusive_communication/sector_valid_observations_int} firms in the sector analysis.
     \end{minipage}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\columnwidth]{../data/outputs/figures/market_value_deciles_llm_16x9.pdf}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../data/outputs/figures/market_value_deciles_llm_1x1.pdf}
+        \subcaption{LLM Flagged}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../data/outputs/figures/market_value_deciles_llm_validation_1x1.pdf}
+        \subcaption{LLM Flagged \& Validated}
+    \end{minipage}
     \caption{LLM Tag Rate by Market Value Decile}
     \label{fig:market_value_deciles}
     \begin{minipage}{\textwidth}
         \vspace{1em}
         \footnotesize
-        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across market value deciles, representing firm size. The chart displays how collusive communication detection varies with company size. Data includes \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis.
+        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across market value deciles, representing firm size. The left panel shows results for the LLM flagged sample, while the right panel shows results for the LLM flagged and validated sample. The charts display how collusive communication detection varies with company size. Data includes \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis.
     \end{minipage}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\columnwidth]{../data/outputs/figures/year_tag_rates_llm_16x9.pdf}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../data/outputs/figures/year_tag_rates_llm_1x1.pdf}
+        \subcaption{LLM Flagged}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../data/outputs/figures/year_tag_rates_llm_validation_1x1.pdf}
+        \subcaption{LLM Flagged \& Validated}
+    \end{minipage}
     \caption{LLM Tag Rate by Year}
     \label{fig:year_tag_rates}
     \begin{minipage}{\textwidth}
         \vspace{1em}
         \footnotesize
-        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM over time. The chart displays temporal trends in collusive communication detection across the sample period. Data includes \data{correlates_collusive_communication/year_valid_observations_int} firms in the call year analysis.
+        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM over time. The left panel shows results for the LLM flagged sample, while the right panel shows results for the LLM flagged and validated sample. The charts display temporal trends in collusive communication detection across the sample period. Data includes \data{correlates_collusive_communication/year_valid_observations_int} firms in the call year analysis.
     \end{minipage}
 \end{figure}
