@@ -18,17 +18,17 @@
 % -----------------------------------------------------
 % Stage 1 (left column)
 % -----------------------------------------------------
-\node (bench)  {Benchmark sample\\of human-labeled transcripts\\\small(\textit{N = TBD})};
+\node (bench)  {Benchmark sample\\of human-labeled transcripts\\\small(\textit{N = \data{summary_stats/tagging_performance/benchmark_sample_count_int}})};
 \node (dev)    [below=of bench] {Develop \& compare\\prompts \& LLM models};
 \node (best)   [below=of dev] {Select best-performing\\prompt + model};
 
 % -----------------------------------------------------
 % Stage 2 (right column)
 % -----------------------------------------------------
-\node (full)   [right=5.6cm of bench] {Apply best model to\\Full transcript dataset\\(Capital IQ)\\\small(\textit{N = TBD})};
-\node (flag)   [below=of full] {LLM-flagged transcripts\\score $\ge 75$\\\small(\textit{N = TBD})};
-\node (valid)  [below=of flag] {LLM-validated transcripts\\10-query avg $\ge 75$\\\small(\textit{N = TBD})};
-\node (audit)  [below=of valid] {Human-audited\\LLM-flagged transcripts\\\small(\textit{N = TBD})};
+\node (full)   [right=5.6cm of bench] {Apply best model to\\Full transcript dataset\\(Capital IQ)\\\small(\textit{N = \data{summary_stats/dataset_overview/total_transcripts_int}})};
+\node (flag)   [below=of full] {LLM-flagged transcripts\\score $\ge 75$\\\small(\textit{N = \data{summary_stats/tagging_performance/llm_tagged_count_int}})};
+\node (valid)  [below=of flag] {LLM-validated transcripts\\10-query avg $\ge 75$\\\small(\textit{N = \data{summary_stats/tagging_performance/llm_validation_tagged_int}})};
+\node (audit)  [below=of valid] {Human-audited\\LLM-flagged transcripts\\\small(\textit{N = \data{summary_stats/tagging_performance/human_audit_sample_count_int}})};
 
 % -----------------------------------------------------
 % Arrows within columns and between stages
@@ -68,6 +68,6 @@
 \begin{minipage}{\textwidth}
     \vspace{1em}
     \footnotesize
-    \textit{Notes:} This figure illustrates the workflow for detecting collusive corporate communications. Stage 1 develops and evaluates prompts and models using the human-labeled benchmark dataset through cross-validation to select the best-performing combination. Stage 2 applies the chosen model at scale to the full Capital IQ transcript dataset (\data{transcript_stats/n_transcripts_int} transcripts), refines high-scoring transcripts with multiple queries using a 75-point threshold, and conducts human audits of the top-scoring results to validate model performance.
+    \textit{Notes:} This figure illustrates the workflow for detecting collusive corporate communications. Stage 1 develops and evaluates prompts and models using the human-labeled benchmark dataset through cross-validation to select the best-performing combination. Stage 2 applies the chosen model at scale to the full Capital IQ transcript dataset (\data{summary_stats/dataset_overview/total_transcripts_int} transcripts), refines high-scoring transcripts with multiple queries using a 75-point threshold, and conducts human audits of the top-scoring results to validate model performance.
 \end{minipage}
 \end{figure}

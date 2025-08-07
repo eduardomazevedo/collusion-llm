@@ -134,6 +134,7 @@ Description of the variable, including data type, scale, and any special values 
 - Analysis scripts should be written sequentially, without unecessary definitions of functions, without pointless main blocks. Instead it should be data science friendly, with #%% blocks that can be run interactively.
 - Every script should have a docstring that explains what it does tersely at the top.
 - If I ask you questions about the data that require analysis, create a file on root called scratch.py to do your analysis. Make it print useful output but not change any files. Delete after we are 100% done with the extra analysis.
+- We always use our `.venv` virtual environment. Use it when running your own code.
 
 ## Latex
 - The paper manuscript files are in `./manuscript/`.

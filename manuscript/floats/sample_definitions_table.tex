@@ -9,25 +9,25 @@
 \vspace{0.2em}
 \hrule height 0.8pt
 \vspace{0.5em}
-\textbf{Benchmark sample of human-labeled transcripts} (N = \textit{TBD}) \\
+\textbf{Benchmark sample of human-labeled transcripts} (N = \data{summary_stats/tagging_performance/benchmark_sample_count_int}) \\
 Benchmark sample combining \textcite{aryal2022coordinated} airline transcripts and U-Haul transcripts originally discussed in \textcite{harrington2022collusion}. This sample has a high concentration of collusive communications.
 
 \vspace{1em}
-\textbf{Full transcript dataset (Capital IQ)} (N = \textit{TBD}) \\
-Universe of $\sim$500{,}000 corporate earnings-call transcripts from Capital IQ.
+\textbf{Full transcript dataset (Capital IQ)} (N = \data{summary_stats/dataset_overview/total_transcripts_int}) \\
+Universe of corporate earnings call transcripts from Capital IQ.
 
 
 \vspace{1em}
-\textbf{LLM-flagged transcripts (score $\ge 75$)} (N = \textit{TBD}) \\
+\textbf{LLM-flagged transcripts (score $\ge 75$)} (N = \data{summary_stats/tagging_performance/llm_tagged_count_int}) \\
 Subset of the full dataset that the best-performing LLM flagged with an initial collusion score of at least 75.
 
 \vspace{1em}
-\textbf{LLM-validated transcripts (10-query avg $\ge 75$)} (N = \textit{TBD}) \\
+\textbf{LLM-validated transcripts (10-query avg $\ge 75$)} (N = \data{summary_stats/tagging_performance/llm_validation_tagged_int}) \\
 Top LLM-flagged transcripts re-scored with ten prompt variants; we keep only those whose \emph{average} score remains $\ge 75$.
 
 \vspace{1em}
-\textbf{Human-audited LLM-flagged transcripts} (N = \textit{TBD}) \\
-Manual audit of the highest-scoring $\sim$200 transcripts; audits indicate roughly one-third true positives and two-thirds false positives.
+\textbf{Human-audited LLM-flagged transcripts} (N = \data{summary_stats/tagging_performance/human_audit_sample_count_int}) \\
+Manual audit of the highest-scoring \data{summary_stats/tagging_performance/human_audit_sample_count_int} transcripts; audits indicate \data{summary_stats/tagging_performance/human_audit_tagged_count_int} true positives (\data{summary_stats/tagging_performance/human_audit_rate_pct_percentage}) and \data{summary_stats/tagging_performance/human_audit_false_positive_rate_pct_percentage} false positives.
 
 \vspace{0.5em}
 \hrule height 0.8pt
