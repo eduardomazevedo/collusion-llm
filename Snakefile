@@ -85,7 +85,7 @@ rule main_dataset:
         transcript_detail="data/datasets/transcript_detail.feather",
         compustat="data/datasets/company_year_compustat.feather",
         human_ratings="data/datasets/human_ratings.csv",
-        top_transcripts="data/intermediaries/top_transcripts.csv",
+        top_transcripts_data="data/datasets/top_transcripts_data.csv",
         queries_db="data/datasets/queries.sqlite"
     output:
         "data/datasets/main_analysis_dataset.feather"
