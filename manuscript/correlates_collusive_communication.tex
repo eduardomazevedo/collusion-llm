@@ -1,12 +1,12 @@
 We now examine the correlates of collusive communication. We will consider three types of correlates: firm sector, firm size, and call year. These covariates are not available for all firms, so the sample sizes for each of these analyses differ somewhat. There are \data{correlates_collusive_communication/sector_valid_observations_int} firms in the sector analysis, \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis, and \data{correlates_collusive_communication/year_valid_observations_int} firms in the year analysis.
 
-We proceed in two measures of collusive communication. First, we consider the probability of llms tagging communication as collusive. This measure has the advantage of spanning the entire dataset. However, due to the large amount of false positives, it includes not only the likelihood of actual collusive communications, but also the likelihood that the llm mistakenly tags a communication as collusive. Second, we consider the fraction of communications that are both found collusive by the llm and by our human validation. This measure is more precise, but it is limited to the subset of communications that were human validated.
+We proceed in three measures of collusive communication. First, we consider the probability of LLMs tagging communication as collusive. This measure has the advantage of spanning the entire dataset. However, due to the large amount of false positives, it includes not only the likelihood of actual collusive communications, but also the likelihood that the LLM mistakenly tags a communication as collusive. Second, we consider the fraction of communications that are both found collusive by the LLM and by our human validation. This measure is more precise, but it is limited to the subset of communications that were human validated. Third, we consider the fraction of communications that are LLM flagged, human validated, and subsequently confirmed as collusive through human audit. This is the most stringent measure but covers the smallest subset of data.
 
-We begin with the fraction of communications tagged as collusive by the llm in each group. Figures \ref{fig:sector_tag_rates}, \ref{fig:market_value_deciles}, and \ref{fig:year_tag_rates} give the averages and confidence intervals for the fraction of collusive communications by sector, size, and year, respectively.
+We begin with the fraction of communications tagged as collusive by the LLM in each group. Figures \ref{fig:sector_tag_rates}, \ref{fig:market_value_deciles}, and \ref{fig:year_tag_rates} give the averages and confidence intervals for the fraction of collusive communications by sector, size, and year, respectively.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\columnwidth]{../data/outputs/figures/sector_tag_rates_16x9.pdf}
+    \includegraphics[width=1\columnwidth]{../data/outputs/figures/sector_tag_rates_llm_16x9.pdf}
     \caption{LLM Tag Rate by Sector}
     \label{fig:sector_tag_rates}
     \begin{minipage}{\textwidth}
@@ -18,7 +18,7 @@ We begin with the fraction of communications tagged as collusive by the llm in e
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\columnwidth]{../data/outputs/figures/market_value_deciles_16x9.pdf}
+    \includegraphics[width=1\columnwidth]{../data/outputs/figures/market_value_deciles_llm_16x9.pdf}
     \caption{LLM Tag Rate by Market Value Decile}
     \label{fig:market_value_deciles}
     \begin{minipage}{\textwidth}
@@ -30,7 +30,7 @@ We begin with the fraction of communications tagged as collusive by the llm in e
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\columnwidth]{../data/outputs/figures/year_tag_rates_16x9.pdf}
+    \includegraphics[width=1\columnwidth]{../data/outputs/figures/year_tag_rates_llm_16x9.pdf}
     \caption{LLM Tag Rate by Year}
     \label{fig:year_tag_rates}
     \begin{minipage}{\textwidth}

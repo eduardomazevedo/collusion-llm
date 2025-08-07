@@ -13,12 +13,27 @@ rule all:
         "data/outputs/top_transcript_data_for_joe.csv",
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
-        "data/outputs/tables/market_value_deciles.csv",
-        "data/outputs/tables/sector_tag_rates.csv", 
-        "data/outputs/tables/year_tag_rates.csv",
-        "data/outputs/figures/market_value_deciles_1x1.png",
-        "data/outputs/figures/sector_tag_rates_1x1.png",
-        "data/outputs/figures/year_tag_rates_1x1.png",
+        # LLM flag outputs
+        "data/outputs/tables/market_value_deciles_llm.csv",
+        "data/outputs/tables/sector_tag_rates_llm.csv", 
+        "data/outputs/tables/year_tag_rates_llm.csv",
+        "data/outputs/figures/market_value_deciles_llm_1x1.png",
+        "data/outputs/figures/sector_tag_rates_llm_1x1.png",
+        "data/outputs/figures/year_tag_rates_llm_1x1.png",
+        # LLM validation flag outputs
+        "data/outputs/tables/market_value_deciles_llm_validation.csv",
+        "data/outputs/tables/sector_tag_rates_llm_validation.csv", 
+        "data/outputs/tables/year_tag_rates_llm_validation.csv",
+        "data/outputs/figures/market_value_deciles_llm_validation_1x1.png",
+        "data/outputs/figures/sector_tag_rates_llm_validation_1x1.png",
+        "data/outputs/figures/year_tag_rates_llm_validation_1x1.png",
+        # Human audit flag outputs
+        "data/outputs/tables/market_value_deciles_human_audit.csv",
+        "data/outputs/tables/sector_tag_rates_human_audit.csv", 
+        "data/outputs/tables/year_tag_rates_human_audit.csv",
+        "data/outputs/figures/market_value_deciles_human_audit_1x1.png",
+        "data/outputs/figures/sector_tag_rates_human_audit_1x1.png",
+        "data/outputs/figures/year_tag_rates_human_audit_1x1.png",
         "data/outputs/tables/summary_stats.csv",
         "data/constants/.populated"
 
@@ -131,20 +146,36 @@ rule summary_stats:
 
 rule correlation_analysis:
     """
-    Analyze LLM collusion tagging patterns and correlations.
-    Creates summary statistics, tables by market value/sector/year, and corresponding figures.
+    Analyze LLM collusion tagging patterns and correlations across three flag variables.
+    Creates summary statistics, tables by market value/sector/year, and corresponding figures
+    for llm_flag, llm_validation_flag, and human_audit_flag variables.
     Outputs YAML summary stats, CSV/LaTeX tables, and PNG/PDF figures in 1:1 and 16:9 formats.
     """
     input:
         "data/datasets/main_analysis_dataset.feather"
     output:
         yaml="data/yaml/correlates_collusive_communication.yaml",
-        mv_table="data/outputs/tables/market_value_deciles.csv",
-        sector_table="data/outputs/tables/sector_tag_rates.csv",
-        year_table="data/outputs/tables/year_tag_rates.csv",
-        mv_fig="data/outputs/figures/market_value_deciles_1x1.png",
-        sector_fig="data/outputs/figures/sector_tag_rates_1x1.png",
-        year_fig="data/outputs/figures/year_tag_rates_1x1.png"
+        # LLM flag outputs
+        mv_table_llm="data/outputs/tables/market_value_deciles_llm.csv",
+        sector_table_llm="data/outputs/tables/sector_tag_rates_llm.csv",
+        year_table_llm="data/outputs/tables/year_tag_rates_llm.csv",
+        mv_fig_llm="data/outputs/figures/market_value_deciles_llm_1x1.png",
+        sector_fig_llm="data/outputs/figures/sector_tag_rates_llm_1x1.png",
+        year_fig_llm="data/outputs/figures/year_tag_rates_llm_1x1.png",
+        # LLM validation flag outputs
+        mv_table_validation="data/outputs/tables/market_value_deciles_llm_validation.csv",
+        sector_table_validation="data/outputs/tables/sector_tag_rates_llm_validation.csv",
+        year_table_validation="data/outputs/tables/year_tag_rates_llm_validation.csv",
+        mv_fig_validation="data/outputs/figures/market_value_deciles_llm_validation_1x1.png",
+        sector_fig_validation="data/outputs/figures/sector_tag_rates_llm_validation_1x1.png",
+        year_fig_validation="data/outputs/figures/year_tag_rates_llm_validation_1x1.png",
+        # Human audit flag outputs
+        mv_table_audit="data/outputs/tables/market_value_deciles_human_audit.csv",
+        sector_table_audit="data/outputs/tables/sector_tag_rates_human_audit.csv",
+        year_table_audit="data/outputs/tables/year_tag_rates_human_audit.csv",
+        mv_fig_audit="data/outputs/figures/market_value_deciles_human_audit_1x1.png",
+        sector_fig_audit="data/outputs/figures/sector_tag_rates_human_audit_1x1.png",
+        year_fig_audit="data/outputs/figures/year_tag_rates_human_audit_1x1.png"
     shell:
         "python src/post_query/analysis/correlation_analysis.py"
 
