@@ -11,6 +11,48 @@ We create dummies for:
     - human_audit_sample (whether transcript was audited after being flagged in the llm validation run)    
     - human_audit_flag (whether transcript was flagged as collusive in human audit, T=True, F/U=False, NA if not audited)
 Merge in compustat data at the company-year level.
+
+Variables in the final dataset:
+Core identifiers:
+    - companyid: Capital IQ company identifier
+    - companyname: Company name from transcript data
+    - transcriptid: Unique transcript identifier
+    - keydevid: Key development identifier
+    - transcript_year: Year of the transcript (extracted from mostimportantdateutc)
+    - headline: Transcript headline/title
+
+Classification variables (our constructions):
+    - benchmark_sample: Boolean, whether transcript is in the benchmark sample
+    - benchmark_human_flag: Boolean/NA, whether flagged as collusion by humans (NA if not in benchmark)
+    - llm_flag: Boolean, whether tagged as collusion in the main LLM run
+    - llm_validation_flag: Boolean/NA, whether flagged in LLM validation run (NA if no validation)
+    - human_audit_sample: Boolean, whether transcript was audited after LLM validation flagging
+    - human_audit_flag: Boolean/NA, whether flagged as collusive in human audit (NA if not audited)
+
+Capital IQ transcript variables:
+    - mostimportantdateutc: Date of the transcript
+    - mostimportanttimeutc: Time of the transcript
+    - keydeveventtypeid: Event type identifier
+    - keydeveventtypename: Event type name
+    - transcriptcollectiontypeid: Collection type identifier
+    - transcriptcollectiontypename: Collection type name
+    - transcriptpresentationtypeid: Presentation type identifier
+    - transcriptpresentationtypename: Presentation type name
+    - transcriptcreationdate_utc: Creation date of transcript
+    - transcriptcreationtime_utc: Creation time of transcript
+    - audiolengthsec: Audio length in seconds
+
+Compustat variables (nice names):
+    - market_value_total_mil: Market value of total capital in millions USD
+    - employees_thousands: Number of employees in thousands
+    - gics_sector: GICS sector code
+    - gics_industry: GICS industry code
+    - gics_group: GICS industry group code
+    - gics_subindustry: GICS sub-industry code
+    - incorporation_country: Country of incorporation code
+    - domicile_country: Location/domicile country code
+
+Dataset is sorted by: companyid, mostimportantdateutc, transcriptid
 """
 
 #%%
@@ -112,18 +154,44 @@ df.loc[~df['human_audit_sample'], 'human_audit_flag'] = pd.NA
 # Create transcript_year from mostimportantdateutc
 df['transcript_year'] = pd.to_datetime(df['mostimportantdateutc']).dt.year
 
-# Assert that compustat data has unique rows by (companyid, fyear)
-compustat_duplicates = compustat_df.groupby(['companyid', 'fyear']).size()
+# Assert that compustat data has unique rows by (companyid, fiscal_year)
+compustat_duplicates = compustat_df.groupby(['companyid', 'fiscal_year']).size()
 duplicate_pairs = compustat_duplicates[compustat_duplicates > 1]
-assert len(duplicate_pairs) == 0, f"Compustat data contains {len(duplicate_pairs)} duplicate (companyid, fyear) combinations. Expected unique rows. First few duplicates: {duplicate_pairs.head().to_dict()}"
+assert len(duplicate_pairs) == 0, f"Compustat data contains {len(duplicate_pairs)} duplicate (companyid, fiscal_year) combinations. Expected unique rows. First few duplicates: {duplicate_pairs.head().to_dict()}"
 
 df = df.merge(
     compustat_df,
     left_on=['companyid', 'transcript_year'],
-    right_on=['companyid', 'fyear'],
+    right_on=['companyid', 'fiscal_year'],
     how='left'
 )
 
+# Drop columns that are not needed for analysis
+columns_to_drop = ['fiscal_year', 'company_name', 'company_status', 'gvkey', 'currency_code', 'data_date', 'industry_format']
+# Only drop columns that exist in the dataframe
+columns_to_drop = [col for col in columns_to_drop if col in df.columns]
+df = df.drop(columns=columns_to_drop)
+
+# Reorder columns for better organization
+# 1. Core identifiers
+core_columns = ['companyid', 'companyname', 'transcriptid', 'keydevid', 'transcript_year', 'headline']
+
+# 2. Our constructed classification variables
+classification_columns = ['benchmark_sample', 'benchmark_human_flag', 'llm_flag', 'llm_validation_flag', 'human_audit_sample', 'human_audit_flag']
+
+# 3. Other Capital IQ transcript variables
+capiq_columns = [col for col in df.columns if col not in core_columns + classification_columns and col not in ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']]
+
+# 4. Compustat variables (the remaining ones after dropping)
+compustat_columns = ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']
+
+# Reorder the dataframe
+column_order = core_columns + classification_columns + capiq_columns + compustat_columns
+df = df[column_order]
+
+# Sort the dataframe
+df = df.sort_values(['companyid', 'mostimportantdateutc', 'transcriptid'])
 
 #%% Save
 df.to_feather(os.path.join(config.DATA_DIR, 'datasets', 'main_analysis_dataset.feather'))
+# %%
