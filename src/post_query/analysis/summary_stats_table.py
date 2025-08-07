@@ -76,7 +76,10 @@ for var, label in CONTINUOUS.items():
     else:
         mean_fmt = fmt_float(col.mean())
         med_fmt = fmt_float(col.median())
-        min_fmt = fmt_float(col.min(), 0)
+        if var in ["market_value_total_mil", "employees_thousands"]:
+            min_fmt = fmt_float(col.min(), 3)
+        else:
+            min_fmt = fmt_float(col.min(), 0)
         max_fmt = fmt_float(col.max(), 0)
 
     panel_a.append({

@@ -11,6 +11,10 @@ We create dummies for:
     - human_audit_sample (whether transcript was audited after being flagged in the llm validation run)    
     - human_audit_flag (whether transcript was flagged as collusive in human audit, T=True, F/U=False, NA if not audited)
 Merge in compustat data at the company-year level.
+Apply data cleaning rules before saving:
+    - market_value_total_mil: set to NA if 0
+    - employees_thousands: set to NA if 0 or > 3,000 (indicating coding errors)
+    - audiolengthsec: set to NA if 0, < 120 seconds, or > 18,000 seconds (5 hours)
 
 Variables in the final dataset:
 Core identifiers:
@@ -191,6 +195,19 @@ df = df[column_order]
 
 # Sort the dataframe
 df = df.sort_values(['companyid', 'mostimportantdateutc', 'transcriptid'])
+
+#%% Data cleaning
+# Clean market value: set to NA if 0
+df.loc[df['market_value_total_mil'] == 0, 'market_value_total_mil'] = pd.NA
+
+# Clean employees: set to NA if 0 or > 3,000 thousands (3 million employees)
+df.loc[df['employees_thousands'] == 0, 'employees_thousands'] = pd.NA
+df.loc[df['employees_thousands'] > 3000, 'employees_thousands'] = pd.NA
+
+# Clean audio length: set to NA if 0, < 120 seconds, or > 5 hours (18,000 seconds)
+df.loc[df['audiolengthsec'] == 0, 'audiolengthsec'] = pd.NA
+df.loc[df['audiolengthsec'] < 120, 'audiolengthsec'] = pd.NA
+df.loc[df['audiolengthsec'] > 18000, 'audiolengthsec'] = pd.NA
 
 #%% Save
 df.to_feather(os.path.join(config.DATA_DIR, 'datasets', 'main_analysis_dataset.feather'))
