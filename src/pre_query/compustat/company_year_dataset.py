@@ -29,6 +29,26 @@ us_df = pd.read_csv(us_file)
 global_df = pd.read_csv(global_file)
 
 
+# Sort the datasets by 'gvkey' and 'fyear' for consistency
+us_df = us_df.sort_values(['gvkey', 'fyear'])
+global_df = global_df.sort_values(['gvkey', 'fyear'])
+
+
+#%% Assert that tables are unique on 'gvkey' and 'fyear'
+# Check for duplicates in US dataset
+us_duplicates = us_df.duplicated(subset=['gvkey', 'fyear'], keep=False)
+if us_duplicates.any():
+    print(f"Found {us_duplicates.sum()} duplicate rows in US dataset based on 'gvkey' and 'fyear'.")
+else:
+    print("No duplicate rows found in US dataset based on 'gvkey' and 'fyear'.")
+
+# Check for duplicates in Global dataset
+global_duplicates = global_df.duplicated(subset=['gvkey', 'fyear'], keep=False)
+if global_duplicates.any():
+    print(f"Found {global_duplicates.sum()} duplicate rows in Global dataset based on 'gvkey' and 'fyear'.")
+else:
+    print("No duplicate rows found in Global dataset based on 'gvkey' and 'fyear'.")
+
 #%% Harmonize datasets
 # Add 'loc' variable to US dataset
 us_df['loc'] = 'USA'
@@ -55,40 +75,6 @@ global_df = global_df[all_cols]
 # Combine the datasets
 print("Combining US and Global datasets...")
 combined_df = pd.concat([us_df, global_df], ignore_index=True)
-
-
-#%% Deduplication
-# Need to deduplicate because some companies are tracked in both US and Global datasets.
-# Assert that there is at most one duplicate per gvkey and fyear
-# and that one of the duplicates has a 'loc' value of 'USA'
-print("Checking for duplicates...")
-duplicates = combined_df.duplicated(subset=['gvkey', 'fyear'], keep=False)
-
-if duplicates.any():
-    print(f"Found {duplicates.sum()} duplicate records.")
-    if not combined_df[duplicates]['loc'].eq('USA').any():
-        print("Error: None of the duplicates have a 'loc' value of 'USA'.")
-        sys.exit(1)
-else:
-    print("No duplicates found.")
-
-# Sort by gvkey, fyear, and mkvalt (descending, NAs last)
-combined_df = combined_df.sort_values(
-    by=['gvkey', 'fyear', 'mkvalt'],
-    ascending=[True, True, False],
-    na_position='last'
-)
-
-# Keep the first occurrence of each gvkey and fyear
-print("Removing duplicates...")
-print(f"Before deduplication: {len(combined_df)} records.")
-combined_df = combined_df.drop_duplicates(subset=['gvkey', 'fyear'], keep='first')
-print(f"After deduplication: {len(combined_df)} records.")
-
-# Assert that there are no duplicates left
-if combined_df.duplicated(subset=['gvkey', 'fyear']).any():
-    print("Error: Duplicates still exist after deduplication.")
-    sys.exit(1)
 
 
 #%% Load gvkey table and check for uniqueness
