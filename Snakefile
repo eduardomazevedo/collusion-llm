@@ -11,9 +11,9 @@ rule all:
         "data/datasets/main_analysis_dataset.feather",
         "data/datasets/top_transcripts_data.csv",
         "data/outputs/top_transcript_data_for_joe.csv",
-        "data/yaml/transcript_stats.yaml",
-        "data/yaml/llm_tagged_stats.yaml",
+        "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
+        "data/outputs/tables/summary_stats.csv",
         "data/outputs/tables/market_value_deciles.csv",
         "data/outputs/tables/sector_tag_rates.csv", 
         "data/outputs/tables/year_tag_rates.csv",
@@ -116,31 +116,19 @@ rule top_transcript_data:
     shell:
         "python src/post_query/analysis/top_transcript_data.py"
 
-rule transcript_data_stats:
+rule summary_stats:
     """
-    Generate summary statistics for transcript data (in the subset with queries).
-    Analyzes transcript details and creates YAML output with key metrics.
-    """
-    input:
-        transcript_detail="data/datasets/transcript_detail.feather",
-        queries_db="data/datasets/queries.sqlite"
-    output:
-        "data/yaml/transcript_stats.yaml"
-    shell:
-        "python src/post_query/analysis/transcript_data_stats.py"
-
-rule llm_tagged_stats:
-    """
-    Generate basic statistics of LLM collusion detection performance.
-    Analyzes LLM tagging performance based on benchmark sample and human audit data.
-    Creates comprehensive statistics with confidence intervals for validation.
+    Generate comprehensive summary statistics for the main analysis dataset.
+    Creates organized YAML statistics and formatted summary table covering dataset overview,
+    temporal coverage, audio characteristics, company characteristics, and tagging performance.
     """
     input:
         "data/datasets/main_analysis_dataset.feather"
     output:
-        "data/yaml/llm_tagged_stats.yaml"
+        yaml="data/yaml/summary_stats.yaml",
+        table="data/outputs/tables/summary_stats.csv"
     shell:
-        "python src/post_query/analysis/llm_tagged_stats.py"
+        "python src/post_query/analysis/summary_stats.py"
 
 rule correlation_analysis:
     """
@@ -167,8 +155,7 @@ rule populate_constants:
     Creates multiple format versions (int, float, percentage, etc.) for use in manuscripts.
     """
     input:
-        "data/yaml/transcript_stats.yaml",
-        "data/yaml/llm_tagged_stats.yaml",
+        "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml"
     output:
         "data/constants/.populated"
