@@ -91,10 +91,32 @@ if combined_df.duplicated(subset=['gvkey', 'fyear']).any():
     sys.exit(1)
 
 
-#%% Marge in companyid using gvkey_table
+#%% Load gvkey table and check for uniqueness
 # Load gvkey_table for mapping gvkey to companyid
 gvkey_df = pd.read_feather(gvkey_table_file)
 
+# Print number of duplicate gvkeys, companyids, and pairs in gvkey_df
+print("Checking gvkey_table for duplicates...")
+gvkey_duplicates = gvkey_df.duplicated(subset=['gvkey'], keep=False)
+if gvkey_duplicates.any():
+    print(f"Found {gvkey_duplicates.sum()} duplicate gvkeys in gvkey_table.")
+else:
+    print("No duplicate gvkeys found in gvkey_table.")
+
+companyid_duplicates = gvkey_df.duplicated(subset=['companyid'], keep=False)
+if companyid_duplicates.any():
+    print(f"Found {companyid_duplicates.sum()} duplicate companyids in gvkey_table.")
+else:
+    print("No duplicate companyids found in gvkey_table.")
+
+# Check for unique pairs of gvkey and companyid
+pair_duplicates = gvkey_df.duplicated(subset=['gvkey', 'companyid'], keep=False)
+if pair_duplicates.any():
+    print(f"Found {pair_duplicates.sum()} duplicate pairs of gvkey and companyid in gvkey_table.")
+else:
+    print("No duplicate pairs of gvkey and companyid found in gvkey_table.")
+
+#%% Merge company id
 # Merge with gvkey_table to get companyid
 # Convert gvkey to string in both datasets to ensure proper matching
 combined_df['gvkey'] = combined_df['gvkey'].astype(str).str.zfill(6)
