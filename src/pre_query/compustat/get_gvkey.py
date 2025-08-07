@@ -22,9 +22,25 @@ print(f"Found {len(unique_company_ids)} unique company IDs in transcript_detail.
 
 #%% Get rows from ciq.wrds_gvkey table for matching company IDs
 company_id_list = ', '.join(map(str, unique_company_ids))
-query = f"SELECT companyid, gvkey FROM ciq.wrds_gvkey WHERE companyid IN ({company_id_list})"
+query = f"SELECT DISTINCT companyid, gvkey FROM ciq.wrds_gvkey WHERE companyid IN ({company_id_list})"
 gvkey_data = conn.raw_sql(query)
 print(f"Matched {len(gvkey_data)} company IDs with gvkeys from WRDS database")
+
+
+#%% Print number of duplicate pairs, duplicate gvkeys, and duplicate company IDs
+duplicate_pairs = gvkey_data.duplicated(subset=["companyid", "gvkey"], keep=False)
+num_duplicate_pairs = duplicate_pairs.sum()
+print(f"Number of duplicate (companyid, gvkey) pairs: {num_duplicate_pairs}")
+
+assert num_duplicate_pairs == 0, f"Found {num_duplicate_pairs} duplicate (companyid, gvkey) pairs in gvkey_data"
+
+duplicate_gvkeys = gvkey_data.duplicated(subset=["gvkey"], keep=False)
+num_duplicate_gvkeys = duplicate_gvkeys.sum()
+print(f"Number of duplicate gvkeys: {num_duplicate_gvkeys}")
+
+duplicate_company_ids = gvkey_data.duplicated(subset=["companyid"], keep=False)
+num_duplicate_company_ids = duplicate_company_ids.sum()
+print(f"Number of duplicate company IDs: {num_duplicate_company_ids}")
 
 
 #%% Save gvkey_table.feather and gvkey_list.txt one id per row
