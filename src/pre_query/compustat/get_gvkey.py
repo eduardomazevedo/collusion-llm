@@ -42,6 +42,16 @@ duplicate_company_ids = gvkey_data.duplicated(subset=["companyid"], keep=False)
 num_duplicate_company_ids = duplicate_company_ids.sum()
 print(f"Number of duplicate company IDs: {num_duplicate_company_ids}")
 
+# Print how many companyid have multiple gvkey
+companyid_counts = gvkey_data.groupby("companyid")["gvkey"].nunique()
+num_companyid_multiple_gvkey = (companyid_counts > 1).sum()
+print(f"Number of company IDs with multiple gvkeys: {num_companyid_multiple_gvkey}")
+
+# Print how many gvkey have multiple companyid
+gvkey_counts = gvkey_data.groupby("gvkey")["companyid"].nunique()
+num_gvkey_multiple_companyid = (gvkey_counts > 1).sum()
+print(f"Number of gvkeys with multiple company IDs: {num_gvkey_multiple_companyid}")
+
 
 #%% Save gvkey_table.feather and gvkey_list.txt one id per row
 gvkey_table_path = "data/intermediaries/gvkey_table.feather"
