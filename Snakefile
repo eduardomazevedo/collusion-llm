@@ -13,6 +13,7 @@ rule all:
         "data/outputs/top_transcript_data_for_joe.csv",
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
+        "data/yaml/benchmarking.yaml",
         # LLM flag outputs
         "data/outputs/tables/market_value_deciles_llm.csv",
         "data/outputs/tables/sector_tag_rates_llm.csv", 
@@ -34,6 +35,8 @@ rule all:
         "data/outputs/figures/market_value_deciles_human_audit_1x1.png",
         "data/outputs/figures/sector_tag_rates_human_audit_1x1.png",
         "data/outputs/figures/year_tag_rates_human_audit_1x1.png",
+        # Benchmarking outputs
+        "data/outputs/tables/benchmarking_combined.csv",
         "data/outputs/tables/summary_stats.csv",
         "data/constants/.populated"
 
@@ -179,6 +182,26 @@ rule correlation_analysis:
     shell:
         "python src/post_query/analysis/correlation_analysis.py"
 
+rule benchmarking_analysis:
+    """
+    Evaluate LLM performance on human-rated benchmark datasets.
+    Compares different approaches (single query, repeated queries, follow-up validation)
+    and different models on Joe's ratings, ACL's ratings, and human audit data.
+    Outputs combined table with two panels and YAML statistics.
+    """
+    input:
+        "data/datasets/queries.sqlite",
+        "data/datasets/human_ratings.csv",
+        "assets/human_audit_top_transcripts.csv"
+    output:
+        combined_csv="data/outputs/tables/benchmarking_combined.csv",
+        combined_tex="data/outputs/tables/benchmarking_combined.tex",
+        approach_csv="data/outputs/tables/approach_comparison.csv",
+        audit_csv="data/outputs/tables/human_audit_validation.csv",
+        yaml="data/yaml/benchmarking.yaml"
+    shell:
+        "python src/post_query/analysis/benchmarking_analysis.py"
+
 rule summary_stats_table:
     """
     Generate publication-ready summary statistics table with two panels:
@@ -202,7 +225,8 @@ rule populate_constants:
     """
     input:
         "data/yaml/summary_stats.yaml",
-        "data/yaml/correlates_collusive_communication.yaml"
+        "data/yaml/correlates_collusive_communication.yaml",
+        "data/yaml/benchmarking.yaml"
     output:
         "data/constants/.populated"
     shell:

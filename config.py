@@ -34,7 +34,7 @@ CACHE_DIR = os.path.join(DATA_DIR, "cache")
 BENCHMARKING_PATH = os.path.join(DATA_DIR, "benchmarking", "comprehensive_metrics.csv")
 
 # Thresholds
-JOE_SCORE_THRESHOLD = 75
+JOE_SCORE_THRESHOLD = 50  # Lowered from 75 to capture more of Joe's conservative ratings (5 transcripts vs 1)
 LLM_SCORE_THRESHOLD = 75
 ANALYSIS_SCORE_THRESHOLD = 75
 
