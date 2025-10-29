@@ -27,6 +27,11 @@ yaml_dir.mkdir(parents=True, exist_ok=True)
 df = pd.read_feather("data/datasets/main_analysis_dataset.feather")
 print(f"Loaded main analysis dataset with {len(df):,} transcripts")
 
+# Load human ratings to break out benchmark subsets
+human_ratings_df = pd.read_csv(config.HUMAN_RATINGS_PATH)
+benchmark_sample_joe_count = int(human_ratings_df['joe_score'].notna().sum())
+benchmark_sample_aryal_count = int(human_ratings_df['acl_manual_flag'].notna().sum())
+
 #%%
 # === BASIC TRANSCRIPT STATISTICS ===
 n_transcripts = len(df)
@@ -185,6 +190,8 @@ summary_stats = {
         'llm_tagged_count': int(llm_tagged),
         'llm_tag_rate_pct': float(llm_tag_rate),
         'benchmark_sample_count': int(benchmark_sample),
+        'benchmark_sample_joe_count': int(benchmark_sample_joe_count),
+        'benchmark_sample_aryal_count': int(benchmark_sample_aryal_count),
         'benchmark_sample_rate_pct': float(benchmark_rate),
         'human_benchmark_tagged_count': int(human_tagged_benchmark),
         'human_benchmark_rate_pct': float(human_benchmark_rate),
