@@ -25,6 +25,9 @@ You’re an expert in detecting subtle collusive intent in company earnings call
 
 With the prompt finalized, we processed the complete corpus of transcripts through OpenAI's API using their batch processing infrastructure. This approach enabled efficient parallel processing while respecting API rate limits. The processing took several days, but could run continuously in the background without manual intervention. Once the processing finished, we had the LLM response strings stored in a large database, structured such that we could easily clean them up and extract the score, reasoning and set of excerpts for analysis.
 
+Throughout the process of refining the prompt, we use LLM versions as released by OpenAI (primarily 
+\textit{gpt-4o-mini}), so we do not train a model specifically for the task at hand. However, OpenAI do provide options to request and pay for a fine-tuned version of one of their models, either based on a sample of input-output pairs, or on a set of more/less preferred output versions for every given input provided in the training sample. The goal of choosing eithe option is to get the general-purpose LLM to produce output that is hopefully more relevant and precise to a specific goal, but is not guaranteed to do so. Moreover, OpenAI recognize in their related documentation that for data extraction tasks, extensive prompt engineering is the first step to pursue, and only upon seeing no improvement does it become potentially helpful to opt for fine-tuning services. They also suggest that users should expect only modest performance improvements from fine-tuning.
+
 % Possible things to add:
 % - something about the compustat data(?)
 % - prompt appendix that talks breifly about why certain things work for making a good prompt, vs some things that don't, also maybe zero-shot vs few-shot
