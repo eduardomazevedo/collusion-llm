@@ -28,7 +28,7 @@
 \node (full)   [right=5.6cm of bench] {Apply best model to\\Full transcript dataset\\(Capital IQ)\\\small(\textit{N = \data{summary_stats/dataset_overview/total_transcripts_int}})};
 \node (flag)   [below=of full] {LLM-flagged transcripts\\score $\ge 75$\\\small(\textit{N = \data{summary_stats/tagging_performance/llm_tagged_count_int}})};
 \node (valid)  [below=of flag] {LLM-validated transcripts\\11-query avg $\ge 75$\\\small(\textit{N = \data{summary_stats/tagging_performance/llm_validation_tagged_int}})};
-\node (audit)  [below=of valid] {Human-audited\\LLM-flagged transcripts\\\small(\textit{N = \data{summary_stats/tagging_performance/human_audit_sample_count_int}})};
+\node (audit)  [below=of valid] {Human-audited\\LLM-validated transcripts\\\small(\textit{N = \data{summary_stats/tagging_performance/human_audit_sample_count_int}})};
 
 % -----------------------------------------------------
 % Arrows within columns and between stages
