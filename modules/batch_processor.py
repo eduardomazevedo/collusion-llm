@@ -26,19 +26,81 @@ class CustomSchemaGenerator(OpenAiResponseFormatGenerator):
 class BaseModel(ToolBaseModel):
     _schema_generator = CustomSchemaGenerator
 
-class CapacityScoreReasoning(BaseModel):
+class Score(BaseModel):
+    score: int
+
+
+class ScoreReasoning(BaseModel):
     score: int
     reasoning: str
 
-class ScoreReasonExcerpts(BaseModel):
+
+class ScoreReasoningExcerpts(BaseModel):
     score: int
     reasoning: str
     excerpts: list[str]
 
+
+class SignalReasoning(BaseModel):
+    signal: str
+    reasoning: str
+
+
+class SignalScoreReasoning(BaseModel):
+    signal: str
+    score: int
+    reasoning: str
+
+
+class FlagReasoning(BaseModel):
+    signal: bool
+    reasoning: str
+
+
+class FlagScoreReasoning(BaseModel):
+    signal: bool
+    score: int
+    reasoning: str
+
+
+class IndicatorExcerpts(BaseModel):
+    indicator: bool
+    excerpts: list[str]
+
+
+class IndicatorExcerptsScore(BaseModel):
+    indicator: bool
+    excerpts: list[str]
+    severity_score: int
+
+
+class OverallSignalSeverity(BaseModel):
+    overall_indicator: bool
+    signal: str
+    excerpts: list[str]
+    severity_score: int
+    reasoning: str
+
+
+class OverallIndicatorsConfidence(BaseModel):
+    overall_indicator: bool
+    indicators: list[str]
+    confidence_score: int
+    excerpts: list[str]
+
 # Map response format names to Pydantic models
 RESPONSE_FORMAT_CLASSES = {
-    "CapacityScoreReasoning": CapacityScoreReasoning,
-    "ScoreReasonExcerpts": ScoreReasonExcerpts
+    "Score": Score,
+    "ScoreReasoning": ScoreReasoning,
+    "ScoreReasoningExcerpts": ScoreReasoningExcerpts,
+    "SignalReasoning": SignalReasoning,
+    "SignalScoreReasoning": SignalScoreReasoning,
+    "FlagReasoning": FlagReasoning,
+    "FlagScoreReasoning": FlagScoreReasoning,
+    "IndicatorExcerpts": IndicatorExcerpts,
+    "IndicatorExcerptsScore": IndicatorExcerptsScore,
+    "OverallSignalSeverity": OverallSignalSeverity,
+    "OverallIndicatorsConfidence": OverallIndicatorsConfidence,
 }
 
 class BatchProcessor:

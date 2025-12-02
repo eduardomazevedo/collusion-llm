@@ -281,94 +281,81 @@ class LLMQuery:
         return results
 
 
-### Pydantic Response Format Models
-class ResponseBinary(BaseModel):
+### Pydantic Response Format Models (consolidated)
+class Score(BaseModel):
+    score: int
+
+
+class ScoreReasoning(BaseModel):
+    score: int
+    reasoning: str
+
+
+class ScoreReasoningExcerpts(BaseModel):
+    score: int
+    reasoning: str
+    excerpts: list[str]
+
+
+class SignalReasoning(BaseModel):
+    signal: str
+    reasoning: str
+
+
+class SignalScoreReasoning(BaseModel):
+    signal: str
+    score: int
+    reasoning: str
+
+
+class FlagReasoning(BaseModel):
+    signal: bool
+    reasoning: str
+
+
+class FlagScoreReasoning(BaseModel):
+    signal: bool
+    score: int
+    reasoning: str
+
+
+class IndicatorExcerpts(BaseModel):
     indicator: bool
     excerpts: list[str]
 
-class ResponseScore(BaseModel):
+
+class IndicatorExcerptsScore(BaseModel):
     indicator: bool
     excerpts: list[str]
     severity_score: int
 
-class ResponseSignals(BaseModel):
+
+class OverallSignalSeverity(BaseModel):
     overall_indicator: bool
     signal: str
     excerpts: list[str]
     severity_score: int
     reasoning: str
 
-class ResponseIndicators2(BaseModel):
+
+class OverallIndicatorsConfidence(BaseModel):
     overall_indicator: bool
     indicators: list[str]
     confidence_score: int
     excerpts: list[str]
 
-class SimpleScore(BaseModel):
-    score: int
-    reasoning: str
-
-class SimpleSignal(BaseModel):
-    signal: str
-    reasoning: str
-
-class SignalScore(BaseModel):
-    signal: str
-    score: int
-    reasoning: str
-
-class SimplePrice(BaseModel):
-    score: int
-    reasoning: str
-
-class LeadPrice(BaseModel):
-    signal: bool
-    reasoning: str
-
-class LeadPriceCert(BaseModel):
-    signal: bool
-    reasoning: str
-    score: int
-
-class SimplePriceScore(BaseModel):
-    score: int
-
-class CapacityScore(BaseModel):
-    score: int
-
-class CapacityScoreReasoning(BaseModel):
-    score: int
-    reasoning: str
-
-class PriceCapacity(BaseModel):
-    score: int
-    reasoning: str
-
-class ScoreReasonExcerpts(BaseModel):
-    score: int
-    reasoning: str
-    excerpts: list[str]
-
-class SimpleExcerptAnalyzer(BaseModel):
-    score: int
 
 # Map response format names to Pydantic models
 RESPONSE_FORMAT_CLASSES = {
-    "SimpleExcerptAnalyzer": SimpleExcerptAnalyzer,
-    "ResponseBinary": ResponseBinary,
-    "ResponseScore": ResponseScore,
-    "ResponseSignals": ResponseSignals,
-    "ResponseIndicators2": ResponseIndicators2,
-    "SimpleScore": SimpleScore,
-    "SimpleSignal": SimpleSignal,
-    "SignalScore": SignalScore,
-    "SimplePrice": SimplePrice,
-    "LeadPrice": LeadPrice,
-    "LeadPriceCert": LeadPriceCert,
-    "SimplePriceScore": SimplePriceScore,
-    "CapacityScore": CapacityScore,
-    "CapacityScoreReasoning": CapacityScoreReasoning,
-    "PriceCapacity": PriceCapacity,
-    "ScoreReasonExcerpts": ScoreReasonExcerpts,
-    "SimpleExcerptAnalyzer": SimpleExcerptAnalyzer,
+    "Score": Score,
+    "ScoreReasoning": ScoreReasoning,
+    "ScoreReasoningExcerpts": ScoreReasoningExcerpts,
+    "SignalReasoning": SignalReasoning,
+    "SignalScoreReasoning": SignalScoreReasoning,
+    "FlagReasoning": FlagReasoning,
+    "FlagScoreReasoning": FlagScoreReasoning,
+    "IndicatorExcerpts": IndicatorExcerpts,
+    "IndicatorExcerptsScore": IndicatorExcerptsScore,
+    "OverallSignalSeverity": OverallSignalSeverity,
+    "OverallIndicatorsConfidence": OverallIndicatorsConfidence,
 }
