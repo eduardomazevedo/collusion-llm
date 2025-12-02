@@ -126,7 +126,7 @@
         "system_message": "Analyze the following earnings call transcript. Find any statements where the company suggests coordinating on increasing prices with competitors. If there is evidence of this behavior, provide score from 0 to 100 to indicate the severity of the behavior as follows: 0: No indication of coordination on pricing. 20: Very weak evidence; statement could be interpreted as coincidental or unrelated. 40: Weak evidence; statement is ambiguous and could have alternative explanations. 60: Moderate evidence; statement suggests coordination but lacks direct or explicit language. 80: Strong evidence; statement strongly implies coordination on pricing. 100: Very strong evidence; clear and explicit language about coordinating on price increases. Also provide a brief reasoning for the score you chose.",
         "response_format": "ScoreReasoning"
     },
-    "SimplePrice": {
+    "SimplePriceV1": {
         "system_message": "Analyze the following earnings call transcript. Find any statements where the company suggests coordinating on increasing prices with competitors. If there is evidence of this behavior, provide score from 0 to 100 to indicate the severity of the behavior. Also provide a brief reasoning for the score you chose.",
         "response_format": "ScoreReasoning"
     },
@@ -139,7 +139,7 @@
         "response_format": "ScoreReasoning"
     },
     "LeadPriceCertV1": {
-        "system_message": "Based on the following earnings call transcript, find out whether the company is signaling that they will raise prices and that competitors should also raise prices. Answer with the signal as True or False, and brief reasoning for your answer. Also provide a score from 0 to 100 indicating how certain you are about the signal you provided.",
+        "system_message": "Based on the following earnings call transcript, find out whether the company is signaling that they will raise prices and that competitors should also raise prices. Answer with the signal flag as True or False, and brief reasoning for your answer. Also provide a score from 0 to 100 indicating how certain you are about the signal you provided.",
         "response_format": "FlagScoreReasoning"
     },
     "LeadPriceV1": {
@@ -150,21 +150,25 @@
         "system_message": "Analyze this earnings call transcript of a public company and identify signs of potential collusive intent. In general, collusive actions involve at least one of the following outcomes: - increasing prices - limiting supply A weak collusion signal can be: - company states or implies pursuing one of the actions is desirable - company states or implies competitors pursuing one of the actions is desirable A strong collusion signal can be: - company mentions pursuing one of the actions AND that other companies should follow - company mentions IF other companies pursue one of the actions, this company will ALSO pursue the action Notes for analysis: - Collusion intent is often implied, so it is important to look for any variations of language that may indicate the collusive actions or signals. - Discussions of normal industry dynamics, such as price matching, competitive responses to market conditions, or general observations about the market, do not necessarily indicate collusion. Pay close attention to whether the company explicitly suggests coordinated actions or conditions its actions on competitors’ behavior. Provide the following information: - collusion signal (choose only between none/weak/strong) - a score from 0 to 100 indicating the extent of collusive intent - a very brief reasoning for the score you chose",
         "response_format": "SignalScoreReasoning"
     },
-    "SimpleSignal": {
+    "SimpleSignalV1": {
         "system_message": "Analyze this earnings call transcript of a public company and identify signs of potential collusive intent. In general, collusive actions involve at least one of the following outcomes: - increasing prices - limiting supply A weak collusion signal can be: - company states or implies pursuing one of the actions is desirable - company states or implies competitors pursuing one of the actions is desirable A strong collusion signal can be: - company mentions pursuing one of the actions AND that other companies should follow - company mentions IF other companies pursue one of the actions, this company will ALSO pursue the action Notes for analysis: - Collusion intent is often implied, so it is important to look for any variations of language that may indicate the collusive actions or signals. - Discussions of normal industry dynamics, such as price matching, competitive responses to market conditions, or general observations about the market, do not necessarily indicate collusion. Pay close attention to whether the company explicitly suggests coordinated actions or conditions its actions on competitors’ behavior. Provide the following information: - collusion signal (choose only between none/weak/strong) - a very brief reasoning for the score you chose",
         "response_format": "SignalReasoning"
     },
-    "SimpleScore": {
+    "SimpleFlagScoreV1": {
+        "system_message": "Analyze the following earnings call transcript and provide a boolean flag (True or False) indicating whether the company shows signs of collusive intent and rate on a scale of 0 to 100 the extent to which the company shows signs of collusive intent. Also provide a brief reasoning for the flag and score.",
+        "response_format": "FlagScoreReasoning"
+    },
+    "SimpleFlagV1": {
+        "system_message": "Analyze the following earnings call transcript and provide a boolean flag (True or False) indicating whether the company shows signs of collusive intent. Also provide a brief reasoning for your flag.",
+        "response_format": "FlagReasoning"
+    },
+    "SimpleScoreV1": {
         "system_message": "Analyze the following earnings call transcript and rate on a scale of 0 to 100 the extent to which the company shows signs of collusive intent. Also provide a brief reasoning for your score.",
         "response_format": "ScoreReasoning"
     },
     "binary": {
         "system_message": "Analyze the following earnings call transcript for signs of collusion or invitations to collude. Identify statements where the company’s actions depend on competitors’ behavior, suggestions or encouragements to competitors regarding pricing or supply, or any indications of coordinated behavior. Respond whether there is evidence of collusion, and if so give the relevant excerpts.",
         "response_format": "IndicatorExcerpts"
-    },
-    "score": {
-        "system_message": "",
-        "response_format": "IndicatorExcerptsScore"
     },
     "signals": {
         "system_message": "Analyze this earnings call transcript of a public company and identify signs of potential collusive intent. In general, collusive actions involve at least one of the following outcomes: - increasing prices - limiting supply - other more particular coordinated profit-increasing actions A weak collusion signal can be: - company states or implies pursuing one of the actions is desirable - company states or implies competitors pursuing one of the actions is desirable A strong collusion signal can be: - company mentions pursuing one of the actions AND that other companies should follow - company mentions IF other companies pursue one of the actions, this company will ALSO pursue the action Notes: Collusion intent is often implied, so it is important to look for any variations of language that may indicate the collusive actions or signals. Discussions of normal industry dynamics, such as price matching, competitive responses to market conditions, or general observations about the market, do not necessarily indicate collusion. Pay close attention to whether the company explicitly suggests coordinated actions or conditions its actions on competitors' behavior. Provide the following information: - overall collusion intent indicator (boolean) - collusion signal (none/weak/strong) - excerpts that show the most relevant examples of collusive intent - a severity score from 0 to 5 based on the following scale: 0: No indications of collusive intent in the transcript. 1: Statements that are largely ambiguous but are related to one of the collusive actions listed earlier. 2: Subtle or weak signals suggesting possible collusive behavior intent, though not very clear. 3: Clearer references to collusive actions or multiple weak signals about any of the potentially collusive outcomes. 4: Strong signals, including clear intention to coordinate with competitors. 5: Repeated or clear endorsements of coordinated action to achieve one of the collusive outcomes. - a very brief reasoning for the score you chose",

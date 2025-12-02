@@ -68,12 +68,6 @@ class IndicatorExcerpts(BaseModel):
     excerpts: list[str]
 
 
-class IndicatorExcerptsScore(BaseModel):
-    indicator: bool
-    excerpts: list[str]
-    severity_score: int
-
-
 class OverallSignalSeverity(BaseModel):
     overall_indicator: bool
     signal: str
@@ -98,7 +92,6 @@ RESPONSE_FORMAT_CLASSES = {
     "FlagReasoning": FlagReasoning,
     "FlagScoreReasoning": FlagScoreReasoning,
     "IndicatorExcerpts": IndicatorExcerpts,
-    "IndicatorExcerptsScore": IndicatorExcerptsScore,
     "OverallSignalSeverity": OverallSignalSeverity,
     "OverallIndicatorsConfidence": OverallIndicatorsConfidence,
 }
