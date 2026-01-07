@@ -19,6 +19,7 @@ import re
 from statsmodels.stats.proportion import proportion_confint
 from pathlib import Path
 import yaml
+import os
 
 #%%
 # Paths
@@ -48,13 +49,87 @@ def save_figure(name, description, fig=None):
         f.write(description)
     plt.close(fig)
 
-def save_table(df, name, description):
+def save_table(
+    df,
+    name,
+    description,
+    latex_column_rename=None,
+    escape=True,
+    latex_cell_transform=None
+):
     csv_path = table_dir / f"{name}.csv"
     tex_path = table_dir / f"{name}.tex"
     df.to_csv(csv_path, index=False)
-    df.to_latex(tex_path, index=False, float_format="%.2f", longtable=True)
+    if latex_cell_transform:
+        latex_df = df.copy()
+        for col, fn in latex_cell_transform.items():
+            if col in latex_df.columns:
+                latex_df[col] = latex_df[col].map(fn)
+    else:
+        latex_df = df.copy()
+    if latex_column_rename:
+        latex_df = latex_df.rename(columns=latex_column_rename)
+    latex_df.to_latex(
+        tex_path,
+        index=False,
+        float_format="%.2f",
+        longtable=True,
+        escape=escape
+    )
     with open(table_dir / f"{name}.txt", "w") as f:
         f.write(description)
+
+def save_score_histogram(scores, name, description, bins=20, threshold=None):
+    if scores.empty:
+        print(f"Skipping histogram {name}: no scores available.")
+        return
+    fig, ax = plt.subplots()
+    ax.hist(scores, bins=bins, color="steelblue", edgecolor="white")
+    if threshold is not None:
+        ax.axvline(threshold, color="red", linestyle="--", linewidth=1, alpha=0.7)
+    ax.set_xlabel("Score")
+    ax.set_ylabel("Count")
+    plt.tight_layout()
+    save_figure(name, description, fig)
+
+def format_bin_label(start, end, right_inclusive, decimals=None):
+    if decimals is None:
+        if np.isclose(start, round(start)) and np.isclose(end, round(end)):
+            decimals = 0
+        else:
+            decimals = 2
+    fmt = f"{{:.{decimals}f}}" if decimals > 0 else "{:.0f}"
+    left = fmt.format(start)
+    right = fmt.format(end)
+    closing = "]" if right_inclusive else ")"
+    return f"[{left}, {right}{closing}"
+
+def make_histogram_table(scores, bins):
+    counts, bin_edges = np.histogram(scores, bins=bins)
+    if np.allclose(bin_edges, np.round(bin_edges)):
+        decimals = 0
+    else:
+        decimals = 2
+    labels = []
+    for i in range(len(counts)):
+        labels.append(format_bin_label(
+            bin_edges[i],
+            bin_edges[i + 1],
+            right_inclusive=(i == len(counts) - 1),
+            decimals=decimals
+        ))
+    table_df = pd.DataFrame({
+        'bin': labels,
+        'count': counts.astype(int)
+    })
+    return table_df
+
+def make_one_point_bins(scores):
+    if scores.empty:
+        return np.array([])
+    min_score = int(np.floor(scores.min()))
+    max_score = int(np.ceil(scores.max()))
+    return np.arange(min_score, max_score + 2, 1)
 
 def analyze_flag_by_market_value(df, flag_col, flag_name):
     """Generate market value decile analysis for a flag variable"""
@@ -216,6 +291,13 @@ def analyze_flag_by_year(df, flag_col, flag_name):
 data_path = Path("data/datasets/main_analysis_dataset.feather")
 df = pd.read_feather(data_path)
 
+top_transcripts_path = os.path.join(config.DATA_DIR, "datasets", "top_transcripts_data.csv")
+top_transcripts_df = pd.read_csv(top_transcripts_path)
+print(f"Loaded top transcripts data with {len(top_transcripts_df):,} transcripts")
+
+human_audit_path = os.path.join("assets", "human_audit_top_transcripts.csv")
+human_audit_df = pd.read_csv(human_audit_path)
+
 # Create clean flag variables (treat NAs as False)
 df['llm_flag_clean'] = df['llm_flag']  # Already clean
 df['llm_validation_flag_clean'] = df['llm_validation_flag'].fillna(False).astype(bool)
@@ -291,6 +373,106 @@ for flag_config in flag_configs:
 # Save summary statistics
 with open(yaml_dir / "correlates_collusive_communication.yaml", "w") as f:
     yaml.dump(summary_stats, f)
+
+#%%
+# LLM score histograms for flagged and validated sets
+flagged_scores = top_transcripts_df['original_score'].dropna()
+validated_scores = top_transcripts_df.loc[
+    top_transcripts_df['mean_score_ten_repeats'].notna() &
+    (top_transcripts_df['mean_score_ten_repeats'] >= config.LLM_SCORE_THRESHOLD),
+    'mean_score_ten_repeats'
+].dropna()
+
+print(f"Creating LLM-flagged score histogram (n={len(flagged_scores):,})...")
+save_score_histogram(
+    flagged_scores,
+    "llm_flagged_score_histogram",
+    "Histogram of LLM-flagged scores (original score, score >= threshold). Produced by correlation_analysis.py",
+    threshold=config.LLM_SCORE_THRESHOLD
+)
+
+print(f"Creating LLM-validated score histogram (n={len(validated_scores):,})...")
+save_score_histogram(
+    validated_scores,
+    "llm_validated_score_histogram",
+    "Histogram of LLM-validated scores (mean of first 10 repeats, first 11 queries). Produced by correlation_analysis.py",
+    threshold=config.LLM_SCORE_THRESHOLD
+)
+
+# One-point bin tables for flagged and validated scores
+bin_header_map = {
+    'bin': 'Bin',
+    'count': 'Count'
+}
+latex_bin_transform = {'bin': lambda s: f"{{{s}}}"}
+flagged_bins = make_one_point_bins(flagged_scores)
+if len(flagged_bins) > 0:
+    flagged_table = make_histogram_table(flagged_scores, bins=flagged_bins)
+    save_table(
+        flagged_table,
+        "llm_flagged_score_bins_1pt",
+        "One-point score bin counts for LLM-flagged scores. Produced by correlation_analysis.py",
+        latex_column_rename=bin_header_map,
+        escape=False,
+        latex_cell_transform=latex_bin_transform
+    )
+
+validated_bins = make_one_point_bins(validated_scores)
+if len(validated_bins) > 0:
+    validated_table = make_histogram_table(validated_scores, bins=validated_bins)
+    save_table(
+        validated_table,
+        "llm_validated_score_bins_1pt",
+        "One-point score bin counts for LLM-validated scores. Produced by correlation_analysis.py",
+        latex_column_rename=bin_header_map,
+        escape=False,
+        latex_cell_transform=latex_bin_transform
+    )
+
+# Human audit sample: LLM-validated score histograms and tables
+human_audit_scores = top_transcripts_df.loc[
+    top_transcripts_df['transcriptid'].isin(human_audit_df['transcript_id']),
+    'mean_score_ten_repeats'
+].dropna()
+
+if human_audit_scores.empty:
+    print("Skipping human audit LLM-validated histograms: no scores available.")
+else:
+    print(f"Creating human audit LLM-validated score histogram (10 bins) (n={len(human_audit_scores):,})...")
+    save_score_histogram(
+        human_audit_scores,
+        "human_audit_llm_validated_score_histogram_10bins",
+        "Histogram of LLM-validated scores for the human audit sample (10 bins). Produced by correlation_analysis.py",
+        bins=10,
+        threshold=config.LLM_SCORE_THRESHOLD
+    )
+    human_audit_table_10 = make_histogram_table(human_audit_scores, bins=10)
+    save_table(
+        human_audit_table_10,
+        "human_audit_llm_validated_score_bins_10",
+        "Ten-bin score counts for LLM-validated scores in the human audit sample. Produced by correlation_analysis.py",
+        latex_column_rename=bin_header_map,
+        escape=False,
+        latex_cell_transform=latex_bin_transform
+    )
+
+    print(f"Creating human audit LLM-validated score histogram (20 bins) (n={len(human_audit_scores):,})...")
+    save_score_histogram(
+        human_audit_scores,
+        "human_audit_llm_validated_score_histogram_20bins",
+        "Histogram of LLM-validated scores for the human audit sample (20 bins). Produced by correlation_analysis.py",
+        bins=20,
+        threshold=config.LLM_SCORE_THRESHOLD
+    )
+    human_audit_table_20 = make_histogram_table(human_audit_scores, bins=20)
+    save_table(
+        human_audit_table_20,
+        "human_audit_llm_validated_score_bins_20",
+        "Twenty-bin score counts for LLM-validated scores in the human audit sample. Produced by correlation_analysis.py",
+        latex_column_rename=bin_header_map,
+        escape=False,
+        latex_cell_transform=latex_bin_transform
+    )
 
 #%%
 # Generate analysis for each flag variable

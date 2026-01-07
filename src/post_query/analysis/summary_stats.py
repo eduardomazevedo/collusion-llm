@@ -16,6 +16,7 @@ import numpy as np
 import yaml
 from pathlib import Path
 from datetime import datetime
+import os
 
 #%%
 # Setup paths
@@ -31,6 +32,15 @@ print(f"Loaded main analysis dataset with {len(df):,} transcripts")
 human_ratings_df = pd.read_csv(config.HUMAN_RATINGS_PATH)
 benchmark_sample_joe_count = int(human_ratings_df['joe_score'].notna().sum())
 benchmark_sample_aryal_count = int(human_ratings_df['acl_manual_flag'].notna().sum())
+
+# Load top transcripts data for LLM score summaries
+top_transcripts_path = os.path.join(config.DATA_DIR, "datasets", "top_transcripts_data.csv")
+top_transcripts_data_df = pd.read_csv(top_transcripts_path)
+print(f"Loaded top transcripts data with {len(top_transcripts_data_df):,} transcripts")
+
+# Load human audit sample for LLM-validated score summaries
+human_audit_path = os.path.join("assets", "human_audit_top_transcripts.csv")
+human_audit_df = pd.read_csv(human_audit_path)
 
 #%%
 # === BASIC TRANSCRIPT STATISTICS ===
@@ -107,6 +117,27 @@ human_audit_sample = df['human_audit_sample'].sum()
 human_audit_available = df['human_audit_flag'].notna().sum()
 human_audit_tagged = df['human_audit_flag'].sum()
 human_audit_rate = human_audit_tagged / human_audit_available * 100 if human_audit_available > 0 else 0
+
+# LLM score summaries for flagged and validated sets
+flagged_scores = top_transcripts_data_df['original_score'].dropna()
+validated_scores = top_transcripts_data_df.loc[
+    top_transcripts_data_df['mean_score_ten_repeats'].notna() &
+    (top_transcripts_data_df['mean_score_ten_repeats'] >= config.LLM_SCORE_THRESHOLD),
+    'mean_score_ten_repeats'
+].dropna()
+
+# LLM-validated scores for the human audit sample
+human_audit_scores = top_transcripts_data_df.loc[
+    top_transcripts_data_df['transcriptid'].isin(human_audit_df['transcript_id']),
+    'mean_score_ten_repeats'
+].dropna()
+
+flagged_score_mean = float(flagged_scores.mean()) if len(flagged_scores) > 0 else None
+flagged_score_median = float(flagged_scores.median()) if len(flagged_scores) > 0 else None
+validated_score_mean = float(validated_scores.mean()) if len(validated_scores) > 0 else None
+validated_score_median = float(validated_scores.median()) if len(validated_scores) > 0 else None
+human_audit_score_mean = float(human_audit_scores.mean()) if len(human_audit_scores) > 0 else None
+human_audit_score_median = float(human_audit_scores.median()) if len(human_audit_scores) > 0 else None
 
 # Agreement statistics (benchmark sample only)
 benchmark_both_available = benchmark_df[
@@ -206,6 +237,12 @@ summary_stats = {
         'llm_validation_tagged': int(llm_validation_tagged),
         'llm_validation_rate_pct': float(llm_validation_rate),
         'llm_validation_rate_overall_sample_pct': float(llm_validation_rate_overall),
+        'llm_flagged_score_mean': flagged_score_mean,
+        'llm_flagged_score_median': flagged_score_median,
+        'llm_validated_score_mean': validated_score_mean,
+        'llm_validated_score_median': validated_score_median,
+        'human_audit_llm_validated_score_mean': human_audit_score_mean,
+        'human_audit_llm_validated_score_median': human_audit_score_median,
         'human_audit_sample_count': int(human_audit_sample),
         'human_audit_tagged_count': int(human_audit_tagged),
         'human_audit_rate_pct': float(human_audit_rate),
