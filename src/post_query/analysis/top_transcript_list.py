@@ -5,8 +5,9 @@ This script:
 1. Queries the database for only SimpleCapacityV8.1.1 prompts
 2. For each transcriptid, keeps only the smallest query_id (earliest query)
 3. Extracts the "score" field from the JSON response
-4. Keeps only rows with score >= LLM_SCORE_THRESHOLD (from config)
-5. Saves only the transcriptid column to data/top_transcripts.csv
+4. Saves all transcriptids with their original scores to data/intermediaries/original_score.csv
+5. Keeps only rows with score >= LLM_SCORE_THRESHOLD (from config)
+6. Saves only the transcriptid column to data/intermediaries/top_transcripts.csv
 """
 
 import sys
@@ -64,6 +65,12 @@ def extract_top_transcripts():
         
         # Add score column
         df['score'] = scores
+        
+        # Save all transcriptids with their original scores to original_score.csv
+        original_score_path = os.path.join(config.DATA_DIR, "intermediaries", "original_score.csv")
+        os.makedirs(os.path.dirname(original_score_path), exist_ok=True)
+        df[['transcriptid', 'score']].to_csv(original_score_path, index=False)
+        print(f"Saved original scores for all {len(df)} transcripts to: {original_score_path}")
         
         # Filter for score >= LLM_SCORE_THRESHOLD
         df_filtered = df[df['score'] >= config.LLM_SCORE_THRESHOLD].copy()

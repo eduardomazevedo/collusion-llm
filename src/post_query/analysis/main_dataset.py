@@ -33,6 +33,9 @@ Classification variables (our constructions):
     - human_audit_sample: Boolean, whether transcript was audited after LLM validation flagging
     - human_audit_flag: Boolean/NA, whether flagged as collusive in human audit (NA if not audited)
 
+LLM score variables:
+    - original_score: Float/NA, original LLM score from the first query of SimpleCapacityV8.1.1 prompt (NA if no query result)
+
 Capital IQ transcript variables:
     - mostimportantdateutc: Date of the transcript
     - mostimportanttimeutc: Time of the transcript
@@ -69,6 +72,7 @@ import os
 compustat_df = pd.read_feather(os.path.join(config.DATA_DIR, 'datasets', 'company_year_compustat.feather'))
 human_ratings_df = pd.read_csv(config.HUMAN_RATINGS_PATH)
 top_transcripts_data_df = pd.read_csv(os.path.join(config.DATA_DIR, 'datasets', 'top_transcripts_data.csv'))
+original_score_df = pd.read_csv(os.path.join(config.DATA_DIR, 'intermediaries', 'original_score.csv'))
 human_audit_df = pd.read_csv(os.path.join('assets', 'human_audit_top_transcripts.csv'))
 df = pd.read_feather(config.TRANSCRIPT_DETAIL_PATH)
 
@@ -153,6 +157,16 @@ df = df.merge(
 # Set human_audit_flag to NA for transcripts not in human audit sample
 df.loc[~df['human_audit_sample'], 'human_audit_flag'] = pd.NA
 
+#%% Merge original_score
+# Merge original score from the initial LLM run for all transcripts
+df = df.merge(
+    original_score_df[['transcriptid', 'score']],
+    on='transcriptid',
+    how='left'
+)
+# Rename score to original_score for clarity
+df = df.rename(columns={'score': 'original_score'})
+
 
 # %% Merge compustat
 # Create transcript_year from mostimportantdateutc
@@ -183,14 +197,17 @@ core_columns = ['companyid', 'companyname', 'transcriptid', 'keydevid', 'transcr
 # 2. Our constructed classification variables
 classification_columns = ['benchmark_sample', 'benchmark_human_flag', 'llm_flag', 'llm_validation_flag', 'human_audit_sample', 'human_audit_flag']
 
+# 2b. LLM score variables
+llm_score_columns = ['original_score']
+
 # 3. Other Capital IQ transcript variables
-capiq_columns = [col for col in df.columns if col not in core_columns + classification_columns and col not in ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']]
+capiq_columns = [col for col in df.columns if col not in core_columns + classification_columns + llm_score_columns and col not in ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']]
 
 # 4. Compustat variables (the remaining ones after dropping)
 compustat_columns = ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']
 
 # Reorder the dataframe
-column_order = core_columns + classification_columns + capiq_columns + compustat_columns
+column_order = core_columns + classification_columns + llm_score_columns + capiq_columns + compustat_columns
 df = df[column_order]
 
 # Sort the dataframe

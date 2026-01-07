@@ -44,6 +44,9 @@ Boolean flag indicating whether the transcript was included in the human audit s
 ### human_audit_flag
 Boolean flag indicating whether the transcript was flagged as collusive in the human audit process. Boolean type with NA values. True if rated as collusive (T), False if rated as non-collusive (F) or uncertain (U), NA if not in human audit sample.
 
+### original_score
+Original LLM score from the first query of SimpleCapacityV8.1.1 prompt. Float64 type, can contain missing values. Score ranges from 0-100, where higher scores indicate higher likelihood of collusive communication. This is the score from the initial single query before any validation runs or repeats. NA if the transcript was not processed through the LLM query system.
+
 ### mostimportantdateutc
 Date of the most important event associated with the transcript. Object type (date format). Used for temporal analysis and sorting.
 

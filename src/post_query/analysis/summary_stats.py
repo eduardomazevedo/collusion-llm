@@ -150,6 +150,13 @@ benchmark_flagged_odds_ratio = (
     (not_collusive_flagged_prob / (1 - not_collusive_flagged_prob))
 ) if not_collusive_flagged_prob > 0 and not_collusive_flagged_prob < 1 and collusive_flagged_prob < 1 else None
 
+# Original score statistics
+original_score_valid = df['original_score'].dropna()
+original_score_mean = float(original_score_valid.mean()) if len(original_score_valid) > 0 else None
+original_score_std = float(original_score_valid.std()) if len(original_score_valid) > 0 else None
+original_score_zeros = int((original_score_valid == 0).sum()) if len(original_score_valid) > 0 else 0
+original_score_zeros_pct = float((original_score_zeros / len(original_score_valid)) * 100) if len(original_score_valid) > 0 else 0
+
 #%%
 # === CREATE STRUCTURED YAML OUTPUT ===
 summary_stats = {
@@ -173,7 +180,7 @@ summary_stats = {
         'mean_length_seconds': float(mean_audio_seconds),
         'mean_length_description': f"{mean_audio_minutes} minutes {mean_audio_seconds_remainder} seconds",
         'total_audio_hours': float(total_audio_hours),
-        'total_audio_years': float(total_audio_years),
+        'total_audio_years': int(total_audio_years),
         'audio_available_pct': float(df['audiolengthsec'].notna().mean() * 100)
     },
     
@@ -212,7 +219,11 @@ summary_stats = {
         'benchmark_collusive_flagged_pct': float(benchmark_collusive_flagged_pct),
         'benchmark_not_collusive_flagged_count': int(benchmark_not_collusive_flagged_count),
         'benchmark_not_collusive_flagged_pct': float(benchmark_not_collusive_flagged_pct),
-        'benchmark_flagged_odds_ratio': float(benchmark_flagged_odds_ratio) if benchmark_flagged_odds_ratio is not None else None
+        'benchmark_flagged_odds_ratio': float(benchmark_flagged_odds_ratio) if benchmark_flagged_odds_ratio is not None else None,
+        'original_score_mean': original_score_mean,
+        'original_score_std': original_score_std,
+        'original_score_zeros_count': int(original_score_zeros),
+        'original_score_zeros_pct': float(original_score_zeros_pct)
     }
 }
 

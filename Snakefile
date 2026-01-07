@@ -37,7 +37,8 @@ rule all:
         "data/outputs/figures/year_tag_rates_human_audit_1x1.png",
         # Benchmarking outputs
         "data/outputs/tables/benchmarking_combined.csv",
-        "data/outputs/tables/summary_stats.csv",
+        "data/outputs/tables/summary_stats_dataset.csv",
+        "data/outputs/tables/summary_stats_results.csv",
         "data/constants/.populated"
 
 rule download_compustat_us:
@@ -92,11 +93,13 @@ rule create_top_transcripts:
     Extract top transcript list from queries database.
     Queries SimpleCapacityV8.1.1 prompts, keeps earliest query per transcript,
     filters by LLM_SCORE_THRESHOLD, and saves transcriptids to CSV.
+    Also saves original_score.csv with scores for all transcripts.
     """
     input:
         "data/datasets/queries.sqlite"
     output:
-        "data/intermediaries/top_transcripts.csv"
+        top_transcripts="data/intermediaries/top_transcripts.csv",
+        original_score="data/intermediaries/original_score.csv"
     shell:
         "python src/post_query/analysis/top_transcript_list.py"
 
@@ -105,12 +108,14 @@ rule main_dataset:
     Create the main analysis dataset at the transcript level.
     Combines transcript details, human ratings, LLM flags, and Compustat data.
     Creates binary flags for human and LLM collusion detection and for whether it is in human benchmark sample.
+    Includes original_score from the initial LLM run for all transcripts.
     """
     input:
         transcript_detail="data/datasets/transcript_detail.feather",
         compustat="data/datasets/company_year_compustat.feather",
         human_ratings="data/datasets/human_ratings.csv",
         top_transcripts_data="data/datasets/top_transcripts_data.csv",
+        original_score="data/intermediaries/original_score.csv",
         queries_db="data/datasets/queries.sqlite"
     output:
         "data/datasets/main_analysis_dataset.feather"
@@ -202,21 +207,35 @@ rule benchmarking_analysis:
     shell:
         "python src/post_query/analysis/benchmarking_analysis.py"
 
-rule summary_stats_table:
+rule summary_stats_dataset:
     """
-    Generate publication-ready summary statistics table with two panels:
-    Panel A: Continuous variables (mean, median, min, max, N)
-    Panel B: Boolean classification flags (N, count=TRUE, percent=TRUE)
+    Generate publication-ready summary statistics table for dataset characteristics.
+    Reports mean, median, min, max, N for continuous variables (market value, employees, audio length, transcript year).
     Outputs CSV, LaTeX, and description files for manuscript use.
     """
     input:
         "data/datasets/main_analysis_dataset.feather"
     output:
-        csv="data/outputs/tables/summary_stats.csv",
-        tex="data/outputs/tables/summary_stats.tex",
-        txt="data/outputs/tables/summary_stats.txt"
+        csv="data/outputs/tables/summary_stats_dataset.csv",
+        tex="data/outputs/tables/summary_stats_dataset.tex",
+        txt="data/outputs/tables/summary_stats_dataset.txt"
     shell:
-        "python src/post_query/analysis/summary_stats_table.py"
+        "python src/post_query/analysis/summary_stats_dataset.py"
+
+rule summary_stats_results:
+    """
+    Generate publication-ready summary statistics table for classification results.
+    Reports N, count=TRUE, percent=TRUE for boolean classification flags (LLM flags, validation flags, human audit flags, benchmark flags).
+    Outputs CSV, LaTeX, and description files for manuscript use.
+    """
+    input:
+        "data/datasets/main_analysis_dataset.feather"
+    output:
+        csv="data/outputs/tables/summary_stats_results.csv",
+        tex="data/outputs/tables/summary_stats_results.tex",
+        txt="data/outputs/tables/summary_stats_results.txt"
+    shell:
+        "python src/post_query/analysis/summary_stats_results.py"
 
 rule populate_constants:
     """

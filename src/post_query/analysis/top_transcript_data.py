@@ -16,7 +16,7 @@ Output files:
 
 2. data/datasets/top_transcripts_data.csv - Core dataset for analysis without text fields
    Columns: transcriptid, original_score, mean_score_ten_repeats, mean_score_all_repeats,
-   mean_follow_up_score, n_queries, n_follow_up_queries
+   mean_follow_up_score, n_queries, n_follow_up_queries, scores_ten_repeats
 """
 
 import sys
@@ -123,8 +123,12 @@ def create_top_transcript_data():
         # Mean score of first 11 queries (first + 10 repeats)
         if n_queries >= 11:
             mean_score_ten_repeats = group['score'].iloc[:11].mean()
+            # List of scores from first 11 queries (first + 10 repeats)
+            scores_ten_repeats = group['score'].iloc[:11].tolist()
         else:
             mean_score_ten_repeats = np.nan
+            # List of available scores (fewer than 11)
+            scores_ten_repeats = group['score'].tolist()
             
         # Other fields from first query
         reasoning = group['reasoning'].iloc[0]
@@ -134,6 +138,7 @@ def create_top_transcript_data():
             'original_score': original_score,
             'mean_score_ten_repeats': mean_score_ten_repeats,
             'mean_score_all_repeats': mean_score_all_repeats,
+            'scores_ten_repeats': scores_ten_repeats,
             'reasoning': reasoning,
             'excerpts': excerpts,
             'n_queries': n_queries
@@ -227,7 +232,41 @@ def create_top_transcript_data():
     # Close database connection
     conn.close()
     
-    # Reorder columns
+    # Step 7: Create core dataset version before filtering final_df
+    print("Step 7: Creating core dataset version...")
+    # Create datasets directory if it doesn't exist
+    datasets_dir = os.path.join(config.DATA_DIR, "datasets")
+    os.makedirs(datasets_dir, exist_ok=True)
+    
+    # Select only core variables (drop companyname, mostimportantdateutc, reasoning, excerpts)
+    core_columns = [
+        'transcriptid',
+        'original_score',
+        'mean_score_ten_repeats',
+        'mean_score_all_repeats',
+        'mean_follow_up_score',
+        'n_queries',
+        'n_follow_up_queries',
+        'scores_ten_repeats'
+    ]
+    
+    # Filter to only include columns that exist in the dataframe
+    existing_core_columns = [col for col in core_columns if col in final_df.columns]
+    core_df = final_df[existing_core_columns].copy()
+    
+    # Convert scores_ten_repeats list to JSON string for CSV storage
+    if 'scores_ten_repeats' in core_df.columns:
+        core_df['scores_ten_repeats'] = core_df['scores_ten_repeats'].apply(
+            lambda x: json.dumps(x) if isinstance(x, list) else json.dumps([])
+        )
+    
+    # Save core dataset
+    core_output_path = os.path.join(datasets_dir, "top_transcripts_data.csv")
+    core_df.to_csv(core_output_path, index=False)
+    print(f"Successfully created {core_output_path}")
+    
+    # Step 8: Reorder columns for Joe CSV (exclude scores_ten_repeats)
+    print("Step 8: Saving full dataset for Joe...")
     column_order = [
         'transcriptid',
         'companyname',
@@ -246,39 +285,13 @@ def create_top_transcript_data():
     existing_columns = [col for col in column_order if col in final_df.columns]
     final_df = final_df[existing_columns]
     
-    # Step 7: Save to CSV
-    print("Step 7: Saving to CSV...")
+    # Save to CSV
     # Create outputs directory if it doesn't exist
     os.makedirs(config.OUTPUTS_DIR, exist_ok=True)
     output_path = os.path.join(config.OUTPUTS_DIR, "top_transcript_data_for_joe.csv")
     final_df.to_csv(output_path, index=False)
     
     print(f"Successfully created {output_path}")
-    
-    # Step 8: Save core dataset version without merged variables and text fields
-    print("Step 8: Saving core dataset version...")
-    # Create datasets directory if it doesn't exist
-    datasets_dir = os.path.join(config.DATA_DIR, "datasets")
-    os.makedirs(datasets_dir, exist_ok=True)
-    
-    # Select only core variables (drop companyname, mostimportantdateutc, reasoning, excerpts)
-    core_columns = [
-        'transcriptid',
-        'original_score',
-        'mean_score_ten_repeats',
-        'mean_score_all_repeats',
-        'mean_follow_up_score',
-        'n_queries',
-        'n_follow_up_queries'
-    ]
-    
-    # Filter to only include columns that exist in the dataframe
-    existing_core_columns = [col for col in core_columns if col in final_df.columns]
-    core_df = final_df[existing_core_columns].copy()
-    
-    # Save core dataset
-    core_output_path = os.path.join(datasets_dir, "top_transcripts_data.csv")
-    core_df.to_csv(core_output_path, index=False)
     
     print(f"Successfully created {core_output_path}")
     print(f"Core dataset has {len(core_df)} rows and {len(core_df.columns)} columns")
