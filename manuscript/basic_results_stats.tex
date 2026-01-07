@@ -1,2 +1,22 @@
 \input{../data/outputs/tables/summary_stats_results.tex}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{../data/outputs/figures/original_score_entire_sample_16x9.pdf}
+\caption{Distribution of original LLM scores for the entire sample. Histogram shows the frequency of scores across all transcripts processed through the initial LLM query. Vertical dashed lines indicate the mean and median scores.}
+\label{fig:original_score_entire_sample}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{../data/outputs/figures/mean_score_validated_samples_16x9.pdf}
+\caption{Distribution of mean LLM scores (10 repetitions) for LLM flagged transcripts. Bars are stacked by validation status: LLM Flagged Only (transcripts flagged but not validated), LLM Validated (passed validation threshold but not human audit), and Audit Validated (confirmed by human audit).}
+\label{fig:mean_score_validated_samples}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{../data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf}
+\caption{Scatter plot comparing original LLM scores to mean scores from 10 repetitions. Points are colored by validation status. The dashed line represents the 45-degree line where original and mean scores are equal. The smooth fit (LOWESS) shows the actual relationship between initial and repeated scores.}
+\label{fig:scatter_scores}
+\end{figure}
