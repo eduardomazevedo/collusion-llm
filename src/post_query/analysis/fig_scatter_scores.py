@@ -1,9 +1,9 @@
 """
-Generate scatter plot comparing original LLM scores to mean scores from 10 repetitions.
+Generate scatter plot comparing original LLM scores to mean scores from 11 queries.
 
 This script creates a scatter plot:
 - X-axis: Original LLM Score (75-100 range, since we only have repetition scores for flagged transcripts)
-- Y-axis: Mean LLM Score (10 Repetitions)
+- Y-axis: Mean LLM Score (11 Queries)
 - Points colored by smallest validation group: LLM Flagged Only, LLM Validated, Audit Validated
 
 Outputs (both 1x1 and 16x9 formats, PNG and PDF):
@@ -73,11 +73,11 @@ def assign_smallest_group(row):
 
 #%%
 # ============================================================================
-# Scatter plot: Original Score vs Mean Score (10 Rep)
+# Scatter plot: Original Score vs Mean Score (11 Queries)
 # ============================================================================
 
 def create_scatter_scores():
-    """Create scatter plot of original score vs mean score from 10 repetitions."""
+    """Create scatter plot of original score vs mean score from 11 queries (original + 10 follow-ups)."""
     # Get LLM flagged observations with both scores
     flagged_df = df_with_scores[df_with_scores['llm_flag'] == True].copy()
     flagged_df = flagged_df[
@@ -133,7 +133,7 @@ def create_scatter_scores():
                'r-', linewidth=2, alpha=0.7, label='Smooth fit')
         
         ax.set_xlabel('Original LLM Score', fontsize=12)
-        ax.set_ylabel('Mean LLM Score (10 Repetitions)', fontsize=12)
+        ax.set_ylabel('Mean LLM Score (11 Queries)', fontsize=12)
         ax.set_xlim(75, 100)
         ax.set_ylim(0, 100)  # Full range for y-axis
         ax.legend(loc='upper right', title='Validation Status')

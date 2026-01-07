@@ -110,7 +110,7 @@ for sample_name, sample_df in samples.items():
     # Original score
     orig_mean, orig_sd, orig_n = calc_stats(sample_df['original_score'])
     
-    # Mean score 10 repetitions (only for LLM flagged samples)
+    # Mean score 11 queries (original + 10 follow-ups) (only for LLM flagged samples)
     # Entire Sample doesn't have this, so show "—"
     if sample_name == "Entire Sample":
         mean10_str = "—"
@@ -134,8 +134,8 @@ for sample_name, sample_df in samples.items():
         "Sample": sample_name,
         "Original Score": orig_str,
         "N (Original)": fmt_int(orig_n),
-        "Mean Score (10 Rep)": mean10_str,
-        "N (10 Rep)": mean10_n_str
+        "Mean Score (11 Queries)": mean10_str,
+        "N (11 Queries)": mean10_n_str
     })
 
 #----------------------------------------------------------------------------
@@ -170,14 +170,14 @@ def make_latex_panel_a(panel):
 
 def make_latex_panel_b(panel):
     rows = "\n".join([
-        f"{r['Sample']} & {r['Original Score']} & {r['N (Original)']} & {r['Mean Score (10 Rep)']} & {r['N (10 Rep)']} \\\\"
+        f"{r['Sample']} & {r['Original Score']} & {r['N (Original)']} & {r['Mean Score (11 Queries)']} & {r['N (11 Queries)']} \\\\"
         for r in panel
     ])
     return (
         r"\textbf{Panel B: LLM score statistics by sample} \\[0.25em]" "\n" +
         r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lccccc}" "\n"
         r"\toprule" "\n"
-        r"Sample & \multicolumn{2}{c}{Original Score} & \multicolumn{2}{c}{Mean Score (10 Rep)} \\" "\n"
+        r"Sample & \multicolumn{2}{c}{Original Score} & \multicolumn{2}{c}{Mean Score (11 Queries)} \\" "\n"
         r"\cmidrule(lr){2-3} \cmidrule(lr){4-5}" "\n"
         r" & Mean (SD) & $N$ & Mean (SD) & $N$ \\" "\n"
         r"\midrule" "\n" +
@@ -203,7 +203,7 @@ latex = r"""
 \vspace{1em}
 \footnotesize
 \textit{Notes:} Panel~A reports non-missing $N$, count of TRUE values, and percent TRUE for key boolean classification flags.
-Panel~B reports mean (standard deviation) and sample size $N$ for LLM scores across different samples. Original Score is from the initial query. Mean Score (10 Rep) is the average across the first 10 validation repetitions (original query plus 10 repeats), and is only available for LLM flagged transcripts. "—" indicates the score is not available for that sample.
+Panel~B reports mean (standard deviation) and sample size $N$ for LLM scores across different samples. Original Score is from the initial query. Mean Score (11 Queries) is the average across 11 queries (original query plus 10 follow-up queries), and is only available for LLM flagged transcripts. "—" indicates the score is not available for that sample.
 \end{minipage}
 \end{table}
 """.strip()
@@ -217,7 +217,7 @@ TEX_PATH.write_text(latex)
 TXT_PATH.write_text(
     "Publication-ready summary table for classification results with two panels:\n"
     "Panel A: Boolean flags – N, count = TRUE, percent = TRUE (based on non-missing).\n"
-    "Panel B: LLM score statistics by sample – reports mean (SD) and N for Original Score and Mean Score (10 Rep) across four samples: Entire Sample, LLM Flagged, LLM Validated, and Audit Validated. Mean Score (10 Rep) is only available for LLM flagged transcripts (shows as '—' for Entire Sample).\n"
+    "Panel B: LLM score statistics by sample – reports mean (SD) and N for Original Score and Mean Score (11 Queries) across four samples: Entire Sample, LLM Flagged, LLM Validated, and Audit Validated. Mean Score (11 Queries) is the average across 11 queries (original query plus 10 follow-up queries) and is only available for LLM flagged transcripts (shows as '—' for Entire Sample).\n"
     "Formatted for manuscript, uses readable headers with grouped columns for each score type."
 )
 

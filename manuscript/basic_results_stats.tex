@@ -1,4 +1,8 @@
+Table \ref{tab:summary_stats_results} shows the summary statistics of the classification flags and LLM scores. Only about 1\% of transcripts are flagged as collusive by the LLM. This is reasonable because public collusive communications are rare. Figure \ref{fig:original_score_entire_sample} shows the distribution of original query LLM scores. The mean score is about 20.0, and the distribution is concentrated on the left, so that the LLMs are confident that most transcripts are not collusive.
+
 \input{../data/outputs/tables/summary_stats_results.tex}
+
+To avoid false positives from hallucinations, we then applied the validation step
 
 \begin{figure}[ht]
 \centering
@@ -7,12 +11,16 @@
 \label{fig:original_score_entire_sample}
 \end{figure}
 
+Figure \ref{fig:mean_score_validated_samples} shows the distribution of mean validation query LLM scores (10 repetitions plus the original query) for LLM flagged transcripts.
+
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/mean_score_validated_samples_16x9.pdf}
 \caption{Distribution of mean LLM scores (10 repetitions) for LLM flagged transcripts. Bars are stacked by validation status: LLM Flagged Only (transcripts flagged but not validated), LLM Validated (passed validation threshold but not human audit), and Audit Validated (confirmed by human audit).}
 \label{fig:mean_score_validated_samples}
 \end{figure}
+
+Figure \ref{fig:scatter_scores} shows the scatter plot comparing original LLM scores to mean scores including the 10 repetitions.
 
 \begin{figure}[ht]
 \centering

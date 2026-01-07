@@ -3,7 +3,7 @@ Generate histogram figures for LLM score distributions.
 
 This script creates two figures:
 1. Histogram of original score for the entire sample (20 bins)
-2. Stacked histogram of mean scores (10 repetitions) for LLM Flagged samples, split by validation status (50 bins)
+2. Stacked histogram of mean scores (11 queries) for LLM Flagged samples, split by validation status (50 bins)
 
 Outputs (for each figure, both 1x1 and 16x9 formats, PNG and PDF):
 - data/outputs/figures/original_score_entire_sample_*
@@ -114,11 +114,11 @@ def assign_smallest_group(row):
 
 #%%
 # ============================================================================
-# Figure 2: Stacked histogram of mean scores (10 rep) for validated samples
+# Figure 2: Stacked histogram of mean scores (11 queries) for validated samples
 # ============================================================================
 
 def create_validated_samples_mean_histogram():
-    """Create stacked histogram of mean scores (10 rep), split by smallest group membership."""
+    """Create stacked histogram of mean scores (11 queries: original + 10 follow-ups), split by smallest group membership."""
     # Get LLM flagged observations with mean_score_ten_repeats
     flagged_df = df_with_scores[df_with_scores['llm_flag'] == True].copy()
     flagged_df = flagged_df[flagged_df['mean_score_ten_repeats'].notna()]
@@ -157,7 +157,7 @@ def create_validated_samples_mean_histogram():
         ax.hist(scores_by_group, bins=bins, stacked=True, label=labels, 
                color=colors, edgecolor='black', alpha=0.8)
         
-        ax.set_xlabel('Mean LLM Score (10 Repetitions)', fontsize=12)
+        ax.set_xlabel('Mean LLM Score (11 Queries)', fontsize=12)
         ax.set_ylabel('Frequency', fontsize=12)
         ax.legend(loc='upper left')
         ax.grid(True, alpha=0.3)
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     print("\n1. Entire sample original score histogram...")
     create_entire_sample_histogram()
     
-    print("\n2. Validated samples mean score (10 rep) histograms...")
+    print("\n2. Validated samples mean score (11 queries) histograms...")
     create_validated_samples_mean_histogram()
     
     print("\nAll figures generated successfully!")
