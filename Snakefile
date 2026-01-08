@@ -17,6 +17,7 @@ rule all:
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
+        "data/outputs/tables/detailed_industry_results.csv",
         # LLM flag outputs
         "data/outputs/tables/market_value_deciles_llm.csv",
         "data/outputs/tables/sector_tag_rates_llm.csv", 
@@ -171,6 +172,22 @@ rule summary_stats:
         yaml="data/yaml/summary_stats.yaml"
     shell:
         "python src/post_query/analysis/summary_stats.py"
+
+rule detailed_industry_results:
+    """
+    Generate detailed industry-level breakdown of LLM flagging results.
+    Creates comprehensive breakdown by GICS, NAICS, and SIC at all hierarchy levels.
+    Outputs CSV table with classification system, level, code, name, and flagging statistics.
+    """
+    input:
+        dataset="data/datasets/main_analysis_dataset.feather",
+        gics="data/intermediaries/gics_classifications.feather",
+        naics="data/intermediaries/naics_classifications.feather",
+        sic="data/intermediaries/sic_classifications.feather"
+    output:
+        "data/outputs/tables/detailed_industry_results.csv"
+    shell:
+        "python src/post_query/analysis/detailed_industry_results.py"
 
 rule correlation_analysis:
     """
