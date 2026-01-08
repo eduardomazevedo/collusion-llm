@@ -1,13 +1,6 @@
-We now examine the correlates of collusive communication. We consider three types of correlates: firm sector, firm size, and call year. These covariates are not available for all firms, so the sample sizes for each of these analyses differ somewhat. There are \data{correlates_collusive_communication/sector_valid_observations_int} firms in the sector analysis, \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis, and \data{correlates_collusive_communication/year_valid_observations_int} firms in the year analysis.
+We now examine the correlates of collusive communication. We consider three types of correlates: firm sector, firm size, and call year. These covariates are not available for all firms, so the sample sizes for each of these analyses differ. There are \data{correlates_collusive_communication/sector_valid_observations_int} firms in the sector analysis, \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis, and \data{correlates_collusive_communication/year_valid_observations_int} firms in the year analysis.
 
-We have three main measures of collusive communication:
-\begin{enumerate}
-    \item Whether a transcript is in the LLM-flagged set.
-    \item Whether a transcript is in the LLM-flagged set and also validated as collusive by the follow-up LLM queries.
-    \item Whether a transcript is in the LLM-flagged set, validated as collusive by the follow-up LLM queries, and also confirmed as collusive by human audit.
-\end{enumerate}
-
-The main issue with using these measures is that they are imperfect. They reflect a mix of the likelihood of collusive communication and the likelihood of LLM detection regardless of whether the communication is collusive. The first measure is the broadest, so it has the advantage of greater statistical resolution but at the cost of lower reliability. Fortunately, it turns out that the main patterns are similar across the LLM-flagged and LLM-validated measures. This partially assuages concerns about the reliability of the measures. Unfortunately, the human audit measure is too small to draw statistically meaningful conclusions. Given this, we focus on the LLM-flagged set and report results for the other two measures in the supplemental material.
+To increase statistical power, we use the LLM-flagged set as the base sample. This is of course imperfect, as being LLM-flagged is a noisy measure of collusive communication, due to the significant rate of false positives. 
 
 Figures \ref{fig:sector_tag_rates}, \ref{fig:market_value_deciles}, and \ref{fig:year_tag_rates} show the fraction of communications tagged as collusive by the LLM across different industry sectors, market value deciles, and years, respectively.
 
