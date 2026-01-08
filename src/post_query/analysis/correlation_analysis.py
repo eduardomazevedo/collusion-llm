@@ -164,10 +164,13 @@ def analyze_flag_by_market_value(df, flag_col, flag_name):
     
     # Create figure
     fig, ax = plt.subplots()
+    # Calculate error bars, ensuring they're non-negative
+    yerr_low = np.maximum(0, mv_stats['tag_pct'] - mv_stats['ci_low'])
+    yerr_high = np.maximum(0, mv_stats['ci_high'] - mv_stats['tag_pct'])
     ax.errorbar(
         mv_stats['mv_decile'],
         mv_stats['tag_pct'],
-        yerr=[mv_stats['tag_pct'] - mv_stats['ci_low'], mv_stats['ci_high'] - mv_stats['tag_pct']],
+        yerr=[yerr_low, yerr_high],
         fmt='o-', capsize=4
     )
     # Add horizontal line for sample average
@@ -215,10 +218,13 @@ def analyze_flag_by_sector(df, flag_col, flag_name, gics_sectors):
     )
     
     fig, ax = plt.subplots()
+    # Calculate error bars, ensuring they're non-negative
+    xerr_low = np.maximum(0, sector_sorted['tag_pct'] - sector_sorted['ci_low'])
+    xerr_high = np.maximum(0, sector_sorted['ci_high'] - sector_sorted['tag_pct'])
     ax.barh(
         y=np.arange(len(sector_sorted)),
         width=sector_sorted['tag_pct'],
-        xerr=[sector_sorted['tag_pct'] - sector_sorted['ci_low'], sector_sorted['ci_high'] - sector_sorted['tag_pct']],
+        xerr=[xerr_low, xerr_high],
         capsize=4, color='skyblue'
     )
     # Add vertical line for sample average
@@ -265,10 +271,13 @@ def analyze_flag_by_year(df, flag_col, flag_name):
     )
     
     fig, ax = plt.subplots()
+    # Calculate error bars, ensuring they're non-negative
+    yerr_low = np.maximum(0, year_stats['tag_pct'] - year_stats['ci_low'])
+    yerr_high = np.maximum(0, year_stats['ci_high'] - year_stats['tag_pct'])
     ax.errorbar(
         year_stats['transcript_year'],
         year_stats['tag_pct'],
-        yerr=[year_stats['tag_pct'] - year_stats['ci_low'], year_stats['ci_high'] - year_stats['tag_pct']],
+        yerr=[yerr_low, yerr_high],
         fmt='o-', capsize=4
     )
     # Add horizontal line for sample average
@@ -493,3 +502,158 @@ for flag_config in flag_configs:
     analyze_flag_by_year(df, col, name)
     
     print(f"Completed analysis for {display_name} flag")
+
+#%%
+# Industry-specific samples: Chemicals, Construction, and Cement
+# Uses preferred SIC/NAICS codes when available, falls back to GICS codes if not available
+# Definitions:
+# - Chemicals: SIC 2800-2899 (preferred) or GICS 151010 (fallback)
+# - Construction: SIC 1500-1799 (preferred), NAICS 23* (alternative), or GICS 2010* (fallback)
+# - Cement: SIC 3241 (preferred), NAICS 327310 (alternative), or GICS 151020 (fallback, broader than ideal)
+
+def analyze_industry_sample(df, sample_mask, industry_name, flag_col, flag_name):
+    """
+    Analyze collusion flagging rates for a specific industry sample.
+    Calculates summary statistics (saved to YAML, no tables generated).
+    """
+    sample_df = df[sample_mask].copy()
+    n_sample = len(sample_df)
+    
+    if n_sample == 0:
+        print(f"Warning: {industry_name} sample has no observations. Skipping analysis.")
+        return None, None
+    
+    # Calculate tag rates
+    tag_rate = sample_df[flag_col].mean() * 100
+    n_tagged = int(sample_df[flag_col].sum())
+    
+    return n_sample, tag_rate
+
+# Check available SIC and NAICS codes for industry sample definitions
+print("\nChecking available SIC and NAICS codes for industry sample definitions...")
+has_sic = 'sic' in df.columns and df['sic'].notna().any()
+has_naics = 'naics' in df.columns and df['naics'].notna().any()
+print(f"SIC codes available: {has_sic}")
+print(f"NAICS codes available: {has_naics}")
+
+if has_sic:
+    available_sic = df[df['sic'].notna()]['sic'].unique()
+    print(f"Found {len(available_sic)} unique SIC codes")
+if has_naics:
+    available_naics = df[df['naics'].notna()]['naics'].unique()
+    print(f"Found {len(available_naics)} unique NAICS codes")
+
+# Define industry samples using preferred SIC/NAICS codes
+# Chemicals: SIC 2800-2899 (Chemicals and Allied Products)
+# Alternative: GICS industry 151010 if SIC not available
+if has_sic:
+    # SIC codes are 4-digit strings, check if they start with "28"
+    chemicals_mask = df['sic'].notna() & df['sic'].astype(str).str.startswith('28')
+    n_chemicals = chemicals_mask.sum()
+    print(f"\nChemicals sample (SIC 2800-2899): {n_chemicals:,} transcripts")
+else:
+    # Fallback to GICS
+    chemicals_mask = df['gics_industry'].notna() & (df['gics_industry'] == '151010')
+    n_chemicals = chemicals_mask.sum()
+    print(f"\nChemicals sample (GICS 151010, SIC not available): {n_chemicals:,} transcripts")
+
+# Construction: SIC 1500-1799 (Construction contractors)
+# SIC 15: General Building Contractors, SIC 16: Heavy Construction, SIC 17: Special Trade Contractors
+# Alternative: NAICS starting with 23 if SIC not available
+if has_sic:
+    # SIC codes starting with "15", "16", or "17"
+    construction_mask = df['sic'].notna() & (
+        df['sic'].astype(str).str.startswith('15') |
+        df['sic'].astype(str).str.startswith('16') |
+        df['sic'].astype(str).str.startswith('17')
+    )
+    n_construction = construction_mask.sum()
+    print(f"\nConstruction sample (SIC 1500-1799): {n_construction:,} transcripts")
+elif has_naics:
+    # Fallback to NAICS starting with 23 (Construction)
+    construction_mask = df['naics'].notna() & df['naics'].astype(str).str.startswith('23')
+    n_construction = construction_mask.sum()
+    print(f"\nConstruction sample (NAICS 23*, SIC not available): {n_construction:,} transcripts")
+else:
+    # Fallback to GICS
+    construction_mask = df['gics_industry'].notna() & df['gics_industry'].astype(str).str.startswith('2010')
+    n_construction = construction_mask.sum()
+    print(f"\nConstruction sample (GICS 2010*, SIC/NAICS not available): {n_construction:,} transcripts")
+
+# Cement: SIC 3241 (Cement, Hydraulic)
+# Alternative: NAICS 327310 if SIC not available
+# Warning: Do not use GICS 151020 as it includes glass, sand, timber
+if has_sic:
+    cement_mask = df['sic'].notna() & (df['sic'].astype(str) == '3241')
+    n_cement = cement_mask.sum()
+    print(f"\nCement sample (SIC 3241): {n_cement:,} transcripts")
+elif has_naics:
+    # Fallback to NAICS 327310 (Cement Manufacturing)
+    cement_mask = df['naics'].notna() & (df['naics'].astype(str) == '327310')
+    n_cement = cement_mask.sum()
+    print(f"\nCement sample (NAICS 327310, SIC not available): {n_cement:,} transcripts")
+else:
+    # Last resort: GICS 151020 (warns user this is broader than ideal)
+    cement_mask = df['gics_industry'].notna() & (df['gics_industry'] == '151020')
+    n_cement = cement_mask.sum()
+    print(f"\nCement sample (GICS 151020, SIC/NAICS not available): {n_cement:,} transcripts")
+    print("  WARNING: GICS 151020 is 'Construction Materials' and includes glass, sand, timber - broader than ideal")
+
+# Store industry samples
+industry_samples = {
+    'chemicals': chemicals_mask,
+    'construction': construction_mask,
+    'cement': cement_mask
+}
+
+#%%
+# Analyze each industry sample for each flag variable
+industry_summary_stats = {}
+
+for industry_name, sample_mask in industry_samples.items():
+    n_total = sample_mask.sum()
+    industry_summary_stats[f'{industry_name}_n_transcripts'] = int(n_total)
+    
+    if n_total == 0:
+        print(f"\nSkipping {industry_name} sample: no observations")
+        continue
+    
+    print(f"\n{'='*60}")
+    print(f"Analyzing {industry_name.upper()} sample ({n_total:,} transcripts)")
+    print(f"{'='*60}")
+    
+    for flag_config in flag_configs:
+        col = flag_config['col']
+        name = flag_config['name']
+        display_name = flag_config['display_name']
+        
+        n_sample, tag_rate = analyze_industry_sample(
+            df, sample_mask, industry_name, col, name
+        )
+        
+        if n_sample is not None:
+            industry_summary_stats[f'{industry_name}_{name}_tag_rate'] = float(tag_rate)
+            industry_summary_stats[f'{industry_name}_{name}_n_tagged'] = int(df[sample_mask][col].sum())
+
+# Add industry sample statistics to YAML
+if industry_summary_stats:
+    # Load existing YAML to merge
+    yaml_path = yaml_dir / "correlates_collusive_communication.yaml"
+    if yaml_path.exists():
+        with open(yaml_path, "r") as f:
+            existing_stats = yaml.safe_load(f) or {}
+    else:
+        existing_stats = {}
+    
+    # Merge industry stats
+    existing_stats.update(industry_summary_stats)
+    
+    # Save updated YAML
+    with open(yaml_path, "w") as f:
+        yaml.dump(existing_stats, f)
+    
+    print(f"\nSaved industry sample statistics to {yaml_path}")
+
+print("\n" + "="*60)
+print("Completed industry-specific sample analysis")
+print("="*60)

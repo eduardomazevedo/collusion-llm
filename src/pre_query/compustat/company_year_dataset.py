@@ -253,7 +253,9 @@ column_mapping = {
     'gvkey': 'gvkey',  # Keep as is - this is a standard identifier
     'indfmt': 'industry_format',
     'loc': 'domicile_country',
-    'mkvalt': 'market_value_total_mil'
+    'mkvalt': 'market_value_total_mil',
+    'sic': 'sic',  # Standard Industrial Classification code (4-digit)
+    'naics': 'naics'  # North American Industry Classification System code (6-digit)
 }
 
 # Rename columns
@@ -263,7 +265,7 @@ final_df = final_df.rename(columns=column_mapping)
 key_cols = ['companyid', 'fiscal_year']
 descriptive_cols = ['company_name', 'company_status', 'gvkey']
 financial_cols = ['market_value_total_mil', 'employees_thousands', 'currency_code', 'data_date']
-classification_cols = ['gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'industry_format']
+classification_cols = ['gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'industry_format', 'sic', 'naics']
 location_cols = ['incorporation_country', 'domicile_country']
 
 # Create final column order

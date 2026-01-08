@@ -21,6 +21,8 @@ Variables produced:
 - gsector: GICS sector
 - gsubind: GICS sub-industry
 - loc: Location/domicile
+- sic: Standard Industrial Classification code (4-digit)
+- naics: North American Industry Classification System code (6-digit)
 - curcd: Currency code
 - emp: Number of employees
 """
@@ -76,6 +78,8 @@ SELECT
     id_table.gsector,
     id_table.gsubind,
     id_table.loc,
+    id_table.sic,
+    id_table.naics,
     comp_global_daily.g_funda.emp
 
 FROM comp_global_daily.g_funda
@@ -86,7 +90,9 @@ INNER JOIN (
         gind,
         gsector,
         gsubind,
-        loc
+        loc,
+        sic,
+        naics
     FROM comp_global_daily.g_company
     WHERE comp_global_daily.g_company.gvkey IN (
         {gvkey_list_sql}
@@ -122,6 +128,15 @@ categorical_columns = ['costat', 'curcd', 'datafmt', 'indfmt', 'consol', 'fic', 
 for col in categorical_columns:
     if col in df.columns:
         df[col] = df[col].astype('category')
+
+# Convert SIC and NAICS to string format (preserve leading zeros)
+# SIC is 4-digit, NAICS is 6-digit
+if 'sic' in df.columns:
+    # SIC codes should be 4 digits, convert to string to preserve leading zeros
+    df['sic'] = df['sic'].astype(str).str.zfill(4)
+if 'naics' in df.columns:
+    # NAICS codes should be 6 digits, convert to string to preserve leading zeros
+    df['naics'] = df['naics'].astype(str).str.zfill(6)
 
 # Convert date columns
 if 'datadate' in df.columns:

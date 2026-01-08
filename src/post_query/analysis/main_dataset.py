@@ -201,10 +201,10 @@ classification_columns = ['benchmark_sample', 'benchmark_human_flag', 'llm_flag'
 llm_score_columns = ['original_score']
 
 # 3. Other Capital IQ transcript variables
-capiq_columns = [col for col in df.columns if col not in core_columns + classification_columns + llm_score_columns and col not in ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']]
+capiq_columns = [col for col in df.columns if col not in core_columns + classification_columns + llm_score_columns and col not in ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'sic', 'naics', 'incorporation_country', 'domicile_country']]
 
 # 4. Compustat variables (the remaining ones after dropping)
-compustat_columns = ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'incorporation_country', 'domicile_country']
+compustat_columns = ['market_value_total_mil', 'employees_thousands', 'gics_sector', 'gics_industry', 'gics_group', 'gics_subindustry', 'sic', 'naics', 'incorporation_country', 'domicile_country']
 
 # Reorder the dataframe
 column_order = core_columns + classification_columns + llm_score_columns + capiq_columns + compustat_columns

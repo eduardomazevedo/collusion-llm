@@ -21,6 +21,8 @@ Variables produced:
 - gsector: GICS sector
 - gsubind: GICS sub-industry
 - loc: Location/domicile
+- sic: Standard Industrial Classification code (4-digit)
+- naics: North American Industry Classification System code (6-digit)
 - emp: Number of employees
 - mkvalt: Market value (millions USD)
 """
@@ -76,6 +78,8 @@ SELECT
     id_table.gsector,
     id_table.gsubind,
     id_table.loc,
+    id_table.sic,
+    id_table.naics,
     comp_na_daily_all.funda.emp,
     comp_na_daily_all.funda.mkvalt
 
@@ -87,7 +91,9 @@ INNER JOIN (
         gind,
         gsector,
         gsubind,
-        loc
+        loc,
+        sic,
+        naics
     FROM comp_na_daily_all.company
     WHERE comp_na_daily_all.company.gvkey IN (
         {gvkey_list_sql}
@@ -124,6 +130,15 @@ categorical_columns = ['costat', 'curcd', 'datafmt', 'indfmt', 'consol', 'fic', 
 for col in categorical_columns:
     if col in df.columns:
         df[col] = df[col].astype('category')
+
+# Convert SIC and NAICS to numeric (they may have leading zeros, so keep as string initially, then convert)
+# SIC is 4-digit, NAICS is 6-digit
+if 'sic' in df.columns:
+    # SIC codes should be 4 digits, convert to string to preserve leading zeros, then to numeric
+    df['sic'] = df['sic'].astype(str).str.zfill(4)
+if 'naics' in df.columns:
+    # NAICS codes should be 6 digits, convert to string to preserve leading zeros
+    df['naics'] = df['naics'].astype(str).str.zfill(6)
 
 # Convert date columns
 if 'datadate' in df.columns:
