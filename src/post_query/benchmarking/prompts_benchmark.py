@@ -101,8 +101,8 @@ def get_latest_llm(prompts: List[str]) -> pd.DataFrame:
     if df.empty:
         return df
     df["transcriptid"] = df["transcriptid"].astype(int)
-    # Keep latest per prompt/transcript
-    df = df.sort_values("date").groupby(["prompt_name", "transcriptid"]).tail(1)
+    # Keep earliest per prompt/transcript (aligns with manuscript counts that use first-run scores)
+    df = df.sort_values("date").groupby(["prompt_name", "transcriptid"]).head(1)
     df[["llm_score", "llm_flag", "llm_reasoning", "llm_excerpts"]] = df["response"].apply(
         lambda x: pd.Series(parse_llm_response(x))
     )

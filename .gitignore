@@ -47,6 +47,8 @@ Thumbs.db
 
 # Ignore scratch.py
 scratch.py
+scratch/
+scratch_outputs/
 
 # LaTeX temporary files
 *.aux

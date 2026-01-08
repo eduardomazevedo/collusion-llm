@@ -59,6 +59,7 @@ audio_stats = df['audiolengthsec'].describe()
 total_audio_hours = df['audiolengthsec'].sum() / 3600
 total_audio_days = total_audio_hours / 24
 total_audio_years = total_audio_days / 365.25
+total_audio_years_int = int(total_audio_years)
 
 # Mean audio length in readable format
 mean_audio_seconds = df['audiolengthsec'].mean()
@@ -213,7 +214,8 @@ summary_stats = {
         'mean_length_seconds': float(mean_audio_seconds),
         'mean_length_description': f"{mean_audio_minutes} minutes {mean_audio_seconds_remainder} seconds",
         'total_audio_hours': float(total_audio_hours),
-        'total_audio_years': int(total_audio_years),
+        'total_audio_years': float(total_audio_years),
+        'total_audio_years_int': total_audio_years_int,
         'audio_available_pct': float(df['audiolengthsec'].notna().mean() * 100)
     },
     

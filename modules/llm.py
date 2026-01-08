@@ -297,6 +297,12 @@ class ScoreReasoningExcerpts(BaseModel):
     excerpts: list[str]
 
 
+class ScoreReasoningExcerptsTable(BaseModel):
+    score: int
+    reasoning: str
+    excerpts: list[str]
+    table: str
+
 class SignalReasoning(BaseModel):
     signal: str
     reasoning: str
@@ -344,6 +350,7 @@ RESPONSE_FORMAT_CLASSES = {
     "Score": Score,
     "ScoreReasoning": ScoreReasoning,
     "ScoreReasoningExcerpts": ScoreReasoningExcerpts,
+    "ScoreReasoningExcerptsTable": ScoreReasoningExcerptsTable,
     "SignalReasoning": SignalReasoning,
     "SignalScoreReasoning": SignalScoreReasoning,
     "FlagReasoning": FlagReasoning,

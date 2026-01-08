@@ -11,9 +11,9 @@ WRDS_USERNAME = os.getenv('WRDS_USERNAME')
 WRDS_PASSWORD = os.getenv('WRDS_PASSWORD')
 
 # LLM
-OPENAI_MODEL = "gpt-4o-mini"
+OPENAI_MODEL = "gpt-4.1-mini"
 PROVIDER = "openai"
-MAX_TOKENS = 1000
+MAX_TOKENS = 10000
 TEMPERATURE = 1.0
 
 # Root folder

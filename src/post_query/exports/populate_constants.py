@@ -84,6 +84,12 @@ def create_constants_for_value(base_path: Path, field_name: str, value: Any) -> 
     base_path.mkdir(parents=True, exist_ok=True)
     
     if isinstance(value, (int, float)):
+        if field_name.endswith("_int"):
+            int_val = int(value)
+            with open(base_path / f"{field_name}.txt", 'w') as f:
+                f.write(format_number_with_commas(int_val))
+            return
+
         # For numbers, create multiple format files
         if is_integer(value):
             # Integer formats
