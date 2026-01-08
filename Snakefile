@@ -39,6 +39,10 @@ rule all:
         "data/outputs/tables/benchmarking_combined.csv",
         "data/outputs/tables/summary_stats_dataset.csv",
         "data/outputs/tables/summary_stats_results.csv",
+        # Score distribution figures
+        "data/outputs/figures/original_score_entire_sample_16x9.pdf",
+        "data/outputs/figures/mean_score_validated_samples_16x9.pdf",
+        "data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf",
         "data/constants/.populated"
 
 rule download_compustat_us:
@@ -236,6 +240,34 @@ rule summary_stats_results:
         txt="data/outputs/tables/summary_stats_results.txt"
     shell:
         "python src/post_query/analysis/summary_stats_results.py"
+
+rule score_histogram_figures:
+    """
+    Generate histogram figures for LLM score distributions.
+    Creates histograms of original scores for entire sample and mean scores for validated samples.
+    Outputs both 1x1 and 16x9 formats in PNG and PDF.
+    """
+    input:
+        "data/datasets/main_analysis_dataset.feather",
+        "data/datasets/top_transcripts_data.csv"
+    output:
+        original_16x9="data/outputs/figures/original_score_entire_sample_16x9.pdf",
+        mean_16x9="data/outputs/figures/mean_score_validated_samples_16x9.pdf"
+    shell:
+        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/post_query/analysis/fig_scores_histogram.py"
+
+rule scatter_scores_figure:
+    """
+    Generate scatter plot comparing original LLM scores to mean scores from 11 queries.
+    Outputs both 1x1 and 16x9 formats in PNG and PDF.
+    """
+    input:
+        "data/datasets/main_analysis_dataset.feather",
+        "data/datasets/top_transcripts_data.csv"
+    output:
+        scatter_16x9="data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf"
+    shell:
+        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/post_query/analysis/fig_scatter_scores.py"
 
 rule populate_constants:
     """
