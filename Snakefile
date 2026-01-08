@@ -18,6 +18,7 @@ rule all:
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
         "data/outputs/tables/detailed_industry_results.csv",
+        "data/outputs/tables/collusive_segments_tag_rates.csv",
         # LLM flag outputs
         "data/outputs/tables/market_value_deciles_llm.csv",
         "data/outputs/tables/sector_tag_rates_llm.csv", 
@@ -188,6 +189,19 @@ rule detailed_industry_results:
         "data/outputs/tables/detailed_industry_results.csv"
     shell:
         "python src/post_query/analysis/detailed_industry_results.py"
+
+rule correlates_high_collusion_segments:
+    """
+    Analyze LLM collusion tagging rates for eight high collusion segments.
+    Uses detailed_industry_results.csv to calculate aggregated tag rates for specific SIC-based segments.
+    Outputs CSV table with segment names, SIC codes, and flagging statistics.
+    """
+    input:
+        "data/outputs/tables/detailed_industry_results.csv"
+    output:
+        "data/outputs/tables/collusive_segments_tag_rates.csv"
+    shell:
+        "python src/post_query/analysis/correlates_high_collusion_segments.py"
 
 rule correlates_sectors:
     """
