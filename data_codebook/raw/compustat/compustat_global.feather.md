@@ -47,5 +47,11 @@ GICS sub-industry code. Category type.
 ### loc
 Location/domicile country code. Category type.
 
+### sic
+Standard Industrial Classification (SIC) code. String type, zero-padded to 4 digits (e.g., "3241", "2800"). Used for industry classification, particularly useful for construction and cement industries where SIC provides more granular classification than GICS. Can contain missing values.
+
+### naics
+North American Industry Classification System (NAICS) code. String type, zero-padded to 6 digits (e.g., "327310", "236117"). Alternative industry classification system used primarily in North America. Can contain missing values.
+
 ### emp
 Number of employees in thousands. Float64 type, can contain missing values.

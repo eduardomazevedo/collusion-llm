@@ -8,6 +8,9 @@ rule all:
         "data/intermediaries/gvkey_table.feather",
         "data/intermediaries/gvkey_list.txt",
         "data/datasets/company_year_compustat.feather",
+        "data/intermediaries/gics_classifications.feather",
+        "data/intermediaries/naics_classifications.feather",
+        "data/intermediaries/sic_classifications.feather",
         "data/datasets/main_analysis_dataset.feather",
         "data/datasets/top_transcripts_data.csv",
         "data/outputs/top_transcript_data_for_joe.csv",
@@ -91,6 +94,19 @@ rule company_year_dataset:
         "data/datasets/company_year_compustat.feather"
     shell:
         "python src/pre_query/compustat/company_year_dataset.py"
+
+rule download_industry_classifications:
+    """
+    Download industry classification titles from WRDS database.
+    Downloads complete mappings of GICS, NAICS, and SIC codes to their descriptive titles.
+    Creates feather files for each classification system in data/intermediaries/.
+    """
+    output:
+        gics="data/intermediaries/gics_classifications.feather",
+        naics="data/intermediaries/naics_classifications.feather",
+        sic="data/intermediaries/sic_classifications.feather"
+    shell:
+        "python src/post_query/analysis/download_industry_classifications.py"
 
 rule create_top_transcripts:
     """

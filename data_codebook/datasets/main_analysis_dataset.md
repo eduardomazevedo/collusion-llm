@@ -98,6 +98,12 @@ GICS industry group code. Category type. Renamed from original Compustat 'ggroup
 ### gics_subindustry
 GICS sub-industry code. Category type. Renamed from original Compustat 'gsubind' variable. Most specific industry classification level.
 
+### sic
+Standard Industrial Classification (SIC) code. String type, zero-padded to 4 digits (e.g., "3241", "2800", "1531"). Used for industry classification, particularly useful for construction and cement industries where SIC provides more granular classification than GICS. Renamed from original Compustat 'sic' variable. Can contain missing values. Used in industry-specific analyses for chemicals (SIC 2800-2899), construction (SIC 1500-1799), and cement (SIC 3241).
+
+### naics
+North American Industry Classification System (NAICS) code. String type, zero-padded to 6 digits (e.g., "327310", "236117"). Alternative industry classification system used primarily in North America. Renamed from original Compustat 'naics' variable. Can contain missing values. Used as alternative classification when SIC codes are not available.
+
 ### incorporation_country
 Country of incorporation code (e.g., USA, CAN, GBR, DEU). Category type. Renamed from original Compustat 'fic' variable. Legal domicile of the company.
 

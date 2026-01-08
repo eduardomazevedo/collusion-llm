@@ -47,6 +47,12 @@ GICS industry group code. Category type. Renamed from original 'ggroup' variable
 ### gics_subindustry
 GICS sub-industry code. Category type. Renamed from original 'gsubind' variable.
 
+### sic
+Standard Industrial Classification (SIC) code. String type, zero-padded to 4 digits (e.g., "3241", "2800"). Used for industry classification, particularly useful for construction and cement industries where SIC provides more granular classification than GICS. Renamed from original 'sic' variable. Can contain missing values.
+
+### naics
+North American Industry Classification System (NAICS) code. String type, zero-padded to 6 digits (e.g., "327310", "236117"). Alternative industry classification system used primarily in North America. Renamed from original 'naics' variable. Can contain missing values.
+
 ### industry_format
 Industry format classification. Category type. Values: INDL (Industrial companies), FS (Financial Services). When duplicates existed for the same gvkey-fyear, INDL was prioritized over FS. Renamed from original 'indfmt' variable.
 
