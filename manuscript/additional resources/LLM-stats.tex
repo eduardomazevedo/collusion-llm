@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage{longtable}
 \usepackage{subcaption}
 
 % Data reading
@@ -39,11 +40,25 @@ For the human audit sample, the LLM-validated scores have a mean of
     \end{minipage}
 \end{figure}
 
-\noindent\textbf{LLM-flagged score bins (1-point).} Bins are left-closed and right-open, except the last bin is right-closed. \\
+\noindent\textbf{LLM-flagged score bins (1-point).} Bins are left-closed and right-open, except the last bin is right-closed.
+\medskip
+\begingroup
+\setlength{\LTleft}{\fill}
+\setlength{\LTright}{\fill}
+\footnotesize
 \input{../../data/outputs/tables/llm_flagged_score_bins_1pt.tex}
+\endgroup
+\medskip
 
-\noindent\textbf{LLM-validated score bins (1-point).} \\
+\noindent\textbf{LLM-validated score bins (1-point).}
+\medskip
+\begingroup
+\setlength{\LTleft}{\fill}
+\setlength{\LTright}{\fill}
+\footnotesize
 \input{../../data/outputs/tables/llm_validated_score_bins_1pt.tex}
+\endgroup
+\medskip
 
 \begin{figure}[ht]
     \centering
@@ -66,10 +81,23 @@ For the human audit sample, the LLM-validated scores have a mean of
     \end{minipage}
 \end{figure}
 
-\noindent\textbf{Human audit LLM-validated score bins (10 bins).} \\
+\noindent\textbf{Human audit LLM-validated score bins (10 bins).}
+\medskip
+\begingroup
+\setlength{\LTleft}{\fill}
+\setlength{\LTright}{\fill}
+\footnotesize
 \input{../../data/outputs/tables/human_audit_llm_validated_score_bins_10.tex}
+\endgroup
+\medskip
 
-\noindent\textbf{Human audit LLM-validated score bins (20 bins).} \\
+\noindent\textbf{Human audit LLM-validated score bins (20 bins).}
+\medskip
+\begingroup
+\setlength{\LTleft}{\fill}
+\setlength{\LTright}{\fill}
+\footnotesize
 \input{../../data/outputs/tables/human_audit_llm_validated_score_bins_20.tex}
+\endgroup
 
 \end{document}
