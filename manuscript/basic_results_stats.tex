@@ -1,18 +1,23 @@
-Table \ref{tab:summary_stats_results} shows the summary statistics of the classification flags and LLM scores. Only about 1\% of transcripts are flagged as collusive by the LLM. This is reasonable because public collusive communications are rare. Figure \ref{fig:original_score_entire_sample} shows the distribution of original query LLM scores. The mean score is about 20.0, and the distribution is concentrated on the left, so that the LLMs are confident that most transcripts are not collusive.
+We begin with the results from the large-scale LLM analysis, prior to the human audit. Table \ref{tab:summary_stats_results} shows the summary statistics of the classification flags and LLM scores.
 
+The first obvious feature of the data is that very few transcripts are flagged as collusive by the LLM. Only \data{summary_stats/tagging_performance/llm_tag_rate_pct_percentage} meet the threshold of 75 collusive score in the original query. This is an important sanity check because public collusive communications are rare. Moreover, the LLM is confident in its judgement that most transcripts are not collusive. We see this both from the low average score of \data{summary_stats/tagging_performance/original_score_mean_float}, and from the histogram in Figure \ref{fig:original_score_entire_sample} which is concentrated on the left. This is consistent with the current state of these models, in which hallucinations exist but are uncommon.
+
+% Table: Summary statistics for classification results
 \input{../data/outputs/tables/summary_stats_results.tex}
 
-To avoid false positives from hallucinations, we then applied the validation step
-
+% Figure: Histogram of original LLM scores for the entire sample
 \begin{figure}[ht]
-\centering
-\includegraphics[width=\textwidth]{../data/outputs/figures/original_score_entire_sample_16x9.pdf}
-\caption{Distribution of original LLM scores for the entire sample. Histogram shows the frequency of scores across all transcripts processed through the initial LLM query. Vertical dashed lines indicate the mean and median scores.}
-\label{fig:original_score_entire_sample}
+    \centering
+    \includegraphics[width=\textwidth]{../data/outputs/figures/original_score_entire_sample_16x9.pdf}
+    \caption{Distribution of original LLM scores for the entire sample. Histogram shows the frequency of scores across all transcripts processed through the initial LLM query. Vertical dashed lines indicate the mean and median scores.}
+    \label{fig:original_score_entire_sample}
 \end{figure}
 
-Figure \ref{fig:mean_score_validated_samples} shows the distribution of mean validation query LLM scores (10 repetitions plus the original query) for LLM flagged transcripts.
+We now turn to the validation step, where each flagged transcript is re-queried 10 times. Out of all the flagged transcripts, only \data{summary_stats/tagging_performance/llm_validation_rate_pct_percentage} pass the validation threshold of an average score of at least 75. Thus, many of the LLM-flagged transcripts are false positives. This is to be expected because again we are searching for the rare event of collusive communications. Thus, even a small rate of hallucinations translates to a large percentage of false positives. The validation step leaves us with a sample of \data{summary_stats/tagging_performance/llm_validation_tagged_int} LLM-validated transcripts.
 
+This winner's curse can be seen transparently in the data. Figure \ref{fig:mean_score_validated_samples} shows that the distribution of mean scores has the bulk of its values below 75. And Figure \ref{fig:scatter_scores} shows that the mean scores are often below the original scores. Thus, most LLM-flagged observations are due to the LLM randomly producing a high score. At the same time, both figures show that transcripts with a high original score tend to have a high mean score after validation. This suggests that the LLM is capturing some signal. We will confirm this below, as we turn to the benchmark sample, human audit, and detailed reading of example transcripts.
+
+% Figure: Histogram of mean LLM scores (10 repetitions) for LLM flagged transcripts
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/mean_score_validated_samples_16x9.pdf}
@@ -20,8 +25,7 @@ Figure \ref{fig:mean_score_validated_samples} shows the distribution of mean val
 \label{fig:mean_score_validated_samples}
 \end{figure}
 
-Figure \ref{fig:scatter_scores} shows the scatter plot comparing original LLM scores to mean scores including the 10 repetitions.
-
+% Figure: Scatter plot comparing original LLM scores to mean scores from 10 repetitions
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf}

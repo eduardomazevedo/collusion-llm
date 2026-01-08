@@ -148,11 +148,13 @@ benchmark_both_available = benchmark_df[
 # Benchmark validation statistics by human tagging
 # Collusive transcripts in benchmark that are LLM validated
 benchmark_collusive = benchmark_df[benchmark_df['benchmark_human_flag'] == True]
+benchmark_collusive_count = len(benchmark_collusive)
 benchmark_collusive_validated_count = int(benchmark_collusive['llm_validation_flag'].sum()) if len(benchmark_collusive) > 0 else 0
 benchmark_collusive_validated_pct = (benchmark_collusive_validated_count / len(benchmark_collusive) * 100) if len(benchmark_collusive) > 0 else 0
 
 # Non-collusive transcripts in benchmark that are LLM validated  
 benchmark_not_collusive = benchmark_df[benchmark_df['benchmark_human_flag'] == False]
+benchmark_not_collusive_count = len(benchmark_not_collusive)
 benchmark_not_collusive_validated_count = int(benchmark_not_collusive['llm_validation_flag'].sum()) if len(benchmark_not_collusive) > 0 else 0
 benchmark_not_collusive_validated_pct = (benchmark_not_collusive_validated_count / len(benchmark_not_collusive) * 100) if len(benchmark_not_collusive) > 0 else 0
 
@@ -233,6 +235,7 @@ summary_stats = {
         'benchmark_sample_rate_pct': float(benchmark_rate),
         'human_benchmark_tagged_count': int(human_tagged_benchmark),
         'human_benchmark_rate_pct': float(human_benchmark_rate),
+        'benchmark_not_collusive_count': int(benchmark_not_collusive_count),
         'llm_validation_available': int(llm_validation_available),
         'llm_validation_tagged': int(llm_validation_tagged),
         'llm_validation_rate_pct': float(llm_validation_rate),
@@ -251,7 +254,7 @@ summary_stats = {
         'benchmark_collusive_validated_pct': float(benchmark_collusive_validated_pct),
         'benchmark_not_collusive_validated_count': int(benchmark_not_collusive_validated_count),
         'benchmark_not_collusive_validated_pct': float(benchmark_not_collusive_validated_pct),
-        'benchmark_validation_odds_ratio': float(benchmark_validation_odds_ratio) if benchmark_validation_odds_ratio is not None else None,
+        'benchmark_validation_odds_ratio': int(benchmark_validation_odds_ratio) if benchmark_validation_odds_ratio is not None else None,
         'benchmark_collusive_flagged_count': int(benchmark_collusive_flagged_count),
         'benchmark_collusive_flagged_pct': float(benchmark_collusive_flagged_pct),
         'benchmark_not_collusive_flagged_count': int(benchmark_not_collusive_flagged_count),
