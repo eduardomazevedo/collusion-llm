@@ -29,9 +29,14 @@ def format_float_two_decimals(num: float) -> str:
     return f"{num:,.2f}"
 
 
-def format_percentage(num: float) -> str:
-    """Format number as percentage with escaped % for LaTeX."""
-    return f"{num:.2f}\\%"
+def format_percentage(num: float, decimals: int = 2) -> str:
+    """Format number as percentage with escaped % for LaTeX.
+    
+    Args:
+        num: The number to format
+        decimals: Number of decimal places (0, 1, or 2)
+    """
+    return f"{num:.{decimals}f}\\%"
 
 
 def format_scientific(num: Union[int, float]) -> str:
@@ -90,9 +95,17 @@ def create_constants_for_value(base_path: Path, field_name: str, value: Any) -> 
         with open(base_path / f"{field_name}_float.txt", 'w') as f:
             f.write(format_float_two_decimals(float(value)))
         
-        # Percentage format
+        # Percentage formats (0, 1, and 2 decimal places)
+        with open(base_path / f"{field_name}_percentage0.txt", 'w') as f:
+            f.write(format_percentage(float(value), decimals=0))
+        with open(base_path / f"{field_name}_percentage1.txt", 'w') as f:
+            f.write(format_percentage(float(value), decimals=1))
+        with open(base_path / f"{field_name}_percentage2.txt", 'w') as f:
+            f.write(format_percentage(float(value), decimals=2))
+        
+        # Also create _percentage.txt for backward compatibility (defaults to 2 decimals)
         with open(base_path / f"{field_name}_percentage.txt", 'w') as f:
-            f.write(format_percentage(float(value)))
+            f.write(format_percentage(float(value), decimals=2))
         
         # Scientific format
         with open(base_path / f"{field_name}_scientific.txt", 'w') as f:
