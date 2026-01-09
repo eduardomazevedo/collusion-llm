@@ -42,3 +42,17 @@
 - generally, when creating any script or updating a script with some new functionality, there should be relevant print statements so that when the code is run in the terminal the user can see what is happening (the most clear example here would be a script that would do a repetitive action over a larger dataset; in this case the user needs to see as print statements some sort of progress out of total steps, and this can be either step by step or every 5 or 10 or whatever amount of steps)
 - when creating a script that runs over a larger dataset to produce output for many observations of a dataset, the script logic should ensure that the file where the output is placed would be saved either every sep or every 5 or 10 or some number of steps so that if the code breaks for some reason, that output is not lost; ask the user if unsure whether this should be done
 - if you try to do something as Codex like running a script or command and you keep failing for some reason, explain what is happenin to the user and see if there is something the user can do immediately to help (e.g. grant some permissions, run something himself in the terminal, etc)
+
+## Latex
+- Figures should usually take up 100% of text width. Figures should have clear title, and detailed notes in a footnotesize minipage. Figure notes should make the paper skimmable, by having the context needed to understand them without reading the whole paper.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{../data/outputs/figures/market_value_deciles_llm_16x9.pdf}
+\caption{LLM Tag Rate by Market Value Decile}
+\label{fig:market_value_deciles}
+\begin{minipage}{\textwidth}
+\vspace{1em}
+\footnotesize
+\textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across market value deciles, representing firm size. The chart displays how collusive communication detection varies with company size. Data includes \data{correlates_collusive_communication/mkvalt_valid_observations_int} firms in the size analysis.
+\end{minipage}
+\end{figure}
