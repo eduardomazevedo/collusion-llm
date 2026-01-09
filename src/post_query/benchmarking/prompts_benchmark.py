@@ -14,12 +14,14 @@ import json
 import os
 import sqlite3
 from typing import Dict, List, Optional, Tuple
+import sys
 
 import numpy as np
 import pandas as pd
 
 import config
 from modules.utils import extract_score_from_unstructured_response
+from modules.colors import GHIBLI_PALETTE
 
 # Default prompts to benchmark
 DEFAULT_PROMPTS = [
@@ -221,8 +223,8 @@ def generate_scatterplots(df_scores: pd.DataFrame, prompts: List[str]) -> None:
             continue
         for size_label, figsize in [("1x1", (6, 6)), ("16x9", (16, 9))]:
             plt.figure(figsize=figsize)
-            plt.scatter(data["joe_score"], data["llm_score"], alpha=0.6, edgecolor="k", linewidth=0.5)
-            plt.plot([0, 100], [0, 100], "r--", label="45° line")
+            plt.scatter(data["joe_score"], data["llm_score"], alpha=0.6, edgecolor=GHIBLI_PALETTE['gray'], linewidth=0.5, c=GHIBLI_PALETTE['deep_teal'])
+            plt.plot([0, 100], [0, 100], color=GHIBLI_PALETTE['gray'], linestyle="--", label="45° line")
             plt.xlim(0, 100)
             plt.ylim(0, 100)
             plt.xlabel("Joe score")

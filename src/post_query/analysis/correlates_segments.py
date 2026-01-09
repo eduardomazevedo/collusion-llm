@@ -19,6 +19,10 @@ import matplotlib.pyplot as plt
 from statsmodels.stats.proportion import proportion_confint
 from pathlib import Path
 import yaml
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
+from modules.colors import GHIBLI_PALETTE
 
 #%%
 # Paths
@@ -265,11 +269,11 @@ def analyze_segments(combined_df, overall_llm_rate=None):
     # Plot header bars (full width, light color background)
     # Increased height to 0.55 (10% taller than 0.5) for better text fit
     if n_sectors > 0:
-        ax.barh(header_sector_y, x_max, color='lightblue', alpha=0.3, height=0.55, 
-                edgecolor='steelblue', linewidth=1)
+        ax.barh(header_sector_y, x_max, color=GHIBLI_PALETTE['deep_teal'], alpha=0.3, height=0.55, 
+                edgecolor=GHIBLI_PALETTE['deep_teal'], linewidth=1)
     if n_segments > 0:
-        ax.barh(header_segment_y, x_max, color='lightcoral', alpha=0.3, height=0.55, 
-                edgecolor='coral', linewidth=1)
+        ax.barh(header_segment_y, x_max, color=GHIBLI_PALETTE['warm_red'], alpha=0.3, height=0.55, 
+                edgecolor=GHIBLI_PALETTE['red'], linewidth=1)
     
     # Plot sectors (at top)
     if n_sectors > 0:
@@ -282,7 +286,7 @@ def analyze_segments(combined_df, overall_llm_rate=None):
             y=sector_y_positions,
             width=sector_values,
             xerr=[xerr_low_sectors, xerr_high_sectors],
-            capsize=4, color='skyblue', alpha=0.8, label='GICS Sector'
+            capsize=4, color=GHIBLI_PALETTE['deep_teal'], alpha=0.8, label='GICS Sector'
         )
     
     # Plot segments (at bottom)
@@ -296,7 +300,7 @@ def analyze_segments(combined_df, overall_llm_rate=None):
             y=segment_y_positions,
             width=segment_values,
             xerr=[xerr_low_segments, xerr_high_segments],
-            capsize=4, color='coral', alpha=0.8, label='High Collusion Segment'
+            capsize=4, color=GHIBLI_PALETTE['warm_red'], alpha=0.8, label='High Collusion Segment'
         )
     
     # Add header text centered on header bars
@@ -335,7 +339,7 @@ def analyze_segments(combined_df, overall_llm_rate=None):
         else:
             overall_avg = 0
     
-    ax.axvline(x=overall_avg, color='red', linestyle='--', linewidth=1.5, alpha=0.7, label='Overall Average')
+    ax.axvline(x=overall_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1.5, alpha=0.7, label='Overall Average')
     
     # Set labels
     ax.set_yticks(all_y_positions)

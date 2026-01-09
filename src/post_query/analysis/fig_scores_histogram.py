@@ -18,6 +18,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
+from modules.colors import GHIBLI_PALETTE
 
 #%%
 # Setup paths
@@ -43,11 +46,11 @@ plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 11
 
 #%%
-# Define colors for consistency
+# Define colors for consistency using Ghibli palette
 COLORS = {
-    'LLM Flagged': '#1f77b4',      # blue
-    'LLM Validated': '#ff7f0e',    # orange
-    'Audit Validated': '#2ca02c'   # green
+    'LLM Flagged': GHIBLI_PALETTE['deep_teal'],      # Deep Teal (first priority color)
+    'LLM Validated': GHIBLI_PALETTE['warm_red'],     # Warm Red (second priority color)
+    'Audit Validated': GHIBLI_PALETTE['green']       # Spirited Meadow (green)
 }
 
 #%%
@@ -69,7 +72,7 @@ def create_entire_sample_histogram():
         fig, ax = plt.subplots(figsize=figsize)
         
         # Create histogram with 20 bins
-        ax.hist(original_scores, bins=20, edgecolor='black', alpha=0.7, color='steelblue')
+        ax.hist(original_scores, bins=20, edgecolor='black', alpha=0.7, color=GHIBLI_PALETTE['deep_teal'])
         
         ax.set_xlabel('Original LLM Score', fontsize=12)
         ax.set_ylabel('Frequency', fontsize=12)
@@ -78,8 +81,8 @@ def create_entire_sample_histogram():
         # Add summary statistics
         mean_score = original_scores.mean()
         median_score = original_scores.median()
-        ax.axvline(mean_score, color='red', linestyle='--', linewidth=2, label=f'Mean: {mean_score:.1f}')
-        ax.axvline(median_score, color='orange', linestyle='--', linewidth=2, label=f'Median: {median_score:.1f}')
+        ax.axvline(mean_score, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=2, label=f'Mean: {mean_score:.1f}')
+        ax.axvline(median_score, color=GHIBLI_PALETTE['warm_red'], linestyle='--', linewidth=2, label=f'Median: {median_score:.1f}')
         ax.legend()
         
         plt.tight_layout()
@@ -140,7 +143,11 @@ def create_validated_samples_mean_histogram():
         
         # Get scores for each group (in stacking order: bottom to top)
         groups_order = ['LLM Flagged Only', 'LLM Validated', 'Audit Validated']
-        colors_order = ['#1f77b4', '#ff7f0e', '#2ca02c']  # blue, orange, green
+        colors_order = [
+            GHIBLI_PALETTE['deep_teal'],  # Deep Teal (first priority)
+            GHIBLI_PALETTE['warm_red'],   # Warm Red (second priority)
+            GHIBLI_PALETTE['green']       # Spirited Meadow (green)
+        ]
         
         scores_by_group = []
         labels = []

@@ -18,6 +18,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
+from modules.colors import GHIBLI_PALETTE
 from scipy.interpolate import UnivariateSpline
 from statsmodels.nonparametric.smoothers_lowess import lowess
 
@@ -45,11 +48,11 @@ plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 11
 
 #%%
-# Define colors for consistency
+# Define colors for consistency using Ghibli palette
 COLORS = {
-    'LLM Flagged Only': '#1f77b4',      # blue
-    'LLM Validated': '#ff7f0e',         # orange
-    'Audit Validated': '#2ca02c'        # green
+    'LLM Flagged Only': GHIBLI_PALETTE['deep_teal'],  # Deep Teal (first priority color)
+    'LLM Validated': GHIBLI_PALETTE['warm_red'],      # Warm Red (second priority color)
+    'Audit Validated': GHIBLI_PALETTE['green']        # Spirited Meadow (green)
 }
 
 #%%
@@ -116,7 +119,7 @@ def create_scatter_scores():
         
         # Add 45-degree line (y = x) for reference
         ax.plot([0, 100], [0, 100], 
-               'k--', linewidth=1.5, alpha=0.5, label='45-degree line')
+               color=GHIBLI_PALETTE['gray'], linestyle='--', linewidth=1.5, alpha=0.5, label='45-degree line')
         
         # Add LOWESS smooth fit
         x_data = flagged_df['original_score'].values
@@ -130,7 +133,7 @@ def create_scatter_scores():
         # LOWESS smoothing
         smoothed = lowess(y_sorted, x_sorted, frac=0.3)
         ax.plot(smoothed[:, 0], smoothed[:, 1], 
-               'r-', linewidth=2, alpha=0.7, label='Smooth fit')
+               color=GHIBLI_PALETTE['red'], linewidth=2, alpha=0.7, label='Smooth fit')
         
         ax.set_xlabel('Original LLM Score', fontsize=12)
         ax.set_ylabel('Mean LLM Score (11 Queries)', fontsize=12)

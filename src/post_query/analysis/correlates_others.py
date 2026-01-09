@@ -21,6 +21,9 @@ from statsmodels.stats.proportion import proportion_confint
 from pathlib import Path
 import yaml
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
+from modules.colors import GHIBLI_PALETTE
 
 #%%
 # Paths
@@ -82,9 +85,9 @@ def save_score_histogram(scores, name, description, bins=20, threshold=None):
         print(f"Skipping histogram {name}: no scores available.")
         return
     fig, ax = plt.subplots()
-    ax.hist(scores, bins=bins, color="steelblue", edgecolor="white")
+    ax.hist(scores, bins=bins, color=GHIBLI_PALETTE['deep_teal'], edgecolor="white")
     if threshold is not None:
-        ax.axvline(threshold, color="red", linestyle="--", linewidth=1, alpha=0.7)
+        ax.axvline(threshold, color=GHIBLI_PALETTE['red'], linestyle="--", linewidth=1, alpha=0.7)
     ax.set_xlabel("Score")
     ax.set_ylabel("Count")
     plt.tight_layout()
@@ -173,7 +176,7 @@ def analyze_flag_by_market_value(df, flag_col, flag_name):
     )
     # Add horizontal line for sample average
     sample_avg = df_mv[flag_col].mean() * 100
-    ax.axhline(y=sample_avg, color='red', linestyle='--', linewidth=1, alpha=0.7)
+    ax.axhline(y=sample_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1, alpha=0.7)
     ax.set_xlabel("Market Value Decile")
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, None)
@@ -224,7 +227,7 @@ def analyze_flag_by_year(df, flag_col, flag_name):
     )
     # Add horizontal line for sample average
     year_sample_avg = df_year[flag_col].mean() * 100
-    ax.axhline(y=year_sample_avg, color='red', linestyle='--', linewidth=1, alpha=0.7)
+    ax.axhline(y=year_sample_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1, alpha=0.7)
     ax.set_xlabel("Year")
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, None)
