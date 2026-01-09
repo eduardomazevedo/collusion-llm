@@ -34,6 +34,22 @@
 \RequirePackage[hidelinks]{hyperref}
 \RequirePackage{subcaption}
 
+% Float placement parameters - aggressively prevent float-only pages
+% Make it very hard to create a float-only page (require 90% of page to be floats)
+\renewcommand{\floatpagefraction}{0.9}
+% Allow floats to take up most of the page with text
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\textfraction}{0.05}  % Allow very little text on float pages
+% Allow more floats per page
+\setcounter{topnumber}{4}
+\setcounter{bottomnumber}{4}
+\setcounter{totalnumber}{6}
+% Make LaTeX try harder to place floats inline
+\setlength{\floatsep}{12pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{20pt plus 2pt minus 4pt}
+\setlength{\intextsep}{12pt plus 2pt minus 2pt}
+
 % Table packages
 \RequirePackage{booktabs}
 \RequirePackage{tabularx}

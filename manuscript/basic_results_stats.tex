@@ -6,16 +6,11 @@ The first obvious feature of the data is that very few transcripts are flagged a
 \input{../data/outputs/tables/summary_stats_results.tex}
 
 % Figure: Histogram of original LLM scores for the entire sample
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=\textwidth]{../data/outputs/figures/original_score_entire_sample_16x9.pdf}
-    \caption{Distribution of original LLM scores for the entire sample. Histogram shows the frequency of scores across all transcripts processed through the initial LLM query. Vertical dashed lines indicate the mean and median scores.}
+    \caption{Distribution of original LLM scores for the entire sample.}
     \label{fig:original_score_entire_sample}
-    \begin{minipage}{\textwidth}
-    \vspace{1em}
-    \footnotesize
-    \textit{Notes:} This figure shows the distribution of LLM scores from the initial query across all transcripts in the full dataset. The histogram reveals that the vast majority of transcripts receive low scores, indicating that the LLM identifies most communications as non-collusive. The concentration of scores on the left side of the distribution demonstrates that the model is confident in its negative classifications, which is consistent with the rarity of public collusive communications. The vertical dashed lines mark the mean and median scores, providing reference points for the central tendency of the distribution.
-    \end{minipage}
 \end{figure}
 
 We now turn to the validation step, where each flagged transcript is re-queried 10 times. Out of all the flagged transcripts, only \data{summary_stats/tagging_performance/llm_validation_rate_pct_percentage} pass the validation threshold of an average score of at least 75. Thus, many of the LLM-flagged transcripts are false positives. This is to be expected because again we are searching for the rare event of collusive communications. Thus, even a small rate of hallucinations translates to a large percentage of false positives. The validation step leaves us with a sample of \data{summary_stats/tagging_performance/llm_validation_tagged_int} LLM-validated transcripts.
@@ -23,27 +18,17 @@ We now turn to the validation step, where each flagged transcript is re-queried 
 This winner's curse can be seen transparently in the data. Figure \ref{fig:mean_score_validated_samples} shows that the distribution of mean scores has the bulk of its values below 75. And Figure \ref{fig:scatter_scores} shows that the mean scores are often below the original scores. Thus, most LLM-flagged observations are due to the LLM randomly producing a high score. At the same time, both figures show that transcripts with a high original score tend to have a high mean score after validation. This suggests that the LLM is capturing some signal. We will confirm this below, as we turn to the benchmark sample, human audit, and detailed reading of example transcripts.
 
 % Figure: Histogram of mean LLM scores (10 repetitions) for LLM flagged transcripts
-\begin{figure}[ht]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/mean_score_validated_samples_16x9.pdf}
-\caption{Distribution of mean LLM scores (10 repetitions) for LLM flagged transcripts. Bars are stacked by validation status: LLM Flagged Only (transcripts flagged but not validated), LLM Validated (passed validation threshold but not human audit), and Audit Validated (confirmed by human audit).}
+\caption{Distribution of mean LLM scores (with 10 repetitions) for LLM flagged transcripts.}
 \label{fig:mean_score_validated_samples}
-\begin{minipage}{\textwidth}
-\vspace{1em}
-\footnotesize
-\textit{Notes:} This figure shows the distribution of mean scores from 10 repeated queries for transcripts that were initially flagged by the LLM (score $\ge$ 75). The histogram is stacked by validation status, showing how transcripts are distributed across three categories: those that failed validation (LLM Flagged Only), those that passed validation but were not audited (LLM Validated), and those confirmed by human audit (Audit Validated). The bulk of the distribution lies below the validation threshold of 75, illustrating the winner's curse phenomenon where many initially high-scoring transcripts are revealed as false positives upon repeated querying. This pattern demonstrates the importance of the validation step in reducing false positives.
-\end{minipage}
 \end{figure}
 
 % Figure: Scatter plot comparing original LLM scores to mean scores from 10 repetitions
-\begin{figure}[ht]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf}
-\caption{Scatter plot comparing original LLM scores to mean scores from 10 repetitions. Points are colored by validation status. The dashed line represents the 45-degree line where original and mean scores are equal. The smooth fit (LOWESS) shows the actual relationship between initial and repeated scores.}
+    \caption{Original LLM Score vs. Mean LLM Score after 10 repetitions.}
 \label{fig:scatter_scores}
-\begin{minipage}{\textwidth}
-\vspace{1em}
-\footnotesize
-\textit{Notes:} This figure compares the original LLM score (from the initial query) to the mean score from 10 repeated queries for all transcripts that were initially flagged. Points are colored by validation status: LLM Flagged Only (failed validation), LLM Validated (passed validation), and Audit Validated (confirmed by human audit). The dashed 45-degree line represents where original and mean scores would be equal. Most points fall below this line, indicating that mean scores are typically lower than original scores, consistent with regression to the mean and the winner's curse. However, transcripts with high original scores tend to have high mean scores, suggesting the LLM is capturing genuine signal. The LOWESS smooth fit shows the actual relationship between initial and repeated scores, revealing both the downward bias and the positive correlation for high-scoring transcripts.
-\end{minipage}
 \end{figure}

@@ -44,7 +44,7 @@
 - if you try to do something as Codex like running a script or command and you keep failing for some reason, explain what is happenin to the user and see if there is something the user can do immediately to help (e.g. grant some permissions, run something himself in the terminal, etc)
 
 ## Latex
-- Figures should usually take up 100% of text width. Figures should have clear title, and detailed notes in a footnotesize minipage. Figure notes should make the paper skimmable, by having the context needed to understand them without reading the whole paper.
+- Figures should usually take up 100% of text width. Figures should have clear terse title, and (if needed) detailed notes in a footnotesize minipage. Figure notes should make the paper skimmable, by having the context needed to understand them without reading the whole paper.
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/market_value_deciles_llm_16x9.pdf}

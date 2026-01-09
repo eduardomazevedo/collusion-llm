@@ -5,10 +5,10 @@ The clearest pattern is the heterogeneity by sector, displayed in Figure \ref{fi
 We also measured the rate of collusive communications in a few segments that are notorious for common collusion. Almost all of them have significantly higher rates of collusive communications than the average. The highest rates are pulp, paper and packaging and glass and concrete, with rates about eight times the average. The only exception is heavy civil construction, which interestingly has a much lower rate of collusive communications than the average. A possible reason is that this segment is known for collusion with bidding rings in public works projects. But this type of collusion is not facilitated by public communications as in the other high collusion segments.
 
 % Figure: tag rate by sector
-\begin{figure}[ht]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/segment_tag_rates_llm.pdf}
-\caption{LLM Tag Rate by Sector and High Collusion Segments}
+\caption{LLM Flagged Rate by Sector and High Collusion Segments}
 \label{fig:segment_tag_rates}
 \begin{minipage}{\textwidth}
 \vspace{1em}
@@ -20,10 +20,10 @@ We also measured the rate of collusive communications in a few segments that are
 The patterns by market value decile are less clear (Figure \ref{fig:market_value_deciles}). The largest firms, except in the top decile, have a slightly higher than average probability of collusive communication. While the differences are statistically significant, they are small.
 
 % Figure: tag rate by market value decile
-\begin{figure}[ht]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/market_value_deciles_llm_16x9.pdf}
-\caption{LLM Tag Rate by Market Value Decile}
+\caption{LLM Flagged Rate by Market Value Decile}
 \label{fig:market_value_deciles}
 \begin{minipage}{\textwidth}
 \vspace{1em}
@@ -35,14 +35,14 @@ The patterns by market value decile are less clear (Figure \ref{fig:market_value
 Likewise, Figure \ref{fig:year_tag_rates} suggests a mild decrease in collusive communication over time. While we see statistically significant differences across these years, these are relatively weak and noisy patterns.
 
 % Figure: tag rate by year
-\begin{figure}[ht]
+\begin{figure}[htb]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/year_tag_rates_llm_16x9.pdf}
-\caption{LLM Tag Rate by Year}
+\caption{LLM Flagged Rate by Year}
 \label{fig:year_tag_rates}
 \begin{minipage}{\textwidth}
 \vspace{1em}
 \footnotesize
-\textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM over time. The chart displays temporal trends in collusive communication detection across the sample period. Data includes \data{correlates_collusive_communication/year_valid_observations_int} firms in the call year analysis.
-\end{minipage}
+    \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM over time. The chart displays temporal trends in collusive communication detection across the sample period. Data includes \data{correlates_collusive_communication/year_valid_observations_int} firms in the call year analysis.
+    \end{minipage}
 \end{figure}
