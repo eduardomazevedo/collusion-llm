@@ -23,7 +23,11 @@ import yaml
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
-from modules.colors import GHIBLI_PALETTE
+from modules.colors import GHIBLI_COLORS, apply_ghibli_theme, STYLE_CONFIG, ghibli_palette
+
+#%%
+# Apply Ghibli theme
+apply_ghibli_theme()
 
 #%%
 # Paths
@@ -95,9 +99,10 @@ def save_score_histogram(scores, name, description, bins=20, threshold=None):
         print(f"Skipping histogram {name}: no scores available.")
         return
     fig, ax = plt.subplots()
-    ax.hist(scores, bins=bins, color=GHIBLI_PALETTE['deep_teal'], edgecolor="white")
+    ax.hist(scores, bins=bins, color=GHIBLI_COLORS[0], 
+            edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])
     if threshold is not None:
-        ax.axvline(threshold, color=GHIBLI_PALETTE['red'], linestyle="--", linewidth=1, alpha=0.7)
+        ax.axvline(threshold, color=STYLE_CONFIG["line_color"], linestyle="--")
     ax.set_xlabel("Score")
     ax.set_ylabel("Count")
     plt.tight_layout()
@@ -178,19 +183,22 @@ def analyze_flag_by_market_value(df, flag_col, flag_name):
     # Calculate error bars, ensuring they're non-negative
     yerr_low = np.maximum(0, mv_stats['tag_pct'] - mv_stats['ci_low'])
     yerr_high = np.maximum(0, mv_stats['ci_high'] - mv_stats['tag_pct'])
-    ax.errorbar(
+    ax.bar(
         mv_stats['mv_decile'],
         mv_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
-        fmt='o-', capsize=4,
-        color=GHIBLI_PALETTE['deep_teal']
+        edgecolor=STYLE_CONFIG["edge_color"],
+        linewidth=STYLE_CONFIG["edge_width"],
+        ecolor=STYLE_CONFIG["error_color"]
     )
     # Add horizontal line for sample average
     sample_avg = df_mv[flag_col].mean() * 100
-    ax.axhline(y=sample_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1, alpha=0.7)
+    ax.axhline(y=sample_avg, color=STYLE_CONFIG["line_color"], linestyle='--')
     ax.set_xlabel("Market Value Decile")
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, None)
+    # Set x-axis to show all ten deciles
+    ax.set_xticks(range(1, 11))
     save_figure(f"market_value_deciles_{flag_name}", f"{flag_name} tag rate by market value decile. Produced by correlates_others.py", fig)
     
     return len(df_mv), float(df_mv[flag_col].mean() * 100)
@@ -230,16 +238,17 @@ def analyze_flag_by_year(df, flag_col, flag_name):
     # Calculate error bars, ensuring they're non-negative
     yerr_low = np.maximum(0, year_stats['tag_pct'] - year_stats['ci_low'])
     yerr_high = np.maximum(0, year_stats['ci_high'] - year_stats['tag_pct'])
-    ax.errorbar(
+    ax.bar(
         year_stats['transcript_year'],
         year_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
-        fmt='o-', capsize=4,
-        color=GHIBLI_PALETTE['deep_teal']
+        edgecolor=STYLE_CONFIG["edge_color"],
+        linewidth=STYLE_CONFIG["edge_width"],
+        ecolor=STYLE_CONFIG["error_color"]
     )
     # Add horizontal line for sample average
     year_sample_avg = df_year[flag_col].mean() * 100
-    ax.axhline(y=year_sample_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1, alpha=0.7)
+    ax.axhline(y=year_sample_avg, color=STYLE_CONFIG["line_color"], linestyle='--')
     ax.set_xlabel("Year")
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, None)

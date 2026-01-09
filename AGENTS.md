@@ -74,19 +74,17 @@ Description of the variable, including data type, scale, and any special values 
 - The downstream analysis produces the final assets that we use for the paper and human reading. Goes in `data/outputs/` with subfolders `tables/`, `figures/`.
 - Most tables should be output as csv and latex. The exception are large tables like `data/outputs/top_transcript_data_for_joe.csv` which are only meant to be read in spreadsheets and not for publication.
 - Figures should be output as .pdf and .png, in both 1:1 and 16:9 formats. Figures and tables should not have titles because we will add them in latex.
-- Figures should use the following color palette, with the teal and warm red being the first two colors to be used.
-ghibli_palette <- c(
-  "deep_teal" = "#3b6978",    # Deep Teal (blue-gray tone)    
-  "warm_red" = "#f28482",     # Warm Red (muted red-orange)
-  "red" = "#FF5C5C"           # Kiki's Delivery Red (strong red)  
-  "cream" = "#f9f5e3",        # Soft Cream (lightest background)
-  "light_gray" = "#DADADA",   # Whispering Wind (light gray)
-  "gray" = "#6C7A8E",         # Totoro Gray (darker gray)
-  "blue" = "#8FB1E9",         # Castle Sky (soft blue)
-  "green" = "#A6D784",        # Spirited Meadow (soft green)
-  "muted_green" = "#84a59d",  # Muted Green (gray-green tone)
-  "gold" = "#FFD700",         # Howl's Moving Castle Gold (strong yellow)
-)
+- Figures should use the Ghibli color palette defined in `modules/colors.py`. Import and use the module as follows:
+  - Use `from modules.colors import GHIBLI_COLORS, ghibli_palette, apply_ghibli_theme, STYLE_CONFIG`
+  - **Always call `apply_ghibli_theme()` at the start of figure generation** to set matplotlib defaults (grid, colors, fonts, etc.)
+  - **Avoid overriding theme settings** - the theme handles grid, fonts, colors, and other styling centrally
+  - For categorical plots, use `GHIBLI_COLORS` which provides a standard sequence: Red (primary), Deep Teal (secondary), Gold (highlight), Blue, Green, Gray
+  - For full palette access, use `ghibli_palette` dictionary
+  - Use `STYLE_CONFIG` for standard styling elements: error bars, annotation lines, and text should use black (`STYLE_CONFIG["error_color"]`, `STYLE_CONFIG["line_color"]`, `STYLE_CONFIG["text_color"]`)
+  - **For histograms and bar charts**: Explicitly add black borders using `edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"]` in the plotting call (e.g., `ax.hist(data, edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])`)
+  - **For scatter plots**: Do not add borders (no edgecolor parameter)
+  - Grid color uses light gray from the palette (`STYLE_CONFIG["grid_color"]`) and appears behind plot elements automatically
+  - Background is white for standard scientific paper style
 - Make exceptions when these colors do not work well, such as with a continuous scale.
 - The code producing each figure or table should also output a .txt file in the same location in `data/outputs` with same filename but txt extension with a terse description of the asset and what script produces it.
 - Scripts that calculate stats that do not fit neatly into a table should output a yaml file in `data/yaml/`. These include basic stats like number of observations, etc.

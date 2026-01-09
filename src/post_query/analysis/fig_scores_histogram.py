@@ -20,12 +20,16 @@ from pathlib import Path
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
-from modules.colors import GHIBLI_PALETTE
+from modules.colors import GHIBLI_COLORS, apply_ghibli_theme, STYLE_CONFIG, ghibli_palette
 
 #%%
 # Setup paths
 OUT_DIR = Path("data/outputs/figures")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+#%%
+# Apply Ghibli theme
+apply_ghibli_theme()
 
 #%%
 # Load data
@@ -40,17 +44,12 @@ df_with_scores = df.merge(
 )
 
 #%%
-# Set style
-sns.set_style("whitegrid")
-plt.rcParams['font.family'] = 'sans-serif'
-plt.rcParams['font.size'] = 11
-
-#%%
-# Define colors for consistency using Ghibli palette
+# Define colors for consistency using Ghibli color sequence
+# GHIBLI_COLORS: [Red, Teal, Gold, Blue, Green, Gray]
 COLORS = {
-    'LLM Flagged': GHIBLI_PALETTE['deep_teal'],      # Deep Teal (first priority color)
-    'LLM Validated': GHIBLI_PALETTE['warm_red'],     # Warm Red (second priority color)
-    'Audit Validated': GHIBLI_PALETTE['green']       # Spirited Meadow (green)
+    'LLM Flagged Only': GHIBLI_COLORS[0],      # Red (primary)
+    'LLM Validated': GHIBLI_COLORS[1],         # Deep Teal (secondary)
+    'Audit Validated': GHIBLI_COLORS[4]         # Green
 }
 
 #%%
@@ -72,17 +71,15 @@ def create_entire_sample_histogram():
         fig, ax = plt.subplots(figsize=figsize)
         
         # Create histogram with 20 bins
-        ax.hist(original_scores, bins=20, edgecolor='black', alpha=0.7, color=GHIBLI_PALETTE['deep_teal'])
+        ax.hist(original_scores, bins=20, color=GHIBLI_COLORS[0], 
+                edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])
         
-        ax.set_xlabel('Original LLM Score', fontsize=12)
-        ax.set_ylabel('Frequency', fontsize=12)
-        ax.grid(True, alpha=0.3)
+        ax.set_xlabel('Original LLM Score')
+        ax.set_ylabel('Frequency')
         
         # Add summary statistics
         mean_score = original_scores.mean()
-        median_score = original_scores.median()
-        ax.axvline(mean_score, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=2, label=f'Mean: {mean_score:.1f}')
-        ax.axvline(median_score, color=GHIBLI_PALETTE['warm_red'], linestyle='--', linewidth=2, label=f'Median: {median_score:.1f}')
+        ax.axvline(mean_score, color=STYLE_CONFIG["line_color"], linestyle='--', label=f'Mean: {mean_score:.1f}')
         ax.legend()
         
         plt.tight_layout()
@@ -146,11 +143,8 @@ def create_validated_samples_mean_histogram():
         
         # Get scores for each group (in stacking order: bottom to top)
         groups_order = ['LLM Flagged Only', 'LLM Validated', 'Audit Validated']
-        colors_order = [
-            GHIBLI_PALETTE['deep_teal'],  # Deep Teal (first priority)
-            GHIBLI_PALETTE['warm_red'],   # Warm Red (second priority)
-            GHIBLI_PALETTE['green']       # Spirited Meadow (green)
-        ]
+        # Use GHIBLI_COLORS sequence: Red, Teal, Green
+        colors_order = [GHIBLI_COLORS[0], GHIBLI_COLORS[1], GHIBLI_COLORS[4]]
         
         scores_by_group = []
         labels = []
@@ -165,12 +159,11 @@ def create_validated_samples_mean_histogram():
         
         # Create stacked histogram
         ax.hist(scores_by_group, bins=bins, stacked=True, label=labels, 
-               color=colors, edgecolor='black', alpha=0.8)
+               color=colors, edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])
         
-        ax.set_xlabel('Mean LLM Score (11 Queries)', fontsize=12)
-        ax.set_ylabel('Frequency', fontsize=12)
+        ax.set_xlabel('Mean LLM Score (11 Queries)')
+        ax.set_ylabel('Frequency')
         ax.legend(loc='upper left')
-        ax.grid(True, alpha=0.3)
         ax.set_xlim(0, 100)
         
         plt.tight_layout()

@@ -22,7 +22,11 @@ import yaml
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
-from modules.colors import GHIBLI_PALETTE
+from modules.colors import GHIBLI_COLORS, apply_ghibli_theme, STYLE_CONFIG, ghibli_palette
+
+#%%
+# Apply Ghibli theme
+apply_ghibli_theme()
 
 #%%
 # Paths
@@ -97,9 +101,10 @@ def save_score_histogram(scores, name, description, bins=20, threshold=None):
         print(f"Skipping histogram {name}: no scores available.")
         return
     fig, ax = plt.subplots()
-    ax.hist(scores, bins=bins, color=GHIBLI_PALETTE['deep_teal'], edgecolor="white")
+    ax.hist(scores, bins=bins, color=GHIBLI_COLORS[0], 
+            edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])
     if threshold is not None:
-        ax.axvline(threshold, color=GHIBLI_PALETTE['red'], linestyle="--", linewidth=1, alpha=0.7)
+        ax.axvline(threshold, color=STYLE_CONFIG["line_color"], linestyle="--")
     ax.set_xlabel("Score")
     ax.set_ylabel("Count")
     plt.tight_layout()
@@ -184,11 +189,13 @@ def analyze_flag_by_market_value(df, flag_col, flag_name):
         mv_stats['mv_decile'],
         mv_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
-        fmt='o-', capsize=4
+        fmt='o-',
+        color=GHIBLI_COLORS[1],
+        ecolor=STYLE_CONFIG["error_color"]
     )
     # Add horizontal line for sample average
     sample_avg = df_mv[flag_col].mean() * 100
-    ax.axhline(y=sample_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1, alpha=0.7)
+    ax.axhline(y=sample_avg, color=STYLE_CONFIG["line_color"], linestyle='--')
     ax.set_xlabel("Market Value Decile")
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, None)
@@ -238,11 +245,14 @@ def analyze_flag_by_sector(df, flag_col, flag_name, gics_sectors):
         y=np.arange(len(sector_sorted)),
         width=sector_sorted['tag_pct'],
         xerr=[xerr_low, xerr_high],
-        capsize=4, color=GHIBLI_PALETTE['blue']
+        color=GHIBLI_COLORS[3],
+        edgecolor=STYLE_CONFIG["edge_color"],
+        linewidth=STYLE_CONFIG["edge_width"],
+        ecolor=STYLE_CONFIG["error_color"]
     )
     # Add vertical line for sample average
     sector_sample_avg = sector_valid[flag_col].mean() * 100
-    ax.axvline(x=sector_sample_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1, alpha=0.7)
+    ax.axvline(x=sector_sample_avg, color=STYLE_CONFIG["line_color"], linestyle='--')
     ax.set_yticks(np.arange(len(sector_sorted)))
     ax.set_yticklabels(sector_sorted['sector_name'])
     ax.set_xlabel(xlabel)
@@ -291,11 +301,13 @@ def analyze_flag_by_year(df, flag_col, flag_name):
         year_stats['transcript_year'],
         year_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
-        fmt='o-', capsize=4
+        fmt='o-',
+        color=GHIBLI_COLORS[1],
+        ecolor=STYLE_CONFIG["error_color"]
     )
     # Add horizontal line for sample average
     year_sample_avg = df_year[flag_col].mean() * 100
-    ax.axhline(y=year_sample_avg, color=GHIBLI_PALETTE['red'], linestyle='--', linewidth=1, alpha=0.7)
+    ax.axhline(y=year_sample_avg, color=STYLE_CONFIG["line_color"], linestyle='--')
     ax.set_xlabel("Year")
     ax.set_ylabel(ylabel)
     ax.set_ylim(0, None)

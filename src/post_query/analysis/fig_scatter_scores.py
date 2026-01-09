@@ -15,19 +15,20 @@ import config
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from pathlib import Path
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
-from modules.colors import GHIBLI_PALETTE
-from scipy.interpolate import UnivariateSpline
-from statsmodels.nonparametric.smoothers_lowess import lowess
+from modules.colors import GHIBLI_COLORS, apply_ghibli_theme, STYLE_CONFIG
 
 #%%
 # Setup paths
 OUT_DIR = Path("data/outputs/figures")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+#%%
+# Apply Ghibli theme
+apply_ghibli_theme()
 
 #%%
 # Load data
@@ -42,17 +43,12 @@ df_with_scores = df.merge(
 )
 
 #%%
-# Set style
-sns.set_style("whitegrid")
-plt.rcParams['font.family'] = 'sans-serif'
-plt.rcParams['font.size'] = 11
-
-#%%
-# Define colors for consistency using Ghibli palette
+# Define colors for consistency using Ghibli color sequence
+# GHIBLI_COLORS: [Red, Teal, Gold, Blue, Green, Gray]
 COLORS = {
-    'LLM Flagged Only': GHIBLI_PALETTE['deep_teal'],  # Deep Teal (first priority color)
-    'LLM Validated': GHIBLI_PALETTE['warm_red'],      # Warm Red (second priority color)
-    'Audit Validated': GHIBLI_PALETTE['green']        # Spirited Meadow (green)
+    'LLM Flagged Only': GHIBLI_COLORS[0],      # Red (primary)
+    'LLM Validated': GHIBLI_COLORS[1],         # Deep Teal (secondary)
+    'Audit Validated': GHIBLI_COLORS[2]        # Gold (third in theme)
 }
 
 #%%
@@ -109,41 +105,41 @@ def create_scatter_scores():
         for group in groups_order:
             group_df = flagged_df[flagged_df['group'] == group]
             if len(group_df) > 0:
+                # Add horizontal jitter to make overlapping points more visible
+                np.random.seed(42)  # For reproducibility
+                jitter = np.random.uniform(-0.5, 0.5, size=len(group_df))
                 ax.scatter(
-                    group_df['original_score'],
+                    group_df['original_score'] + jitter,
                     group_df['mean_score_ten_repeats'],
                     c=COLORS[group],
-                    label=f'{group} (N={group_counts.get(group, 0)})',
-                    alpha=0.6,
-                    s=50,
-                    edgecolors='black',
-                    linewidths=0.5
+                    label=f'{group} (N={group_counts.get(group, 0):,})',
+                    alpha=0.3
                 )
         
         # Add 45-degree line (y = x) for reference
         ax.plot([0, 100], [0, 100], 
-               color=GHIBLI_PALETTE['gray'], linestyle='--', linewidth=1.5, alpha=0.5, label='45-degree line')
+               color=STYLE_CONFIG["line_color"], linestyle='--', label='45-degree line')
         
-        # Add LOWESS smooth fit
+        # Add linear fit
         x_data = flagged_df['original_score'].values
         y_data = flagged_df['mean_score_ten_repeats'].values
         
-        # Sort by x for smooth line
-        sort_idx = np.argsort(x_data)
-        x_sorted = x_data[sort_idx]
-        y_sorted = y_data[sort_idx]
+        # Fit linear polynomial
+        coeffs = np.polyfit(x_data, y_data, 1)
+        poly = np.poly1d(coeffs)
         
-        # LOWESS smoothing
-        smoothed = lowess(y_sorted, x_sorted, frac=0.3)
-        ax.plot(smoothed[:, 0], smoothed[:, 1], 
-               color=GHIBLI_PALETTE['red'], linewidth=2, alpha=0.7, label='Smooth fit')
+        # Generate smooth line for plotting (extend to full x-axis range)
+        x_fit = np.linspace(70, 100, 100)
+        y_fit = poly(x_fit)
         
-        ax.set_xlabel('Original LLM Score', fontsize=12)
-        ax.set_ylabel('Mean LLM Score (11 Queries)', fontsize=12)
-        ax.set_xlim(75, 100)
+        ax.plot(x_fit, y_fit, 
+               color=STYLE_CONFIG["line_color"], label='Linear fit')
+        
+        ax.set_xlabel('Original LLM Score')
+        ax.set_ylabel('Mean LLM Score (11 Queries)')
+        ax.set_xlim(70, 100)
         ax.set_ylim(0, 100)  # Full range for y-axis
-        ax.legend(loc='upper right', title='Validation Status')
-        ax.grid(True, alpha=0.3)
+        ax.legend(loc='lower right', title='Validation Status')
         
         plt.tight_layout()
         
