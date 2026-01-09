@@ -18,27 +18,22 @@ rule all:
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
         "data/outputs/tables/detailed_industry_results.csv",
-        "data/outputs/tables/collusive_segments_tag_rates.csv",
         # LLM flag outputs
         "data/outputs/tables/market_value_deciles_llm.csv",
-        "data/outputs/tables/sector_tag_rates_llm.csv", 
+        "data/outputs/tables/segment_tag_rates_llm.csv", 
         "data/outputs/tables/year_tag_rates_llm.csv",
         "data/outputs/figures/market_value_deciles_llm_1x1.png",
-        "data/outputs/figures/sector_tag_rates_llm_1x1.png",
+        "data/outputs/figures/segment_tag_rates_llm_1x1.png",
         "data/outputs/figures/year_tag_rates_llm_1x1.png",
-        # LLM validation flag outputs
+        # LLM validation flag outputs (market value and year only, no sectors)
         "data/outputs/tables/market_value_deciles_llm_validation.csv",
-        "data/outputs/tables/sector_tag_rates_llm_validation.csv", 
         "data/outputs/tables/year_tag_rates_llm_validation.csv",
         "data/outputs/figures/market_value_deciles_llm_validation_1x1.png",
-        "data/outputs/figures/sector_tag_rates_llm_validation_1x1.png",
         "data/outputs/figures/year_tag_rates_llm_validation_1x1.png",
-        # Human audit flag outputs
+        # Human audit flag outputs (market value and year only, no sectors)
         "data/outputs/tables/market_value_deciles_human_audit.csv",
-        "data/outputs/tables/sector_tag_rates_human_audit.csv", 
         "data/outputs/tables/year_tag_rates_human_audit.csv",
         "data/outputs/figures/market_value_deciles_human_audit_1x1.png",
-        "data/outputs/figures/sector_tag_rates_human_audit_1x1.png",
         "data/outputs/figures/year_tag_rates_human_audit_1x1.png",
         # Benchmarking outputs
         "data/outputs/tables/benchmarking_combined.csv",
@@ -190,41 +185,22 @@ rule detailed_industry_results:
     shell:
         "python src/post_query/analysis/detailed_industry_results.py"
 
-rule correlates_high_collusion_segments:
+rule correlates_segments:
     """
-    Analyze LLM collusion tagging rates for eight high collusion segments.
-    Uses detailed_industry_results.csv to calculate aggregated tag rates for specific SIC-based segments.
-    Outputs CSV table with segment names, SIC codes, and flagging statistics.
-    """
-    input:
-        "data/outputs/tables/detailed_industry_results.csv"
-    output:
-        "data/outputs/tables/collusive_segments_tag_rates.csv"
-    shell:
-        "python src/post_query/analysis/correlates_high_collusion_segments.py"
-
-rule correlates_sectors:
-    """
-    Analyze LLM collusion tagging patterns by sector (GICS) across three flag variables.
-    Creates sector tables and corresponding figures for llm_flag, llm_validation_flag, and human_audit_flag.
+    Analyze LLM collusion tagging patterns by sector (GICS) and high collusion segments.
+    Uses detailed_industry_results.csv to create combined tables and figures with both groups.
     Outputs CSV/LaTeX tables and PNG/PDF figures in 1:1 and 16:9 formats.
-    Note: Requires correlates_others to run first to create the YAML file.
+    Note: Requires detailed_industry_results and correlates_others to run first.
     """
     input:
-        "data/datasets/main_analysis_dataset.feather",
+        "data/outputs/tables/detailed_industry_results.csv",
         yaml="data/yaml/correlates_collusive_communication.yaml"
     output:
-        # LLM flag outputs
-        sector_table_llm="data/outputs/tables/sector_tag_rates_llm.csv",
-        sector_fig_llm="data/outputs/figures/sector_tag_rates_llm_1x1.png",
-        # LLM validation flag outputs
-        sector_table_validation="data/outputs/tables/sector_tag_rates_llm_validation.csv",
-        sector_fig_validation="data/outputs/figures/sector_tag_rates_llm_validation_1x1.png",
-        # Human audit flag outputs
-        sector_table_audit="data/outputs/tables/sector_tag_rates_human_audit.csv",
-        sector_fig_audit="data/outputs/figures/sector_tag_rates_human_audit_1x1.png"
+        # Combined LLM flag outputs for sectors and segments
+        segment_table_llm="data/outputs/tables/segment_tag_rates_llm.csv",
+        segment_fig_llm="data/outputs/figures/segment_tag_rates_llm_1x1.png"
     shell:
-        "python src/post_query/analysis/correlates_sectors.py"
+        "python src/post_query/analysis/correlates_segments.py"
 
 rule correlates_others:
     """

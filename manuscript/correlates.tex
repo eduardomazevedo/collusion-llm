@@ -2,26 +2,26 @@ We now examine the correlates of collusive communication. We consider three type
 
 To increase statistical power, we use the LLM-flagged set as the base sample. This is of course imperfect, as being LLM-flagged is a noisy measure of collusive communication, due to the significant rate of false positives. 
 
-Figures \ref{fig:sector_tag_rates}, \ref{fig:market_value_deciles}, and \ref{fig:year_tag_rates} show the fraction of communications tagged as collusive by the LLM across different industry sectors, market value deciles, and years, respectively.
+Figures \ref{fig:segment_tag_rates}, \ref{fig:market_value_deciles}, and \ref{fig:year_tag_rates} show the fraction of communications tagged as collusive by the LLM across different industry sectors and high collusion segments, market value deciles, and years, respectively.
 
 The clearest pattern is the heterogeneity by sector. Materials is an outlier, with more than triple the average probability of collusive communication. This is followed by energy, with over twice the average probability. Consumer staples, communications and services, and industrials are also significantly above average. We highlight that these correlational results are tentative, due to the imperfect nature of our LLM measures and the high rate of false positives. Nevertheless, the fact that the patterns are similar across the LLM-flagged and LLM-validated measures suggests that the results may indeed represent heterogeneity in the prevalence of collusive communication across sectors.
 
-The patterns by market value decile are less clear. The largest firms, except in the top decile, have a slightly higher than average probability of collusive communication. While the differences are statistically significant, they are not large, and it is unclear whether these are due to actual differences in collusive communication or simply due to unrelated differences in the likelihood of LLM detection.
-
-Likewise, Figure \ref{fig:year_tag_rates} suggests a mild decrease in collusive communication over time. While we see statistically significant differences across these years, these are relatively weak and noisy patterns.
-
+% Figure: tag rate by sector
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\textwidth]{../data/outputs/figures/sector_tag_rates_llm_16x9.pdf}
-    \caption{LLM Tag Rate by Sector}
-    \label{fig:sector_tag_rates}
+    \includegraphics[width=\textwidth]{../data/outputs/figures/segment_tag_rates_llm.pdf}
+    \caption{LLM Tag Rate by Sector and High Collusion Segments}
+    \label{fig:segment_tag_rates}
     \begin{minipage}{\textwidth}
         \vspace{1em}
         \footnotesize
-        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across different industry sectors. The chart displays the tag rates with confidence intervals. Data includes \data{correlates_collusive_communication/sector_valid_observations_int} firms in the sector analysis.
+        \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM across different industry sectors (GICS) and segments that are notorious for high collusion. The segments are defined using SIC codes as follows: (1) Cement (SIC 3241), (2) Commodity Chemicals—Industrial Inorganic (281), Industrial Organic (286), and Agricultural Chemicals (287), (3) Heavy Civil Construction—Highway and Street Construction (161) and Heavy Construction Except Highway (162), (4) Pulp, Paper and Packaging—Pulp Mills (261), Paper Mills (262), Paperboard Mills (263), and Paperboard Containers (265), (5) Primary Metals—Steel Works (331), Iron and Steel Foundries (332), and Primary Smelting of Nonferrous Metals (333), and (6) Glass and Concrete Products—Flat Glass (321) and Concrete, Gypsum, and Plaster Products (327). These segments were selected based on theoretical predictions of collusion risk (e.g., homogeneous products, high transport costs, capacity constraints) and historical cartel cases.
     \end{minipage}
 \end{figure}
 
+The patterns by market value decile are less clear. The largest firms, except in the top decile, have a slightly higher than average probability of collusive communication. While the differences are statistically significant, they are not large, and it is unclear whether these are due to actual differences in collusive communication or simply due to unrelated differences in the likelihood of LLM detection.
+
+% Figure: tag rate by market value decile
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{../data/outputs/figures/market_value_deciles_llm_16x9.pdf}
@@ -34,6 +34,10 @@ Likewise, Figure \ref{fig:year_tag_rates} suggests a mild decrease in collusive 
     \end{minipage}
 \end{figure}
 
+
+Likewise, Figure \ref{fig:year_tag_rates} suggests a mild decrease in collusive communication over time. While we see statistically significant differences across these years, these are relatively weak and noisy patterns.
+
+% Figure: tag rate by year
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{../data/outputs/figures/year_tag_rates_llm_16x9.pdf}
