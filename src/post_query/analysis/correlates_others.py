@@ -338,11 +338,6 @@ for flag_config in flag_configs:
     # Tag rates for missing observations
     summary_stats[f'mkvalt_missing_{name}_tag_rate'] = float(df[df['market_value_total_mil'].isna()][col].mean() * 100)
 
-# Save summary statistics (will be merged with sector stats later)
-yaml_path = yaml_dir / "correlates_collusive_communication.yaml"
-with open(yaml_path, "w") as f:
-    yaml.dump(summary_stats, f)
-
 #%%
 # LLM score histograms for flagged and validated sets
 flagged_scores = top_transcripts_df['original_score'].dropna()
@@ -574,24 +569,16 @@ for industry_name, sample_mask in industry_samples.items():
             industry_summary_stats[f'{industry_name}_{name}_tag_rate'] = float(tag_rate)
             industry_summary_stats[f'{industry_name}_{name}_n_tagged'] = int(df[sample_mask][col].sum())
 
-# Add industry sample statistics to YAML
+# Add industry sample statistics to summary_stats
 if industry_summary_stats:
-    # Load existing YAML to merge
-    yaml_path = yaml_dir / "correlates_collusive_communication.yaml"
-    if yaml_path.exists():
-        with open(yaml_path, "r") as f:
-            existing_stats = yaml.safe_load(f) or {}
-    else:
-        existing_stats = {}
-    
-    # Merge industry stats
-    existing_stats.update(industry_summary_stats)
-    
-    # Save updated YAML
-    with open(yaml_path, "w") as f:
-        yaml.dump(existing_stats, f)
-    
-    print(f"\nSaved industry sample statistics to {yaml_path}")
+    summary_stats.update(industry_summary_stats)
+    print(f"\nAdded industry sample statistics to summary stats")
+
+# Save all summary statistics to YAML (single write at the end)
+yaml_path = yaml_dir / "correlates_collusive_communication.yaml"
+with open(yaml_path, "w") as f:
+    yaml.dump(summary_stats, f)
+print(f"\nSaved all summary statistics to {yaml_path}")
 
 print("\n" + "="*60)
 print("Completed industry-specific sample analysis")
