@@ -172,7 +172,8 @@ def analyze_flag_by_market_value(df, flag_col, flag_name):
         mv_stats['mv_decile'],
         mv_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
-        fmt='o-', capsize=4
+        fmt='o-', capsize=4,
+        color=GHIBLI_PALETTE['deep_teal']
     )
     # Add horizontal line for sample average
     sample_avg = df_mv[flag_col].mean() * 100
@@ -223,7 +224,8 @@ def analyze_flag_by_year(df, flag_col, flag_name):
         year_stats['transcript_year'],
         year_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
-        fmt='o-', capsize=4
+        fmt='o-', capsize=4,
+        color=GHIBLI_PALETTE['deep_teal']
     )
     # Add horizontal line for sample average
     year_sample_avg = df_year[flag_col].mean() * 100

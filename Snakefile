@@ -52,8 +52,10 @@ rule download_compustat_us:
     """
     output:
         "data/raw/compustat/compustat_us.feather"
+    resources:
+        wrds=1
     shell:
-        "python src/pre_query/compustat/download_compustat_us.py"
+        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/download_compustat_us.py"
 
 rule download_compustat_global:
     """
@@ -62,8 +64,10 @@ rule download_compustat_global:
     """
     output:
         "data/raw/compustat/compustat_global.feather"
+    resources:
+        wrds=1
     shell:
-        "python src/pre_query/compustat/download_compustat_global.py"
+        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/download_compustat_global.py"
 
 rule get_gvkey:
     """
@@ -75,8 +79,10 @@ rule get_gvkey:
     output:
         table="data/intermediaries/gvkey_table.feather",
         list_file="data/intermediaries/gvkey_list.txt"
+    resources:
+        wrds=1
     shell:
-        "python src/pre_query/compustat/get_gvkey.py"
+        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/get_gvkey.py"
 
 rule company_year_dataset:
     """
@@ -90,7 +96,7 @@ rule company_year_dataset:
     output:
         "data/datasets/company_year_compustat.feather"
     shell:
-        "python src/pre_query/compustat/company_year_dataset.py"
+        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/company_year_dataset.py"
 
 rule download_industry_classifications:
     """
@@ -102,6 +108,8 @@ rule download_industry_classifications:
         gics="data/intermediaries/gics_classifications.feather",
         naics="data/intermediaries/naics_classifications.feather",
         sic="data/intermediaries/sic_classifications.feather"
+    resources:
+        wrds=1
     shell:
         "python src/post_query/analysis/download_industry_classifications.py"
 
