@@ -55,7 +55,7 @@ scratch_outputs/
 *.bbl
 *.blg
 *.fdb_latexmk
-manuscript/manuscript.bbl-SAVE-ERROR
+*-SAVE-ERROR
 *.fls
 *.log
 *.out

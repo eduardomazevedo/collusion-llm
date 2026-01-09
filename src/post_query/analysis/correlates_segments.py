@@ -173,10 +173,18 @@ def get_high_collusion_segments(detailed_df):
     
     return pd.DataFrame(segment_results)
 
-def analyze_segments(combined_df):
+def analyze_segments(combined_df, overall_llm_rate=None):
     """
     Generate combined analysis for GICS sectors and high collusion segments.
     Creates table and figure with both groups clearly distinguished.
+    
+    Parameters:
+    -----------
+    combined_df : DataFrame
+        Combined sectors and segments dataframe
+    overall_llm_rate : float, optional
+        Overall LLM flag rate from the entire dataset (as percentage). 
+        If None, will calculate from sectors weighted by n_transcripts.
     """
     xlabel = "LLM Flagged as Collusive (%)"
     
@@ -314,7 +322,19 @@ def analyze_segments(combined_df):
         all_labels.insert(insert_idx, '')  # Empty string for header
     
     # Add vertical line for overall average
-    overall_avg = combined_df['tag_pct'].mean()
+    # Use provided overall_llm_rate, or calculate as weighted average of sectors only (excluding segments)
+    if overall_llm_rate is not None:
+        overall_avg = overall_llm_rate
+    else:
+        # Calculate weighted average from sectors only (weighted by n_transcripts)
+        # This represents the overall dataset average since sectors cover all transcripts
+        if n_sectors > 0:
+            total_transcripts = sectors['n'].sum()
+            weighted_sum = (sectors['tag_pct'] * sectors['n']).sum()
+            overall_avg = weighted_sum / total_transcripts if total_transcripts > 0 else 0
+        else:
+            overall_avg = 0
+    
     ax.axvline(x=overall_avg, color='red', linestyle='--', linewidth=1.5, alpha=0.7, label='Overall Average')
     
     # Set labels
@@ -382,10 +402,37 @@ combined_df = pd.concat([sector_df, segment_df], ignore_index=True)
 print(f"Total groups: {len(combined_df)} ({len(sector_df)} sectors + {len(segment_df)} segments)")
 
 #%%
+# Load main dataset to calculate overall LLM flag rate
+print("\nLoading main dataset to calculate overall LLM flag rate...")
+main_data_path = Path("data/datasets/main_analysis_dataset.feather")
+if main_data_path.exists():
+    main_df = pd.read_feather(main_data_path)
+    # Calculate overall LLM flag rate as percentage
+    overall_llm_rate = main_df['llm_flag'].mean() * 100
+    print(f"Overall LLM flag rate from main dataset: {overall_llm_rate:.2f}%")
+    print(f"Total transcripts in main dataset: {len(main_df):,}")
+else:
+    print("Warning: Main dataset not found, will calculate overall average from sectors weighted by n_transcripts")
+    overall_llm_rate = None
+
+#%%
 # Analyze combined data
 print("\nAnalyzing combined sectors and segments...")
-sector_stats, segment_stats = analyze_segments(combined_df)
+sector_stats, segment_stats = analyze_segments(combined_df, overall_llm_rate=overall_llm_rate)
 print("Completed analysis")
+
+# Get sector rates for healthcare (minimum) and materials (maximum) for LaTeX
+healthcare_rate = 0.0
+materials_rate = 0.0
+if len(sector_df) > 0:
+    # Find healthcare and materials sectors (hardcoded as min and max)
+    healthcare_mask = sector_df['name'].str.contains('Health Care|Healthcare', case=False, na=False)
+    materials_mask = sector_df['name'].str.contains('Materials', case=False, na=False)
+    
+    if healthcare_mask.any():
+        healthcare_rate = float(sector_df.loc[healthcare_mask, 'pct_llm_flagged'].iloc[0])
+    if materials_mask.any():
+        materials_rate = float(sector_df.loc[materials_mask, 'pct_llm_flagged'].iloc[0])
 
 #%%
 # Save statistics to YAML
@@ -399,6 +446,22 @@ else:
 # Add sector statistics
 existing_stats['sector_valid_llm_tag_rate'] = float(sector_stats['avg_rate'])
 existing_stats['sector_valid_observations'] = int(sector_stats['n_total'])
+
+# Add overall LLM rate (from entire dataset, not just sectors/segments)
+if overall_llm_rate is not None:
+    existing_stats['overall_llm_tag_rate'] = float(overall_llm_rate)
+else:
+    # Fallback: use weighted average of sectors
+    if len(sector_df) > 0:
+        total_transcripts = sector_df['n_transcripts'].sum()
+        weighted_sum = (sector_df['pct_llm_flagged'] * sector_df['n_transcripts']).sum()
+        existing_stats['overall_llm_tag_rate'] = float(weighted_sum / total_transcripts if total_transcripts > 0 else 0)
+    else:
+        existing_stats['overall_llm_tag_rate'] = 0.0
+
+# Add healthcare (minimum) and materials (maximum) sector rates
+existing_stats['sector_healthcare_rate'] = healthcare_rate
+existing_stats['sector_materials_rate'] = materials_rate
 
 # Add segment statistics
 existing_stats['segment_valid_llm_tag_rate'] = float(segment_stats['avg_rate'])

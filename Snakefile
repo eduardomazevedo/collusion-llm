@@ -23,7 +23,7 @@ rule all:
         "data/outputs/tables/segment_tag_rates_llm.csv", 
         "data/outputs/tables/year_tag_rates_llm.csv",
         "data/outputs/figures/market_value_deciles_llm_1x1.png",
-        "data/outputs/figures/segment_tag_rates_llm_1x1.png",
+        "data/outputs/figures/segment_tag_rates_llm.png",
         "data/outputs/figures/year_tag_rates_llm_1x1.png",
         # LLM validation flag outputs (market value and year only, no sectors)
         "data/outputs/tables/market_value_deciles_llm_validation.csv",
@@ -197,8 +197,9 @@ rule correlates_segments:
         yaml="data/yaml/correlates_collusive_communication.yaml"
     output:
         # Combined LLM flag outputs for sectors and segments
+        # Note: Figure uses custom format (10x9), not standard 1x1/16x9
         segment_table_llm="data/outputs/tables/segment_tag_rates_llm.csv",
-        segment_fig_llm="data/outputs/figures/segment_tag_rates_llm_1x1.png"
+        segment_fig_llm="data/outputs/figures/segment_tag_rates_llm.png"
     shell:
         "python src/post_query/analysis/correlates_segments.py"
 
