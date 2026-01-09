@@ -50,6 +50,8 @@ rule download_compustat_us:
     Download US Compustat data from WRDS database.
     Creates feather file with US company financial data.
     """
+    input:
+        "data/intermediaries/gvkey_list.txt"
     output:
         "data/raw/compustat/compustat_us.feather"
     resources:
@@ -62,6 +64,8 @@ rule download_compustat_global:
     Download Global Compustat data from WRDS database.
     Creates feather file with global company financial data.
     """
+    input:
+        "data/intermediaries/gvkey_list.txt"
     output:
         "data/raw/compustat/compustat_global.feather"
     resources:
@@ -325,7 +329,8 @@ rule populate_constants:
     input:
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
-        "data/yaml/benchmarking.yaml"
+        "data/yaml/benchmarking.yaml",
+        "data/outputs/tables/segment_tag_rates_llm.csv"
     output:
         "data/constants/.populated"
     shell:
