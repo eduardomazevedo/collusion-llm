@@ -3,6 +3,7 @@ import config
 import wrds
 import pandas as pd
 import os
+import sqlite3
 
 # Connect
 conn = wrds.Connection(wrds_username=config.WRDS_USERNAME, password=config.WRDS_PASSWORD)
@@ -42,7 +43,39 @@ df['keydevid'] = df['keydevid'].astype('Int64')
 
 #%%
 from modules.utils import eliminate_duplicate_transcripts
-df = eliminate_duplicate_transcripts(df)
+preferred_transcriptids = set()
+if os.path.exists(config.DATABASE_PATH):
+    try:
+        conn = sqlite3.connect(config.DATABASE_PATH)
+        table_check = pd.read_sql(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='queries'",
+            conn
+        )
+        if not table_check.empty:
+            queries_df = pd.read_sql("SELECT DISTINCT transcriptid FROM queries", conn)
+            preferred_transcriptids = set(queries_df['transcriptid'].dropna().astype(int))
+            print(f"Loaded {len(preferred_transcriptids):,} transcript IDs from queries database.")
+        else:
+            print("Queries table not found; using most recent transcript versions only.")
+        conn.close()
+    except Exception as exc:
+        print(f"WARNING: failed to load queries database transcript IDs: {exc}")
+else:
+    print("Queries database not found; using most recent transcript versions only.")
+
+if preferred_transcriptids:
+    available_preferred = df['transcriptid'].isin(preferred_transcriptids)
+    n_available = int(available_preferred.sum())
+    n_missing = len(preferred_transcriptids) - n_available
+    n_override_events = df.loc[available_preferred, 'keydevid'].nunique()
+    print(f"Preferred transcript IDs found in WRDS detail: {n_available:,}")
+    print(f"Events with preferred transcript versions: {n_override_events:,}")
+    if n_missing > 0:
+        missing_ids = sorted(preferred_transcriptids - set(df['transcriptid'].dropna().astype(int)))
+        print(f"WARNING: {n_missing:,} preferred transcript IDs not found in WRDS detail.")
+        print(f"First few missing IDs: {missing_ids[:10]}")
+
+df = eliminate_duplicate_transcripts(df, preferred_transcriptids=preferred_transcriptids)
 
 
 #%%

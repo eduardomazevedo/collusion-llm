@@ -106,11 +106,14 @@ def assign_smallest_group(row):
     Assign each observation to its smallest group.
     Groups are nested: Audit Validated ⊂ LLM Validated ⊂ LLM Flagged
     """
-    if row['human_audit_flag'] == True:
+    def is_true(val):
+        return pd.notna(val) and bool(val)
+
+    if is_true(row['human_audit_flag']):
         return 'Audit Validated'
-    elif row['llm_validation_flag'] == True:
+    elif is_true(row['llm_validation_flag']):
         return 'LLM Validated'
-    elif row['llm_flag'] == True:
+    elif is_true(row['llm_flag']):
         return 'LLM Flagged Only'
     else:
         return None
@@ -195,4 +198,3 @@ if __name__ == "__main__":
     create_validated_samples_mean_histogram()
     
     print("\nAll figures generated successfully!")
-

@@ -5,11 +5,13 @@ import tiktoken
 from typing import List, Dict
 import modules.capiq as capiq
 
-def eliminate_duplicate_transcripts(df):
+def eliminate_duplicate_transcripts(df, preferred_transcriptids=None):
     """
     Given a DataFrame of transcripts that may include multiple revisions
     for the same event (same keydevid), keep only the most recent version
     based on transcriptcreationdate_utc and transcriptcreationtime_utc.
+    If preferred_transcriptids is provided, keep those transcript versions
+    for their keydevids when available.
     """
     # Ensure the date and time columns are in string format
     df['transcriptcreationdate_utc'] = df['transcriptcreationdate_utc'].astype(str)
@@ -25,12 +27,22 @@ def eliminate_duplicate_transcripts(df):
     df = df.sort_values(by="creation_datetime")
 
     # Drop duplicates on keydevid, keeping only the most recent (i.e., last) version
-    df = df.drop_duplicates(subset="keydevid", keep="last")
+    latest_df = df.drop_duplicates(subset="keydevid", keep="last")
+
+    if preferred_transcriptids:
+        preferred_df = df[df["transcriptid"].isin(preferred_transcriptids)].copy()
+        if not preferred_df.empty:
+            # Keep the most recent preferred version per keydevid.
+            preferred_df = preferred_df.drop_duplicates(subset="keydevid", keep="last")
+            latest_df = latest_df.set_index("keydevid")
+            preferred_df = preferred_df.set_index("keydevid")
+            latest_df.update(preferred_df)
+            latest_df = latest_df.reset_index()
 
     # Optionally drop the helper column if you don't need it anymore
-    df.drop(columns="creation_datetime", inplace=True)
+    latest_df.drop(columns="creation_datetime", inplace=True)
 
-    return df
+    return latest_df
 
 
 def get_quarter_year_from_headline(headline: str):

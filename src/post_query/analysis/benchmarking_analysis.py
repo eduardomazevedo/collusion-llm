@@ -67,10 +67,14 @@ def load_human_ratings() -> pd.DataFrame:
 #%%
 def load_human_audit() -> pd.DataFrame:
     """Load and process human audit data."""
-    df = pd.read_csv('assets/human_audit_top_transcripts.csv')
+    df = pd.read_excel(config.HUMAN_AUDIT_PATH, usecols=["transcript_id", "T/F/N"])
     
-    # Convert to binary: T=1, F/U=0
-    df['audit_binary'] = (df['human_audit_rating'] == 'T').astype(int)
+    # Convert to binary: T=1, F/N=0
+    audit_col = "T/F/N"
+    df[audit_col] = df[audit_col].astype("string").str.strip().str.upper().replace("", pd.NA)
+    df = df[df[audit_col].notna()].copy()
+    assert set(df[audit_col].unique()).issubset({'T', 'F', 'N'}), "T/F/N contains values other than T, F, N"
+    df['audit_binary'] = (df[audit_col] == 'T').astype(int)
     
     # Rename for consistency
     df = df.rename(columns={'transcript_id': 'transcriptid'})

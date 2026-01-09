@@ -8,13 +8,21 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
 # Change to project root directory
 cd "$PROJECT_ROOT"
 
-# Check if virtual environment directory exists
-if [ ! -d ".venv" ]; then
+# Check if virtual environment directory exists and is valid
+if [ -d ".venv" ] && [ -f ".venv/bin/activate" ]; then
+    echo "Virtual environment already exists."
+else
+    if [ -d ".venv" ]; then
+        echo "Existing .venv is missing bin/activate; recreating..."
+        rm -rf .venv
+    fi
     # Create virtual environment with Python 3
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo "Error: python3 not found. Please install Python 3 and retry."
+        exit 1
+    fi
     python3 -m venv .venv
     echo "Virtual environment created."
-else
-    echo "Virtual environment already exists."
 fi
 
 # Activate virtual environment
