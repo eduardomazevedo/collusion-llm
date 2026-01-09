@@ -100,10 +100,12 @@ Description of the variable, including data type, scale, and any special values 
 ### Using the `\data{}` Command for Constants
 The `\data{}` command automatically imports numerical and text constants from YAML files processed by `src/post_query/exports/populate_constants.py`. The script converts YAML data into multiple format variants for flexible LaTeX usage:
 
-**For numerical values**, the script creates multiple file formats:
+**For numerical values**, the script creates multiple file formats with precision options:
 - `_int.txt`: Integer with thousands separators (e.g., "1,234")
-- `_float.txt`: Float with 2 decimals and commas (e.g., "1,234.56")
-- `_percentage.txt`: Percentage with escaped % (e.g., "12.34\%")
+- `_float0.txt`, `_float1.txt`, `_float2.txt`: Float with 0, 1, or 2 decimal places and commas (e.g., "1,235", "1,234.6", "1,234.56")
+- `_float.txt`: Backward-compatible alias for `_float2.txt` (2 decimals)
+- `_percentage0.txt`, `_percentage1.txt`, `_percentage2.txt`: Percentage with 0, 1, or 2 decimal places and escaped % (e.g., "12\%", "12.3\%", "12.34\%")
+- `_percentage.txt`: Backward-compatible alias for `_percentage2.txt` (2 decimals)
 - `_scientific.txt`: Scientific notation (e.g., "1.23e+03")
 
 **For date strings** (YYYY-MM-DD format):
@@ -114,8 +116,13 @@ The `\data{}` command automatically imports numerical and text constants from YA
 
 **Usage Examples:**
 "Our analysis includes \data{summary_stats/total_transcripts_int} earnings call transcripts spanning \data{summary_stats/time_period_years_int} years."
-"The LLM identified potential collusive communication in \data{correlates_collusive_communication/collusion_rate_percentage} of all transcripts."
-"The average market value was \$\data{correlates_collusive_communication/avg_market_value_float} million, with a standard deviation of \data{correlates_collusive_communication/std_market_value_scientific}."
+"The LLM identified potential collusive communication in \data{correlates_collusive_communication/collusion_rate_percentage1} of all transcripts."
+"The average market value was \$\data{correlates_collusive_communication/avg_market_value_float1} million, with a standard deviation of \data{correlates_collusive_communication/std_market_value_scientific}."
+
+**Choosing Precision:**
+- Use `_float0`, `_float1`, or `_float2` to control decimal places for floats (0, 1, or 2 decimals)
+- Use `_percentage0`, `_percentage1`, or `_percentage2` to control decimal places for percentages (0, 1, or 2 decimals)
+- The base `_float.txt` and `_percentage.txt` files default to 2 decimals for backward compatibility
 
 - Figures and table floats should include detailed notes in the bottom with footnote size, that make the latex skimmable. Here is an example:
 ```latex

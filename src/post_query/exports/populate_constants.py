@@ -6,7 +6,7 @@ Takes all YAML files from output/yaml/ and converts them to text files in output
 that can be imported into LaTeX using \\input{../output/constants/path/to/field.txt}
 
 The script processes different data types:
-- Numbers: saved as _int.txt (with commas), _float.txt (2 decimals), _percentage.txt (escaped %), _scientific.txt
+- Numbers: saved as _int.txt (with commas), _float0/_float1/_float2.txt (0/1/2 decimals), _percentage0/_percentage1/_percentage2.txt (escaped % with 0/1/2 decimals), _scientific.txt
 - Dates: saved as original string and _date.txt (formatted as "February 2nd, 2002")
 - Strings: copied literally
 """
@@ -24,9 +24,14 @@ def format_number_with_commas(num: Union[int, float]) -> str:
     return f"{num:,}"
 
 
-def format_float_two_decimals(num: float) -> str:
-    """Format float with two decimal places and commas."""
-    return f"{num:,.2f}"
+def format_float(num: float, decimals: int = 2) -> str:
+    """Format float with specified number of decimal places and commas.
+    
+    Args:
+        num: The number to format
+        decimals: Number of decimal places (0, 1, or 2)
+    """
+    return f"{num:,.{decimals}f}"
 
 
 def format_percentage(num: float, decimals: int = 2) -> str:
@@ -97,9 +102,17 @@ def create_constants_for_value(base_path: Path, field_name: str, value: Any) -> 
             with open(base_path / f"{field_name}_int.txt", 'w') as f:
                 f.write(format_number_with_commas(int_val))
         
-        # Float format (always create for numbers)
+        # Float formats (0, 1, and 2 decimal places)
+        with open(base_path / f"{field_name}_float0.txt", 'w') as f:
+            f.write(format_float(float(value), decimals=0))
+        with open(base_path / f"{field_name}_float1.txt", 'w') as f:
+            f.write(format_float(float(value), decimals=1))
+        with open(base_path / f"{field_name}_float2.txt", 'w') as f:
+            f.write(format_float(float(value), decimals=2))
+        
+        # Also create _float.txt for backward compatibility (defaults to 2 decimals)
         with open(base_path / f"{field_name}_float.txt", 'w') as f:
-            f.write(format_float_two_decimals(float(value)))
+            f.write(format_float(float(value), decimals=2))
         
         # Percentage formats (0, 1, and 2 decimal places)
         with open(base_path / f"{field_name}_percentage0.txt", 'w') as f:
