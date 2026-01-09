@@ -249,7 +249,7 @@ rule benchmarking_analysis:
     input:
         "data/datasets/queries.sqlite",
         "data/datasets/human_ratings.csv",
-        "assets/human_audit_top_transcripts.csv"
+        "assets/human_audit_v3.xlsx"
     output:
         combined_csv="data/outputs/tables/benchmarking_combined.csv",
         combined_tex="data/outputs/tables/benchmarking_combined.tex",
@@ -302,7 +302,7 @@ rule score_histogram_figures:
         original_16x9="data/outputs/figures/original_score_entire_sample_16x9.pdf",
         mean_16x9="data/outputs/figures/mean_score_validated_samples_16x9.pdf"
     shell:
-        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/post_query/analysis/fig_scores_histogram.py"
+        "PYTHONPATH=\"{workflow.basedir}:$PYTHONPATH\" python src/post_query/analysis/fig_scores_histogram.py"
 
 rule scatter_scores_figure:
     """
@@ -315,7 +315,7 @@ rule scatter_scores_figure:
     output:
         scatter_16x9="data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf"
     shell:
-        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/post_query/analysis/fig_scatter_scores.py"
+        "PYTHONPATH=\"{workflow.basedir}:$PYTHONPATH\" python src/post_query/analysis/fig_scatter_scores.py"
 
 rule populate_constants:
     """

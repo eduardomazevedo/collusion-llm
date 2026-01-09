@@ -70,13 +70,23 @@ def save_table(
         latex_df = df.copy()
     if latex_column_rename:
         latex_df = latex_df.rename(columns=latex_column_rename)
-    latex_df.to_latex(
-        tex_path,
-        index=False,
-        float_format="%.2f",
-        longtable=True,
-        escape=escape
-    )
+    try:
+        latex_df.to_latex(
+            tex_path,
+            index=False,
+            float_format="%.2f",
+            longtable=True,
+            escape=escape
+        )
+    except Exception as exc:
+        print(f"WARNING: falling back to non-longtable LaTeX for {name}: {exc}")
+        latex_df.to_latex(
+            tex_path,
+            index=False,
+            float_format="%.2f",
+            longtable=False,
+            escape=escape
+        )
     with open(table_dir / f"{name}.txt", "w") as f:
         f.write(description)
 
@@ -268,8 +278,11 @@ top_transcripts_path = os.path.join(config.DATA_DIR, "datasets", "top_transcript
 top_transcripts_df = pd.read_csv(top_transcripts_path)
 print(f"Loaded top transcripts data with {len(top_transcripts_df):,} transcripts")
 
-human_audit_path = os.path.join("assets", "human_audit_top_transcripts.csv")
-human_audit_df = pd.read_csv(human_audit_path)
+human_audit_df = pd.read_excel(config.HUMAN_AUDIT_PATH, usecols=["transcript_id", "T/F/N"])
+human_audit_df["T/F/N"] = (
+    human_audit_df["T/F/N"].astype("string").str.strip().str.upper().replace("", pd.NA)
+)
+human_audit_df = human_audit_df[human_audit_df["T/F/N"].notna()].copy()
 
 # Create clean flag variables (treat NAs as False)
 df['llm_flag_clean'] = df['llm_flag']  # Already clean

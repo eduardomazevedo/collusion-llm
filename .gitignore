@@ -35,6 +35,7 @@ wheels/
 # OS
 .DS_Store
 Thumbs.db
+~$*.xlsx
 
 # Ignore temporary Python files
 *.pyc

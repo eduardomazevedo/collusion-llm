@@ -39,8 +39,11 @@ top_transcripts_data_df = pd.read_csv(top_transcripts_path)
 print(f"Loaded top transcripts data with {len(top_transcripts_data_df):,} transcripts")
 
 # Load human audit sample for LLM-validated score summaries
-human_audit_path = os.path.join("assets", "human_audit_top_transcripts.csv")
-human_audit_df = pd.read_csv(human_audit_path)
+human_audit_df = pd.read_excel(config.HUMAN_AUDIT_PATH, usecols=["transcript_id", "T/F/N"])
+human_audit_df["T/F/N"] = (
+    human_audit_df["T/F/N"].astype("string").str.strip().str.upper().replace("", pd.NA)
+)
+human_audit_df = human_audit_df[human_audit_df["T/F/N"].notna()].copy()
 
 #%%
 # === BASIC TRANSCRIPT STATISTICS ===
