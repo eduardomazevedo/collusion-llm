@@ -160,18 +160,6 @@ recent research, see \textcite{huberimhof2019machine},
 rather than numerical data and fits into body of work on ``text as data''
 (\textcite{gentzkow2019text}).
 
-Closely related to our study is \textcite{duso2025public} which is the first
-paper to apply Natural Language Processing to a corpus of company public
-announcements. Rather than use an LLM, their study
-uses the ``bag of words'' approach which specifies keywords and bigrams
-(i.e., pairs of keywords such as ``raise price'') and then counts the number
-of bigrams in a transcript. They offer some examples to illustrate that it
-can identify public announcements with collusive content. The other key
-difference between the two studies is that we evaluate performance by
-engaging in a human audit of the LLM's output. The audit provides systematic
-evidence on the usefulness of an LLM and helps identify its strengths and
-weaknesses.
-
 The study's second contribution is in adding to our understanding about how
 firms coordinate through public announcements. As part of the human audit,
 the specific content which is the basis for collusion is identified,
@@ -193,21 +181,83 @@ discipline;
 competitors' conduct in a manner encouraging similar conduct.
 \end{enumerate}
 
-\noindent This contribution adds to the small literature on how firms
-coordinate, such as \textcite{aryal2022coordinated} and
-\textcite{harrington2022collusion}. This is an understudied area compared to
-research on how firms design the collusive agreement (i.e., collusive
-strategies) and achieve cartel stability (i.e., satisfy equilibrium
-conditions).\footnote{%
-Using the language of game theory, research is almost entirely focused on
+This contribution adds to our understanding on how firms coordinate. This is
+an understudied area compared to research on how firms design the collusive
+agreement (i.e., collusive strategies) and achieve cartel stability (i.e.,
+satisfy equilibrium conditions).\footnote{%
+In the language of game theory, research is almost entirely focused on
 understanding the collusive equilibrium upon which firms settle.
 Coordination is about how firms move from a competitive (static Nash)
 equilibrium to a collusive (repeated game) equilibrium.} Especially when the
 method of coordination does not involve direct, express, and private
-communication (i.e., the proverbial ``smoke-filled'' room), how firms
-coordinate can influence the form collusion takes (e.g., firms raise prices
-but without a market allocation scheme) as well as the likelihood of
-collusion (e.g., whether firms achieve mutual understanding to raise
-prices).
+communication (i.e., the proverbial \textquotedblleft
+smoke-filled\textquotedblright\ room), it is important to understand how
+firms communicate as that can affect the form collusion takes (e.g., firms
+may raise prices but without a market allocation scheme) as well as the
+likelihood of collusion (e.g., whether firms achieve mutual understanding to
+raise prices).\footnote{%
+Our study focuses on a particular class of public announcements. Other less
+explicit coordinating practices include advance price announcements
+(\textcite{borenstein2004rapid}; \textcite{chen2017preannouncements}), coded
+messages (\textcite{cramton2000collusive}; \textcite{harrington2025nonexpress}),
+and price signaling (\textcite{byrne2019learning}; \textcite{byrne2025platforms}).}
+
+\medskip
+
+\textbf{Literature Review }
+
+Relevant to our study is the recent literature on the use of public
+disclosures to facilitate collusion. Exploring the choice of firms to
+collude through private or public communications, \textcite{bourveau2020corporate}
+find that as cartel enforcement against explicit collusion
+increases - as measured by the rise in leniency programs - firms reveal more
+proprietary information through financial disclosures including earnings
+calls. They argue that this information sharing is conducive to engaging in
+tacit collusion. \textcite{kepler2021private} also looks at the trade-off between public
+and private information sharing in the context of firms' coordinating prices
+or outputs. He finds that when firms form strategic alliances - which gives
+them the opportunity to privately exchange information - firms disclose less
+about their expected future business conditions and production decisions in
+their public announcements. \textcite{pawliczek2022facilitating} test
+whether firms having stronger incentives to collude - and thereby are more
+likely to be trying to collude - results in more public disclosures. The
+source of variation in the proclivity to collude is the degree of common
+ownership across firms. As common ownership increases, firms disclose more
+about business conditions and strategies in their earnings calls.
+
+The next three studies more directly examine the relationship between public
+announcements and collusive conduct. \textcite{harrington2022collusion} collects and
+categorizes all known cases in which there is evidence that firms
+coordinated using public announcements which reference rival firms. A
+typology of announcements is created which is reviewed in Section 4. \textcite{aryal2022coordinated}
+and \textcite{sheng2024public} measure the effect of public
+announcements on firms' conduct. For the airlines industry, \textcite{aryal2022coordinated}
+find that when all airlines on a route have "capacity discipline" or
+related content in their earnings calls then their capacities (as measured
+by seats) decline by around 2\% in the ensuing quarter. This decrease is
+more than half of the average inter-quarter variation. \textcite{sheng2024public}
+examine the effect of the frequency of firms using the words "cut,
+balance, constrain, discipline, reduction, or adjustment" in their earning
+calls on various output measures. A 1\% increase in their frequency is
+associated with a 1.5\% decrease in the size of hatchery supply flock, a 1\%
+decrease in broiler-type eggs in incubators, and a 1.4\% decrease in chicks
+hatched.
+
+The preceding three studies focused on previously documented cases of
+collusion. In contrast, the objective of our study is to find collusion in
+markets where it has not been discovered. The most closely related study is
+\textcite{duso2025public} which is the first to apply
+Natural Language Processing to a large corpus of company public
+announcements in search of collusion. Rather than use an LLM, they use a
+dictionary approach as in \textcite{aryal2022coordinated} and \textcite{sheng2024public}.
+Bigrams - or pairs of words - are defined to capture a firm referring to its
+strategy or to its competitors; e.g. "competitor should" and "raise price".
+The score for a firm in a quarter is the number of times those bigrams
+appear in its public announcements for that quarter. The study provides
+examples showing how this screening approach can identify public
+announcements with collusive content. In addition to our study using an LLM,
+the other key advantage is that we evaluate performance by engaging in a
+human audit of the LLM's output. The audit both provides systematic evidence
+on the performance of an LLM and helps identify its strengths and weaknesses.
 
 % TODO: Add roadmap for paper.
