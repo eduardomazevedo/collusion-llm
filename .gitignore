@@ -50,6 +50,7 @@ Thumbs.db
 scratch.py
 scratch/
 scratch_outputs/
+temp sections/
 
 # LaTeX temporary files
 *.aux
