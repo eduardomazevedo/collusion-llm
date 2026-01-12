@@ -42,12 +42,11 @@ for path in [figure_dir, table_dir, yaml_dir]:
 # Format: (segment_name, sic_codes, match_type)
 # match_type: 'exact' for exact SIC code match, 'prefix' for codes starting with the prefix
 HIGH_COLLUSION_SEGMENTS = [
-    ('Cement', ['3241'], 'exact'),
+    ('Cement, Glass & Concrete', ['3241', '321', '327'], 'mixed'),  # 3241 exact, 321/327 prefix
     ('Commodity Chemicals', ['281', '286', '287'], 'prefix'),
     ('Heavy Civil Construction', ['161', '162'], 'prefix'),
     ('Pulp, Paper & Packaging', ['261', '262', '263', '265'], 'prefix'),
     ('Primary Metals', ['331', '332', '333'], 'prefix'),
-    ('Glass & Concrete', ['321', '327'], 'prefix'),
 ]
 
 #%%
@@ -128,20 +127,37 @@ def get_high_collusion_segments(detailed_df):
         # Find all matching rows
         all_matches = []
         
-        for sic_code in sic_codes:
-            if match_type == 'exact':
-                # Exact match: SIC code must be exactly this (handle zero-padding)
+        # Handle mixed match type: first code is exact, rest are prefix
+        if match_type == 'mixed':
+            for i, sic_code in enumerate(sic_codes):
                 sic_code_clean = str(sic_code).zfill(4)
-                matches = sic_df[sic_df['code'].astype(str).str.zfill(4) == sic_code_clean]
-            else:  # prefix
-                # Prefix match: SIC code must start with this prefix
-                sic_code_clean = str(sic_code).zfill(4)
-                matches = sic_df[
-                    sic_df['code'].astype(str).str.zfill(4).str.startswith(sic_code_clean)
-                ]
-            
-            if len(matches) > 0:
-                all_matches.append(matches)
+                if i == 0:
+                    # First code: exact match
+                    matches = sic_df[sic_df['code'].astype(str).str.zfill(4) == sic_code_clean]
+                else:
+                    # Remaining codes: prefix match
+                    matches = sic_df[
+                        sic_df['code'].astype(str).str.zfill(4).str.startswith(sic_code_clean)
+                    ]
+                
+                if len(matches) > 0:
+                    all_matches.append(matches)
+        else:
+            # Standard handling: all codes use same match type
+            for sic_code in sic_codes:
+                if match_type == 'exact':
+                    # Exact match: SIC code must be exactly this (handle zero-padding)
+                    sic_code_clean = str(sic_code).zfill(4)
+                    matches = sic_df[sic_df['code'].astype(str).str.zfill(4) == sic_code_clean]
+                else:  # prefix
+                    # Prefix match: SIC code must start with this prefix
+                    sic_code_clean = str(sic_code).zfill(4)
+                    matches = sic_df[
+                        sic_df['code'].astype(str).str.zfill(4).str.startswith(sic_code_clean)
+                    ]
+                
+                if len(matches) > 0:
+                    all_matches.append(matches)
         
         if len(all_matches) == 0:
             print(f"  WARNING: No matches found for {segment_name}")
