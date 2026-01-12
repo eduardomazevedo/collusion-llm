@@ -32,6 +32,23 @@ print(f"Loaded main analysis dataset with {len(df):,} transcripts")
 human_ratings_df = pd.read_csv(config.HUMAN_RATINGS_PATH)
 benchmark_sample_joe_count = int(human_ratings_df['joe_score'].notna().sum())
 benchmark_sample_aryal_count = int(human_ratings_df['acl_manual_flag'].notna().sum())
+print(f"Loaded human ratings with {len(human_ratings_df):,} rows")
+
+# Load raw ACL scores to compare against Capital IQ coverage
+acl_scores_df = pd.read_csv(config.ACL_SCORES_PATH)
+acl_manual_df = acl_scores_df[acl_scores_df['manual_capacity_discipline_count'].notna()].copy()
+aryal_total_transcripts = int(len(acl_manual_df))
+aryal_unique_airlines = int(acl_manual_df['carrier'].nunique())
+aryal_collusive_count = int((acl_manual_df['manual_capacity_discipline_count'] == 1).sum())
+aryal_collusive_rate_pct = (
+    (aryal_collusive_count / aryal_total_transcripts) * 100
+    if aryal_total_transcripts > 0
+    else 0
+)
+print(f"Loaded ACL raw scores with {len(acl_scores_df):,} rows")
+print(f"  ACL manual transcripts: {aryal_total_transcripts:,}")
+print(f"  ACL unique airlines: {aryal_unique_airlines:,}")
+print(f"  ACL collusive transcripts: {aryal_collusive_count:,}")
 
 # Load top transcripts data for LLM score summaries
 top_transcripts_path = os.path.join(config.DATA_DIR, "datasets", "top_transcripts_data.csv")
@@ -115,6 +132,14 @@ llm_validation_available = df['llm_validation_flag'].notna().sum()
 llm_validation_tagged = df['llm_validation_flag'].sum()
 llm_validation_rate = llm_validation_tagged / llm_validation_available * 100 if llm_validation_available > 0 else 0
 llm_validation_rate_overall = llm_validation_tagged / n_transcripts * 100
+
+# Capital IQ coverage of Aryal transcripts
+aryal_transcripts_in_ciq = int(benchmark_sample_aryal_count)
+aryal_transcripts_match_pct = (
+    (aryal_transcripts_in_ciq / aryal_total_transcripts) * 100
+    if aryal_total_transcripts > 0
+    else 0
+)
 
 # Human audit statistics
 human_audit_sample = df['human_audit_sample'].sum()
@@ -237,6 +262,12 @@ summary_stats = {
         'benchmark_sample_count': int(benchmark_sample),
         'benchmark_sample_joe_count': int(benchmark_sample_joe_count),
         'benchmark_sample_aryal_count': int(benchmark_sample_aryal_count),
+        'aryal_total_transcripts': int(aryal_total_transcripts),
+        'aryal_unique_airlines': int(aryal_unique_airlines),
+        'aryal_collusive_count': int(aryal_collusive_count),
+        'aryal_collusive_rate_pct': float(aryal_collusive_rate_pct),
+        'aryal_transcripts_in_ciq': int(aryal_transcripts_in_ciq),
+        'aryal_transcripts_match_pct': float(aryal_transcripts_match_pct),
         'benchmark_sample_rate_pct': float(benchmark_rate),
         'human_benchmark_tagged_count': int(human_tagged_benchmark),
         'human_benchmark_rate_pct': float(human_benchmark_rate),
