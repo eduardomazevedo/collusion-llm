@@ -5,7 +5,14 @@
 \RequirePackage[utf8]{inputenc}
 
 % Bibliography with biber backend
-\RequirePackage[backend=biber, style=authoryear, sorting=nyt]{biblatex}
+\RequirePackage[
+  backend=biber,
+  style=authoryear,
+  sorting=nyt,
+  maxcitenames=2,
+  mincitenames=1,
+  uniquename=false
+]{biblatex}
 % Add bibliography resource file
 \addbibresource{bibliography.bib}
 
