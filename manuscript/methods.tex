@@ -24,7 +24,7 @@ We applied the best-performing prompt and model to the full Capital IQ transcrip
 \textbf{LLM Validation of LLM-flagged transcripts}
 
 
-This initial procedure produced a large number of false positives. This is reasonable because collusive communications are rare. Thus, even a small rate of hallucinations will translated to a large percentage of false positives. To address this, we ran an additional ten repeated queries on the LLM-flagged transcripts. We then define as {\textbf{LLM-validated}} transcripts those whose average score remained at least 75 after the validation. This leaves us with \data{summary_stats/tagging_performance/llm_validation_tagged_int} transcripts.
+This initial procedure produced a large number of false positives. This is reasonable because collusive communications are rare. To address this, in order to identify robust ouput, we ran an additional ten repeated queries on the LLM-flagged transcripts. We then define as {\textbf{LLM-validated}} transcripts those whose average score remained at least 75 after the validation. This leaves us with \data{summary_stats/tagging_performance/llm_validation_tagged_int} transcripts.
 
 \textbf{Human audit of LLM-validated transcripts}
 
