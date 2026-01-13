@@ -292,6 +292,7 @@ human_audit_df["T/F/N"] = (
     human_audit_df["T/F/N"].astype("string").str.strip().str.upper().replace("", pd.NA)
 )
 human_audit_df = human_audit_df[human_audit_df["T/F/N"].notna()].copy()
+human_audit_df = human_audit_df[human_audit_df["T/F/N"].isin(["T", "F"])].copy()
 
 # Create clean flag variables (treat NAs as False)
 df['llm_flag_clean'] = df['llm_flag']  # Already clean

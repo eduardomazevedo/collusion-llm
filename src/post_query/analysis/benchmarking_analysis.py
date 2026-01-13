@@ -73,7 +73,8 @@ def load_human_audit() -> pd.DataFrame:
     audit_col = "T/F/N"
     df[audit_col] = df[audit_col].astype("string").str.strip().str.upper().replace("", pd.NA)
     df = df[df[audit_col].notna()].copy()
-    assert set(df[audit_col].unique()).issubset({'T', 'F', 'N'}), "T/F/N contains values other than T, F, N"
+    df = df[df[audit_col].isin(["T", "F"])].copy()
+    assert set(df[audit_col].unique()).issubset({'T', 'F'}), "T/F/N contains values other than T, F"
     df['audit_binary'] = (df[audit_col] == 'T').astype(int)
     
     # Rename for consistency

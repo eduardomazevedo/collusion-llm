@@ -8,8 +8,8 @@ We create dummies for:
     - benchmark_human_flag (whether transcript was tagged as collusion by humans in th benchmark sample)
     - llm_flag (whether tagged as collution in the main LLM run)
     - llm_validation_flag (whether transcript was tagged as collusion in the LLM validation run with 10 repeats)
-    - human_audit_sample (whether transcript was audited after being flagged in the llm validation run)    
-    - human_audit_flag (whether transcript was flagged as collusive in human audit, T=True, F/N=False, NA if not audited)
+    - human_audit_sample (whether transcript was audited after being flagged in the llm validation run)
+    - human_audit_flag (whether transcript was flagged as collusive in human audit, T=True, F=False, NA if not audited)
 Merge in compustat data at the company-year level.
 Apply data cleaning rules before saving:
     - market_value_total_mil: set to NA if 0
@@ -115,15 +115,16 @@ transcript_ids_flagged_in_validation = top_transcripts_data_df[
 ]['transcriptid'].unique()
 
 #%% Process human audit data
-# Clean audit ratings, dropping blanks (not in the audit sample)
+# Clean audit ratings, dropping blanks and excluding N (not in the audit sample)
 audit_col = "T/F/N"
 human_audit_df[audit_col] = (
     human_audit_df[audit_col].astype("string").str.strip().str.upper().replace("", pd.NA)
 )
 human_audit_df = human_audit_df[human_audit_df[audit_col].notna()].copy()
-assert set(human_audit_df[audit_col].unique()).issubset({'T', 'F', 'N'}), "T/F/N contains values other than T, F, N"
+human_audit_df = human_audit_df[human_audit_df[audit_col].isin(["T", "F"])].copy()
+assert set(human_audit_df[audit_col].unique()).issubset({'T', 'F'}), "T/F/N contains values other than T, F"
 
-# Create boolean from T/F/N categorical: T=True, F and N=False
+# Create boolean from T/F categorical: T=True, F=False
 human_audit_df['human_audit_flag'] = human_audit_df[audit_col] == 'T'
 
 # Human audit sample transcripts (exclude blanks)
