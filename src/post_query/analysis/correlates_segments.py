@@ -42,11 +42,13 @@ for path in [figure_dir, table_dir, yaml_dir]:
 # Format: (segment_name, sic_codes, match_type)
 # match_type: 'exact' for exact SIC code match, 'prefix' for codes starting with the prefix
 HIGH_COLLUSION_SEGMENTS = [
-    ('Cement, Glass & Concrete', ['3241', '321', '327'], 'mixed'),  # 3241 exact, 321/327 prefix
-    ('Commodity Chemicals', ['281', '286', '287'], 'prefix'),
-    ('Heavy Civil Construction', ['161', '162'], 'prefix'),
-    ('Pulp, Paper & Packaging', ['261', '262', '263', '265'], 'prefix'),
-    ('Primary Metals', ['331', '332', '333'], 'prefix'),
+    ('Heavy Construction', ['161', '162'], 'prefix'),
+    ('Wood Products', ['243'], 'prefix'),
+    ('Paper & Packaging', ['261', '262', '263', '265'], 'prefix'),
+    ('Commodity Chemicals', ['281', '285', '286', '287'], 'prefix'),
+    ('Cement & Glass', ['321', '324', '327'], 'prefix'),
+    ('Primary Metals', ['331', '333'], 'prefix'),
+    ('Ocean Shipping', ['441', '442'], 'prefix'),
 ]
 
 #%%
