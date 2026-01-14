@@ -11,10 +11,15 @@
   sorting=nyt,
   maxcitenames=2,
   mincitenames=1,
+  maxbibnames=99,
+  minbibnames=99,
   uniquename=false
 ]{biblatex}
 % Add bibliography resource file
 \addbibresource{bibliography.bib}
+
+% Remove "In:" before journal or book titles in references
+\renewbibmacro{in:}{}
 
 % Fonts
 \RequirePackage{mathpazo}
