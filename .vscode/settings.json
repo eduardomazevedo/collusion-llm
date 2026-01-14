@@ -19,6 +19,8 @@
     // LaTeX Workshop configuration
     "latex-workshop.latex.autoBuild.run": "onSave",
     "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.latex.watch.delay": 1000,
+    "latex-workshop.latex.watch.pdf.delay": 1000,
     "latex-workshop.latex.outDir": "",
     "latex-workshop.latex.magic.args": [
         "-synctex=1",

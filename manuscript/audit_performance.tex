@@ -1,22 +1,8 @@
-Of the 301 transcripts with the highest LLM-validated score, the human auditor rated 109 as containing collusive content and 192 as lacking collusive content for a true positive rate of 36.2\%. Table X2 reports the true positive rate after partitioning the sample into three roughly equal-sized subsamples (while respecting score breaks). The true positive rate is decreasing in the score with a true positive rate of 41.5\% for the 106 transcripts in the highest bin and 31.9\% for the 94 transcripts in the lowest bin.
+Of the \data{audit/sample_count_int} transcripts with the highest LLM-validated score, the human auditor rated \data{audit/true_positive_count_int} as containing collusive content and \data{audit/false_positive_count_int} as lacking collusive content for a true positive rate of \data{audit/true_positive_rate_pct_percentage1}. Table~\ref{tab:X2} reports the true positive rate after partitioning the sample into three roughly equal-sized subsamples (while respecting score breaks). The true positive rate is decreasing in the score with a true positive rate of \data{audit/top_bin/true_positive_rate_pct_percentage1} for the \data{audit/top_bin/count_int} transcripts in the highest bin and \data{audit/bottom_bin/true_positive_rate_pct_percentage1} for the \data{audit/bottom_bin/count_int} transcripts in the lowest bin.
 
 With details provided later, 163 of the 192 false positive transcripts contained content that, while relevant, did not cross the line for facilitating coordinated conduct. The other 29 false positive transcripts lacked any relevant content (``no content'') in which case it may be appropriate to classify them as hallucinations. With that definition, the hallucination rate is 9.6\% (29 out of 301).
 
-\begin{table}[htbp]
-    \centering
-    \caption{LLM Performance Statistics}
-    \begin{tabular}{l c c c c c}
-        \hline
-        Sample & Scores & Number & True positive & False positive & True positive rate \\
-        \hline
-        Full sample & 76.92-85.00 & 301 & 109 & 192 & 36.2\% \\
-        Top bin & 79.58-85.00 & 106 & 44 & 62 & 41.5\% \\
-        Middle bin & 77.92-79.58 & 101 & 35 & 66 & 34.7\% \\
-        Bottom bin & 76.92-77.85 & 94 & 30 & 64 & 31.9\% \\
-        \hline
-    \end{tabular}
-    \label{tab:X2}
-\end{table}
+\input{../data/outputs/tables/human_audit_performance_bins.tex}
 
 As detailed in the Supplementary Information, there are 71 distinct companies in these 109 true positive transcripts and the four companies with the largest number of transcripts are Gol Linhas Aéreas Inteligentes (7 transcripts) which is a domestic airline in Brazil, Micron Technology (6) which is a manufacturer of computer memory and data storage, Norske Skogindustrier (4) which is a pulp and paper manufacturer, and Coca-Cola Bottlers Japan (4). We will later take a closer look at Gol Linhas Aéreas Inteligentes.
 

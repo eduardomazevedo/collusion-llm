@@ -1,16 +1,25 @@
-The remainder of the section will summarize the findings from a human audit of the LLM’s output. The human auditor examined the 301 transcripts with the highest validated scores assigned by the LLM, which makes up .06\% of the corpus. With the LLM having determined these transcripts contain collusive content, the human auditor will make their own independent evaluation. If the human auditor finds the transcript contains collusive content then it is classified as a ``true positive'', and if the human auditor does not find the transcript contains collusive content then it is classified as a ``false positive''. 
+The remainder of the section will summarize the findings from a human audit of the LLM’s output. The human auditor examined the \data{audit/sample_count_int} transcripts with the highest validated scores assigned by the LLM, which makes up \data{audit/sample_rate_pct_percentage2} of the corpus. With the LLM having determined these transcripts contain collusive content, the human auditor will make their own independent evaluation. If the human auditor finds the transcript contains collusive content then it is classified as a ``true positive'', and if the human auditor does not find the transcript contains collusive content then it is classified as a ``false positive''. 
 
 Of course, the human auditor may be mistaken in their judgment – in the sense that the content did not result in firms coordinating their conduct to reduce competition -- but the goal is not to identify actual episodes of collusion but to determine if an LLM can replicate a human auditor.
 
 The ensuing analysis addresses three questions. First, how accurate is an LLM in identifying collusive content? Accuracy will be measured by the true positive rate. This exercise will inform us of the usefulness of an LLM at substituting for human auditors in evaluating public communications. Second, what describes the collusive content of true positives? That is, what is the basis for concluding a firm’s announcement facilitates collusion? This analysis will advance our understanding of firm conduct and contribute to the body of work associated with \textcite{aryal2022coordinated} and \textcite{harrington2022collusion}. Third, when the LLM gets it wrong, how does it get it wrong? That will inform us of the LLM’s limitations and may suggest how to improve its performance.
 
 \subsubsection{Human Audit Procedure}
-Balancing the value of reviewing more transcripts against the time it takes to review them, we decided to review the top 300 transcripts – which makes up about one-half of the LLM-validated transcripts -- subject to including all transcripts with the same score. This resulted in 301 transcripts which comprise all those with a score of at least 76.92. The scores ranged from 76.92 to 85.00. The scores are summarized in Table X1 and Figure Y1.
+Balancing the value of reviewing more transcripts against the time it takes to review them, we decided to review the top 300 transcripts – which makes up about one-half of the LLM-validated transcripts -- subject to including all transcripts with the same score. This resulted in \data{audit/sample_count_int} transcripts which comprise all those with a score of at least \data{audit/score_min_float2}. The scores ranged from \data{audit/score_min_float2} to \data{audit/score_max_float2}. The sscores are summarized in Table~\ref{tab:audit_summary} and Figure~\ref{fig:human_audit_score_histogram}.
 
-% Placeholder for Table X1 and Figure Y1
-\begin{center}
-    [Insert Table X1 and Figure Y1 here]
-\end{center}
+\begin{table}[htbp]
+    \centering
+    \caption{Human audit summary statistics}
+    \label{tab:audit_summary}
+    \input{../data/outputs/tables/human_audit_summary_stats.tex}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\columnwidth]{../data/outputs/figures/human_audit_score_histogram_10bins_16x9.pdf}
+    \caption{Distribution of LLM-validated scores in the human audit sample}
+    \label{fig:human_audit_score_histogram}
+\end{figure}
 
 For each of these transcripts, the human auditor read the excerpts provided by the LLM. In order to make for a more independent judgment, the human auditor did not read the LLM’s explanation for its score. The human auditor was aware that the LLM had given the transcript a high score and thus knew the LLM had rated the content as collusive. It is possible this knowledge could bias their evaluation though we have no reason to think it did.
 
