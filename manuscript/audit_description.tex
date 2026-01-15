@@ -1,11 +1,20 @@
-The remainder of the section will summarize the findings from a human audit of the LLM’s output. The human auditor examined the \data{audit/sample_count_int} transcripts with the highest validated scores assigned by the LLM, which makes up \data{audit/sample_rate_pct_percentage2} of the corpus. With the LLM having determined these transcripts contain collusive content, the human auditor will make their own independent evaluation. If the human auditor finds the transcript contains collusive content then it is classified as a ``true positive'', and if the human auditor does not find the transcript contains collusive content then it is classified as a ``false positive''. 
-
-Of course, the human auditor may be mistaken in their judgment – in the sense that the content did not result in firms coordinating their conduct to reduce competition -- but the goal is not to identify actual episodes of collusion but to determine if an LLM can replicate a human auditor.
-
-The ensuing analysis addresses three questions. First, how accurate is an LLM in identifying collusive content? Accuracy will be measured by the true positive rate. This exercise will inform us of the usefulness of an LLM at substituting for human auditors in evaluating public communications. Second, what describes the collusive content of true positives? That is, what is the basis for concluding a firm’s announcement facilitates collusion? This analysis will advance our understanding of firm conduct and contribute to the body of work associated with \textcite{aryal2022coordinated} and \textcite{harrington2022collusion}. Third, when the LLM gets it wrong, how does it get it wrong? That will inform us of the LLM’s limitations and may suggest how to improve its performance.
-
-\subsubsection{Human Audit Procedure}
-Balancing the value of reviewing more transcripts against the time it takes to review them, we decided to review the top 300 transcripts – which makes up about one-half of the LLM-validated transcripts -- subject to including all transcripts with the same score. This resulted in \data{audit/sample_count_int} transcripts which comprise all those with a score of at least \data{audit/score_min_float2}. The scores ranged from \data{audit/score_min_float2} to \data{audit/score_max_float2}. The sscores are summarized in Table~\ref{tab:audit_summary} and Figure~\ref{fig:human_audit_score_histogram}.
+To assess the performance of the LLM, we conducted an audit of the LLM's
+output.\footnote{%
+The auditor is one of the paper's authors, Joseph Harrington.} Balancing the
+value of reviewing more transcripts against the time it takes to review
+them, we decided to review the top 300 transcripts - which makes up about
+one-half of the LLM-validated transcripts - subject to including all
+transcripts with the same score. This resulted in \data{audit/sample_count_int}
+transcripts which comprise all those with a score of at least
+\data{audit/score_min_float2}. The scores ranged from
+\data{audit/score_min_float2} to \data{audit/score_max_float2} and are
+summarized in Table~\ref{tab:audit_summary} and
+Figure~\ref{fig:human_audit_score_histogram}.\footnote{%
+Actually, there are 302 transcripts satisfying this criterion but one was
+removed as the content described past collusion. It was an earnings call
+from Loblaw Companies which was a member of the Canadian bread cartel.
+Notably, the transcript received a score of 86.25 which was the highest
+score in the sample.}
 
 \begin{table}[htbp]
     \centering
@@ -21,8 +30,77 @@ Balancing the value of reviewing more transcripts against the time it takes to r
     \label{fig:human_audit_score_histogram}
 \end{figure}
 
-For each of these transcripts, the human auditor read the excerpts provided by the LLM. In order to make for a more independent judgment, the human auditor did not read the LLM’s explanation for its score. The human auditor was aware that the LLM had given the transcript a high score and thus knew the LLM had rated the content as collusive. It is possible this knowledge could bias their evaluation though we have no reason to think it did.
+For each of these transcripts, the human auditor read the excerpts provided
+by the LLM.\footnote{%
+Quoting from the prompt, the LLM was instructed to \textquotedblleft provide
+a list of excerpts that support your assessment.\textquotedblright\ Reading
+only the excerpts and not the entire transcript was done as a time-saving
+device. It could downward bias the true positive rate if the LLM properly
+identifies a transcript as containing collusive content but does not always
+include sufficient relevant material in the excerpts to allow a human
+auditor to draw the same conclusion. Another reason for focusing on the
+excerpts is that a competition agency's protocol in using an LLM could
+involve reading only the excerpts in order to save on the agency's human
+resources. In that case, the LLM's efficacy in extracting passages to put in
+excerpts is relevant to its performance.} In order to make for a more
+independent judgment, the human auditor did not read the LLM's explanation
+for its score.\footnote{%
+Quoting from the prompt, the LLM was instructed to \textquotedblleft provide
+a very brief explanation of your assessment.\textquotedblright} The human
+auditor was aware that the LLM had given the transcript a high score and
+thus knew the LLM had rated the content as collusive. It is possible this
+knowledge could bias their evaluation though we have no reason to think it
+did.\footnote{%
+All information used by the human auditor is available in Online Appendix A
+so that the reader may make their own judgment.}
 
-The human auditor evaluated each transcript’s excerpts in terms of whether it would facilitate collusive effect. They did not evaluate it in terms of collusive intent. Intent is difficult to determine and our more general concern is whether public communications might reduce competition, whether intended or not. The LLM was instructed to consider intent, as well as effect, in order to better communicate what it is we are looking for. It is possible the LLM could have assigned a lower score where it finds evidence of effect but not intent; that is, the LLM assesses the content could reduce competition but concludes that was not the firm’s intent. However, based on our review of the LLM’s output, we do not believe its assessment was so nuanced.
+The human auditor's evaluation was guided by the typology in
+\textcite{harrington2022collusion}. What potentially distinguishes
+collusion-facilitating content is that a firm makes reference to the conduct
+of rival firms or the industry at large. Within that class of public
+announcements, three categories are identified in
+\textcite{harrington2022collusion}. First, a firm describes how its future
+conduct depends on a rival firm's conduct. A firm may express it is acting
+as a leader with the implicit message that rival firms are to follow, or as
+a follower which then invites a rival firm to lead. Second, a firm
+prescribes how rival firms or the industry at large should behave in the
+future. This could mean explicitly recommending conduct in terms of such
+variables as prices and capacities. Or a firm could commend competitors or
+the industry at large for past conduct and thereby implicitly recommend
+continuation of that conduct or criticize past conduct and thereby
+implicitly recommend discontinuation of that conduct. Third, a firm
+describes how rival firms or the industry at large will behave in the
+future. This forecast could be an invitation to firms to act consistent with
+that forecast.
 
-Upon reading the excerpts, the human auditor concluded whether the content could facilitate firms jointly reducing competition such as by reducing supply or capacity or raising price. If that was determined to be the case then it was classified as a ``true positive'' (and labelled T), and otherwise as a ``false positive'' (and labelled as F). If T then the human auditor summarized the collusive content. If F, the human auditor summarized the content that might have led the LLM to give the transcript a high score. In some cases, there is no relevant content in which case it is denoted ``no content''. The LLM’s output along with the human auditor’s evaluation and summary are provided in Online Appendix A.
+If the human auditor found the transcript's excerpts contain collusive
+content then it was classified as a \textquotedblleft true
+positive\textquotedblright\ (and labelled T), and if the human auditor did
+not find the transcript contains collusive content then it was classified as
+a \textquotedblleft false positive\textquotedblright\ (and labelled F). If T
+then the human auditor summarized the collusive content. If F, the human
+auditor summarized the content that might have led the LLM to give the
+transcript a high score. In some cases, there is no relevant content in
+which case it is denoted \textquotedblleft no content\textquotedblright .
+The LLM's output along with the human auditor's evaluation and summary are
+provided in Online Appendix A. Of course, the human auditor may be mistaken
+in their judgment -- in the sense that the content did not result in firms
+coordinating their conduct to reduce competition - but the goal is not to
+identify actual episodes of collusion but to determine if an LLM can replace
+human experts.\footnote{%
+Determining the efficacy of an LLM or a human auditor in identifying
+communications that resulted in coordination would require assessing effect,
+either through observational reporting, as in
+\textcite{harrington2022collusion}, or empirical analysis, as in
+\textcite{aryal2022coordinated}.}
+
+The ensuing analysis addresses three questions. First, how accurate is an
+LLM in identifying collusive content? Accuracy will be measured by the true
+positive rate. This exercise will inform us of the usefulness of an LLM at
+substituting for human experts in evaluating public communications. Second,
+what describes the collusive content of true positives? That is, what is the
+basis for concluding a firm's announcement facilitates collusion? This
+analysis will advance our understanding of firm conduct. Third, when the LLM
+gets it wrong, how does it get it wrong? That will inform us of the LLM's
+limitations and may suggest how to improve its performance. The latter two
+questions are addressed in Section 5.

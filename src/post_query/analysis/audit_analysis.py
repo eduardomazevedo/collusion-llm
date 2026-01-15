@@ -291,7 +291,7 @@ with open(performance_tex_path, "w") as f:
         "\\begin{table}[htbp]\n"
         "\\centering\n"
         "\\caption{LLM Performance Statistics}\n"
-        "\\label{tab:X2}\n"
+        "\\label{tab:audit_performance_bins}\n"
         "\\begin{tabular}{l c c c c c}\n"
         "\\hline\n"
         "Sample & Scores & Number & True positive & False positive & True positive rate \\\\\n"

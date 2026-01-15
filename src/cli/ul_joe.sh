@@ -3,7 +3,8 @@
 # Script to sync manuscript, constants, and outputs to Dropbox directory
 # Usage: bash ./src/cli/ul_joe.sh
 
-TARGET_DIR="/Users/eduaze/Library/CloudStorage/Dropbox-Penn/Eduardo Azevedo/working/2025-collusion-manuscript"
+DROPBOX_BASE_DIR="${DROPBOX_BASE_DIR:-$HOME/Library/CloudStorage/Dropbox}"
+TARGET_DIR="${DROPBOX_BASE_DIR}/2025-collusion-manuscript"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
@@ -33,4 +34,3 @@ echo "Copying ./data/outputs/ to $TARGET_DIR/data/outputs/..."
 cp -r ./data/outputs "$TARGET_DIR/data/"
 
 echo "Sync complete! Files are ready for editing in $TARGET_DIR"
-
