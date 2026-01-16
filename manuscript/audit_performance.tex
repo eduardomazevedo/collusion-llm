@@ -48,3 +48,15 @@ more standard private communications. The LLM flagging them is a reminder
 that screening public communications for collusive content could lead to
 investigations that uncover the most compelling evidence of illegal
 collusion: direct, express, and private communications between competitors.
+
+In concluding, let us note that that a high false positive rate of 63.8\% is not surprising if it 
+is rare for a firm to have collusive content in its public announcements. 
+Even if the error rate (i.e., the likelihood that a transcript without 
+collusive content is given a high score by the LLM) is low, a high fraction 
+of transcripts with a high LLM score will not have collusive content when 
+sufficently many transcripts lack collusive content. Consistent with this 
+hypothesis, the error rate was a very low 0.4\% for the benchmark sample.\footnote{With the audit sample, we are measuring the likelihood that the 
+transcript does not have collusive content conditional on it being assigned 
+a high score by the LLM. With the benchmark sample, we are measuring the 
+likelihood of the LLM assigning a high score conditional on the transcript 
+not having collusive content.} 

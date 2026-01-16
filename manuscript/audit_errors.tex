@@ -1,4 +1,4 @@
-Out of the \data{audit/sample_count_int} LLM-validated transcripts with the highest scores, \data{audit/false_positive_count_int} were classified by the human auditor as false positives. Of those, 29 of them lacked any relevant content and have been interpreted as hallucinations. The other 163 contain some content which, in principle, could be part of a collusive message. Specifically, the transcripts refer to the firm’s competitive conduct or the state of market competition though did not connect it to the conduct of competitors or the industry and thereby fell short of facilitating coordinated conduct. Here we describe the most common content that appeared in the LLM’s excerpts and appeared to be the justification for the LLM unjustifiably assigning it a high score.
+Out of the \data{audit/sample_count_int} LLM-validated transcripts with the highest scores, \data{audit/false_positive_count_int} were classified by the human auditor as false positives. Of those, 29 of them lacked any relevant content and have been interpreted as hallucinations. The other 163 contain some content which, in principle, could be part of a collusive message. Specifically, the transcripts refer to the firm’s competitive conduct or the state of market competition though did not connect it to the conduct of competitors or the industry and thereby fell short of facilitating coordinated conduct. Here we describe the most common content that appeared in the LLM’s excerpts and appeared to be the reason for the LLM assigning it a high score.
 
 67 transcripts referred to a firm reducing, restricting, or managing its supply or capacity in a manner consistent with higher prices or avoiding lower prices. However, it did not say or suggest that this conduct is something the industry should or will or needs to do.
 
@@ -157,9 +157,11 @@ $[321900]$
 $[414209]$
 \end{quote}
 
-In summing up, the LLM identified instances in which a firm’s message was consistent with less competition in that it referred to reducing supply or capacity or raising or at least not lowering prices. To facilitate collusive conduct, a firm needs to link such content to industry conduct in a manner that encourage similar conduct by competitors. The LLM failed in not verifying that such a link was present in the firm’s message. Consequently, there was a high false positive rate in the transcripts given the highest scores by the LLM.
+In summing up, the LLM identified instances in which a firm’s message was consistent with less competition in that it referred to reducing supply or capacity or raising or at least not lowering prices. To facilitate collusive conduct, a firm needs to link such content to industry conduct in a manner that encourages similar conduct by competitors. The LLM failed in not verifying that such a link was present in the firm’s message. Consequently, the LLM had a high false positive rate.
 
-\textbf{Takeaways.}
+\medskip
+
+\textbf{Takeaways}
 
 Out of hundreds of thousands of transcripts, the LLM was able to pull out a select few containing collusive content. This content takes a variety of forms including expressing a need for reduced industry capacity, noting that it has taken the lead in cutting supply and saying competitors need to do their part, and putting forth a call for the industry to show pricing discipline. At the same, there is a high rate of false positives. The LLM often did not catch the nuanced difference between a firm describing its own supply or capacity reduction, showing pricing discipline, or some other form of constrained conduct and the firm calling on the industry to do so.
 
