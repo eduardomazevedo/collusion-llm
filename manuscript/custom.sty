@@ -127,6 +127,7 @@
 \RequirePackage{fullpage}
 \RequirePackage[hidelinks]{hyperref}
 \RequirePackage{subcaption}
+\IfFileExists{placeins.sty}{\RequirePackage{placeins}}{\providecommand{\FloatBarrier}{}}
 
 % Float placement parameters - aggressively prevent float-only pages
 % Make it very hard to create a float-only page (require 90% of page to be floats)
