@@ -20,6 +20,10 @@
 % Add bibliography resource file
 \addbibresource{bibliography.bib}
 
+% Drop "p."/"pp." prefixes in page and page-range fields
+\DeclareFieldFormat{pages}{#1}
+\DeclareFieldFormat{page}{#1}
+
 % Remove "In:" before journal or book titles in references
 \renewbibmacro{in:}{}
 
