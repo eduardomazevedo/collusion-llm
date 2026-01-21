@@ -27,6 +27,23 @@
 % Remove "In:" before journal or book titles in references
 \renewbibmacro{in:}{}
 
+% Add comma before suffix in given-family order (e.g., "Joseph E. Harrington, Jr.")
+\renewbibmacro*{name:given-family}[4]{%
+  \usebibmacro{name:delim}{#2#3#1}%
+  \usebibmacro{name:hook}{#2#3#1}%
+  \mkbibcompletenamegivenfamily{%
+    \ifdefvoid{#2}
+      {}
+      {\mkbibnamegiven{#2}\isdot\bibnamedelimd}%
+    \ifdefvoid{#3}
+      {}
+      {\mkbibnameprefix{#3}\isdot
+       \ifprefchar
+         {}
+         {\ifuseprefix{\bibnamedelimc}{\bibnamedelimd}}}%
+    \mkbibnamefamily{#1}\isdot
+    \ifdefvoid{#4}{}{\addcomma\space\mkbibnamesuffix{#4}\isdot}}}
+
 % Fonts
 \RequirePackage{mathpazo}
 
