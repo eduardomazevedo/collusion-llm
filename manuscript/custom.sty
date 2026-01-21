@@ -27,6 +27,24 @@
 % Remove "In:" before journal or book titles in references
 \renewbibmacro{in:}{}
 
+% Use "Name, eds." instead of "Ed. by Name"
+\renewbibmacro*{byeditor+others}{%
+  \ifnameundef{editor}
+    {}
+    {\printnames[byeditor]{editor}%
+     \setunit{\addcomma\space}%
+     \ifboolexpr{
+       test {\ifnumgreater{\value{editor}}{1}}
+       or
+       test {\ifandothers{editor}}
+     }
+       {\printtext{\bibstring{editors}}}
+       {\printtext{\bibstring{editor}}}%
+     \clearname{editor}%
+     \newunit}%
+  \usebibmacro{byeditorx}%
+  \usebibmacro{bytranslator+others}}
+
 % Add comma before suffix in given-family order (e.g., "Joseph E. Harrington, Jr.")
 \renewbibmacro*{name:given-family}[4]{%
   \usebibmacro{name:delim}{#2#3#1}%
@@ -43,6 +61,47 @@
          {\ifuseprefix{\bibnamedelimc}{\bibnamedelimd}}}%
     \mkbibnamefamily{#1}\isdot
     \ifdefvoid{#4}{}{\addcomma\space\mkbibnamesuffix{#4}\isdot}}}
+
+% Put suffix after given name in family-given order (e.g., "Harrington, Joseph E., Jr.")
+\renewbibmacro*{name:family-given}[4]{%
+  \ifuseprefix
+    {\usebibmacro{name:delim}{#3#1}%
+     \usebibmacro{name:hook}{#3#1}%
+     \mkbibcompletenamefamilygiven{%
+       \ifdefvoid{#3}
+         {}
+         {\ifcapital
+            {\mkbibnameprefix{\MakeCapital{#3}}\isdot}
+            {\mkbibnameprefix{#3}\isdot}%
+          \ifprefchar{}{\bibnamedelimc}}%
+       \mkbibnamefamily{#1}\isdot
+       \ifdefvoid{#2}
+         {}
+         {\revsdnamepunct\bibnamedelimd\mkbibnamegiven{#2}\isdot}%
+       \ifdefvoid{#4}
+         {}
+         {\ifboolexpe{test {\ifdefvoid{#2}}}{\revsdnamepunct}{\addcomma\space}%
+          \mkbibnamesuffix{#4}\isdot}}}
+    {\usebibmacro{name:delim}{#1}%
+     \usebibmacro{name:hook}{#1}%
+     \mkbibcompletenamefamilygiven{%
+       \mkbibnamefamily{#1}\isdot
+       \ifboolexpe{%
+         test {\ifdefvoid{#2}}
+         and
+         test {\ifdefvoid{#3}}}
+         {}
+         {\revsdnamepunct}%
+       \ifdefvoid{#2}
+         {}
+         {\bibnamedelimd\mkbibnamegiven{#2}\isdot}%
+       \ifdefvoid{#4}
+         {}
+         {\ifboolexpe{test {\ifdefvoid{#2}}}{\revsdnamepunct}{\addcomma\space}%
+          \mkbibnamesuffix{#4}\isdot}%
+       \ifdefvoid{#3}
+         {}
+         {\bibnamedelimd\mkbibnameprefix{#3}\isdot}}}}
 
 % Fonts
 \RequirePackage{mathpazo}
