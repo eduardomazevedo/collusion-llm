@@ -6,7 +6,7 @@ The first obvious feature of the data is that very few transcripts are flagged a
 \input{../data/outputs/tables/summary_stats_results.tex}
 
 % Figure: Histogram of original LLM scores for the entire sample
-\begin{figure}[htb]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{../data/outputs/figures/original_score_entire_sample_16x9.pdf}
     \caption{Distribution of original LLM scores for the entire sample.}
@@ -18,7 +18,7 @@ We now turn to the validation step, where each flagged transcript is re-queried 
 This winner's curse can be seen transparently in the data. Figure \ref{fig:mean_score_validated_samples} shows that the distribution of mean scores has the bulk of its values below 75. And Figure \ref{fig:scatter_scores} shows that the mean scores are often below the original scores. Thus, most LLM-flagged observations are due to the LLM randomly producing a high score. At the same time, both figures show that transcripts with a high original score tend to have a high mean score after validation. This suggests that the LLM is capturing some signal. We will confirm this below, as we turn to the benchmark sample, human audit, and detailed reading of some transcripts.
 
 % Figure: Histogram of mean LLM scores (10 repetitions) for LLM flagged transcripts
-\begin{figure}[htb]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/mean_score_validated_samples_16x9.pdf}
 \caption{Distribution of mean LLM scores (with 10 repetitions) for LLM flagged transcripts.}
@@ -26,7 +26,7 @@ This winner's curse can be seen transparently in the data. Figure \ref{fig:mean_
 \end{figure}
 
 % Figure: Scatter plot comparing original LLM scores to mean scores from 10 repetitions
-\begin{figure}[htb]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{../data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf}
     \caption{Original LLM Score vs. Mean LLM Score after 10 repetitions.}
