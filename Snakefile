@@ -253,7 +253,7 @@ rule benchmarking_analysis:
     input:
         "data/datasets/queries.sqlite",
         "data/datasets/human_ratings.csv",
-        "assets/human_audit_v3.xlsx"
+        "assets/human_audit_final.xlsx"
     output:
         combined_csv="data/outputs/tables/benchmarking_combined.csv",
         combined_tex="data/outputs/tables/benchmarking_combined.tex",
