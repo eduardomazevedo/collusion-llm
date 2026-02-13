@@ -321,6 +321,21 @@ rule scatter_scores_figure:
     shell:
         "PYTHONPATH=\"{workflow.basedir}:$PYTHONPATH\" python src/post_query/analysis/fig_scatter_scores.py"
 
+rule quoted_excerpt_labels:
+    """
+    Generate labels for quoted excerpts in audit manuscript sections.
+    Creates company/event/date labels keyed by query_id in YAML format for \\data{} usage.
+    """
+    input:
+        queries_db="data/datasets/queries.sqlite",
+        transcript_detail="data/datasets/transcript_detail.feather",
+        audit_types_tex="manuscript/audit_types.tex",
+        audit_errors_tex="manuscript/audit_errors.tex"
+    output:
+        "data/yaml/quoted_excerpt_labels.yaml"
+    shell:
+        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/post_query/exports/quoted_excerpt_labels.py"
+
 rule populate_constants:
     """
     Convert YAML statistics files to LaTeX-friendly constant files.
@@ -330,6 +345,7 @@ rule populate_constants:
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
+        "data/yaml/quoted_excerpt_labels.yaml",
         "data/outputs/tables/segment_tag_rates_llm.csv"
     output:
         "data/constants/.populated"
