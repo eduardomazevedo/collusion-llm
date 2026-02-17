@@ -54,40 +54,51 @@ conferences, announcements of future prices, statements on earnings calls,
 and in other public ways.''\footnote{\textit{In re Delta/AirTran Baggage Fee
 Antitrust Litig}., 733 F. Supp. 2d 1348, 1360 (N.D. Ga. 2010).}
 
-When collusion involves private communications, the enforcement challenge is
-gaining access to these communications as firms do their best to keep them
-secret. When it involves public communications, the enforcement challenge is
-quite different. Accessibility is not a problem as the communications are in
-the public domain. Plaintiffs do not need to go through discovery and
-competition agencies do not need to conduct a dawn raid or issue subpoenas
-to access them. The challenge is instead finding a ``needle in a haystack.''
-There is a massive volume of public communications produced by thousands of
-companies and reviewing it all in search of possible collusion would seem a
-fool's errand and a poor use of scarce resources.
+This study has two objectives. First, it is to advance our understanding of collusion through public communications. 
+This type of collusive practice has only recently been the subject of analysis and, consequently, little is known about it. 
+The second objective is to translate this new knowledge into improved enforcement. There is the concern that the 
+few cases thus far pursued by public and private enforcers may be only the tip of the iceberg. 
 
-To meet this challenge, we develop a method for reviewing companies' public
-statements at scale so that competition agencies and plaintiff law firms can
-effectively search for collusion. The approach uses a large language model
-(LLM). The first step is to properly design a prompt. Guided by some
-previously documented cases of collusion with public announcements, prompts
-were experimented with and refined to find one effective at flagging
-transcripts with collusive content. A scoring process was then constructed
-by which the LLM assigns a score to each transcript. With the prompt and
-scoring process in place, around 500,000 transcripts were run through the
-LLM to look for collusive content. To evaluate the LLM's performance, those
-with the highest scores were subject to a human audit.
+In order to 
+contribute to both objectives, we first make a methodological contribution by developing and then applying 
+a tool for finding corporate communications containing collusive content. In referring to "collusive content", 
+we mean any content that facilitates coordinated conduct among competitors to reduce competition. Using this tool, 
+we are able to discover many previously unidentified company transcripts containing collusive content. With those 
+transcripts, we distill and organize the associated collusive content in order to better understand how it could 
+affect competition. While we do not explore the effect of this communication on prices or quantities, our study 
+has the ancillary contribution of providing a set of candidate markets for conducting such an empirical analysis. 
+We hope researchers will exploit it. Turning to the enforcement objective, we show how this tool can be used by 
+competition agencies and plaintiff law firms to identify possible cases to prosecute or litigate. In addition, 
+our analysis of the content used in such communications provides the basis for writing guidelines to instruct 
+firms what they should not be saying and what content may be the basis for an investigation.
 
-The objective of this project is for an LLM to substitute for human review
-in finding suspicious content. Our analysis reveals that the LLM is indeed
-able to discover companies' announcements that facilitate coordinated
-conduct to reduce competition. In some cases, it rediscovers previously
-documented communications such as the aforementioned airlines episode. The
-LLM was able to find these few collusive ``needles'' amidst hundreds of
-thousands of noncollusive ``hay.''
+Achieving these objectives requires discovering communications with collusive content. When collusion involves private 
+communications, the challenge is that firms do their best to keep those communications secret. When it 
+involves public communications, the challenge is quite different. Accessibility is not a problem as the 
+communications are in the public domain. The challenge is instead akin to finding a "needle in a haystack." 
+There is a massive volume of public communications produced by thousands of companies and reviewing it all 
+in search of possible collusive content would seem a fool's errand.
 
-A concern is that the LLM has been trained on a corpus which includes
+To meet this challenge, we develop a method for reviewing companies' public statements at scale. 
+The approach uses a large language model (LLM). The first step is to properly design a prompt. Guided 
+by some previously documented cases of collusion with public announcements, prompts were experimented 
+with and refined to find one effective at flagging transcripts with collusive content. A scoring 
+process was then constructed by which the LLM assigns a score to each transcript. With the prompt 
+and scoring process in place, around 500,000 transcripts were run through the LLM to look for collusive 
+content. Those transcripts with the highest scores were then reviewed by a human expert. The human audit 
+is integral to both research objectives. First, the audit distills and organizes the content towards 
+understanding the collusive content used by firms. Second, the audit evaluates the LLM's performance 
+and thus assesses its potential as a screening tool for enforcers.
+
+Prior to describing how it contributes to those two objectives, let us first summarize the output of the LLM. 
+To begin, it is very selective as it filters out 99.88\% of all transcripts which is consistent 
+with our prior belief that collusive content is rare (though common enough to be an antitrust concern). 
+Critically, the LLM is able to systematically discover companies' announcements with collusive content. 
+In some instances, it rediscovers previously documented communications such as the aforementioned 
+airlines episode. Thus, the LLM was able to find these few collusive "needles" amidst hundreds of 
+thousands of noncollusive "hay."  A concern is that the LLM has been trained on a corpus which includes
 references to documented cartel episodes, such as those in
-\textcite{harrington2022collusion} and \textcite{aryal2022coordinated} or
+\textcite{aryal2022coordinated} and \textcite{harrington2022collusion} or
 newspaper stories and legal briefs. In that case, it is only reciting what
 it learned from ``reading.'' Assuaging that concern, we find that most of
 the collusive messages found pertain to new episodes. Here are two
@@ -127,42 +138,11 @@ this is a healthy instrument for the health of the industry.''
 \end{itemize}
 
 \noindent The LLM was able to discover these messages along with many other
-transcripts containing collusive content. We will later describe other
-examples and offer an extensive case study of the Brazilian airline industry
-which, in our opinion, delivers compelling evidence of a violation of
-antitrust law.
+transcripts containing collusive content.
 
-While the discoveries of these collusive communications is impressive, the
-LLM does have limitations. The rate of false positives -- so the LLM says
-there is collusive content but the human auditor disagrees -- is
-uncomfortably high. We analyze those false positives in order to understand
-how the LLM is getting it wrong. Often, it is not able to pick up the
-subtlety between a firm describing its own conduct being less aggressive and
-it calling on its competitors or the industry to be less aggressive.
-Recognizing these limitations, our takeaway is that an LLM, when
-complemented with human oversight, can be part of an effective screening
-program. By ``effective'' we mean identifying collusion with a modest use of
-human resources.
-
-The paper makes two contributions. The first is to the growing literature on
-cartel screening. Generally, screening involves looking for collusion
-in data sets comprising prices or bids (in the context of a procurement
-auction). This could mean testing for collusive markers (i.e., patterns more
-consistent with collusion than competition) or for structural breaks
-associated with cartel birth or death.\footnote{%
-\textcite{harrington2008detecting}, \textcite{harringtonimhof2022cartel}, and
-\textcite{oecd2024detecting} offer surveys of cartel screening. For some
-recent research, see \textcite{huberimhof2019machine},
-\textcite{kawai2022detecting}, \textcite{chassang2022robust},
-\textcite{kawai2023bidrotation}, \textcite{silveira2023who}, and
-\textcite{aaltio2025complementary}.} In contrast, our method works on text
-rather than numerical data and fits into a body of work on ``text as data''
-(\textcite{gentzkow2019text}).
-
-The study's second contribution is in adding to our understanding about how
-firms coordinate through public announcements. As part of the human audit,
-the specific content which is the basis for collusion is described and categorized. More than 90\% of the transcripts have collusive
-content that falls into one of five categories:
+The human audit reviews the 301 company transcripts assigned the
+highest score by the LLM. While there is a rich variety of collusive content,
+more than 90\% of the transcripts can be placed into one of five categories:
 
 \begin{enumerate}
 \item A firm announces the industry has reduced supply or capacity and references competitors
@@ -179,8 +159,8 @@ discipline.
 competitors' conduct in a manner encouraging similar conduct.
 \end{enumerate}
 
-This contribution adds to our understanding on how firms coordinate. This is
-an understudied area compared to research on how firms design the collusive
+The study informs us of the manner in which public announcements facilitate coordinated conduct.
+Coordination is an understudied area compared to research on how firms design the collusive
 agreement (i.e., collusive strategies) and achieve cartel stability (i.e.,
 satisfy equilibrium conditions).\footnote{%
 In the language of game theory, research is almost entirely focused on
@@ -200,17 +180,49 @@ explicit coordinating practices include advance price announcements
 messages (\textcite{cramton2000collusive}, \textcite{harrington2025nonexpress}),
 and price signaling (\textcite{byrne2019learning}, \textcite{byrne2025platforms}).}
 
+The study's second objective is to contribute to enforcement by developing a 
+screening tool for collusion involving public communciations. The LLM's 
+ability to identify a diverse array of collusive content is impressive. At 
+the same time, the false positive rate is 64\% (where a false positive means 
+the LLM says there is collusive content but the human expert disagrees). 
+However, if only a small percentage of company transcripts genuinely have 
+collusive content - which seems reasonable - then even a low error rate will 
+produce many false positives. Thus, a high false positive rate may 
+be inevitable. What is crucial for enforcement is that the LLM identifies 
+collusive content that can be the basis for an investigation. Our takeaway is that 
+an LLM, when complemented with human oversight, can be part of an effective 
+screening program. To show proof of concept, we provide a case study of the 
+Brazilian domestic airline industry. The LLM identifies suspicious content 
+and subsequent examination reveals convincing evidence of two airlines 
+effectively communicating to coordinate a reduction in their capacities.
+
+This second contribution adds to the growing literature on 
+cartel screening. Generally, screening involves looking for collusion
+in data sets comprising prices or bids (in the context of a procurement
+auction). This could mean testing for collusive markers (i.e., patterns more
+consistent with collusion than competition) or for structural breaks
+associated with cartel birth or death.\footnote{%
+\textcite{harrington2008detecting}, \textcite{harringtonimhof2022cartel}, and
+\textcite{oecd2024detecting} offer surveys of cartel screening. For some
+recent research, see \textcite{huberimhof2019machine},
+\textcite{kawai2022detecting}, \textcite{chassang2022robust},
+\textcite{kawai2023bidrotation}, \textcite{silveira2023who}, and
+\textcite{aaltio2025complementary}.} In contrast, our method works on text
+rather than numerical data and fits into a body of work on ``text as data''
+(\textcite{gentzkow2019text}).
+
 \medskip
 
 \textbf{Literature Review }
 
-Relevant to our study is the recent literature on the use of public
+Most relevant to our study is the recent literature on the use of public
 disclosures to facilitate collusion. Exploring the choice of firms to
 collude through private or public communications, \textcite{bourveau2020corporate}
 find that as cartel enforcement against explicit collusion
 increases - as measured by the rise in leniency programs - firms reveal more
 proprietary information through financial disclosures including earnings
-calls. They argue that this information sharing is conducive to tacit collusion. \textcite{kepler2021private} also looks at the trade-off between public
+calls. They argue that this information sharing is conducive to tacit collusion.
+ \textcite{kepler2021private} also looks at the trade-off between public
 and private information sharing in the context of firms' coordinating prices
 or outputs. He finds that when firms form strategic alliances - which gives
 them the opportunity to privately exchange information - firms disclose less
@@ -236,13 +248,12 @@ more than half of the average inter-quarter variation. \textcite{sheng2024public
 examine the effect on various output measures of the frequency of firms using the words "cut,
 balance, constrain, discipline, reduction, or adjustment" in their earning
 calls. A 1\% increase in their frequency is
-associated with a 1.5\% decrease in the size of hatchery supply flock, a 1\%
-decrease in broiler-type eggs in incubators, and a 1.4\% decrease in chicks
-hatched.
+associated with a 1-1.5\% decrease in output depending on the measure.
 
 The preceding three studies focused on previously documented cases of
-collusion. In contrast, the objective of our study is to find collusion in
-markets where it has gone undiscovered. The most closely related study is
+collusion. Our study's objectives require finding new episodes in which 
+public announcements facilitate coordinated conduct. The most 
+closely related study is
 \textcite{duso2025public} which is the first to apply
 Natural Language Processing to a large corpus of company public
 announcements in search of collusion. Rather than use an LLM, they use a
@@ -252,24 +263,19 @@ strategy or to its competitors; e.g. "competitor should" and "raise price".
 The score for a firm in a quarter is the number of times those bigrams
 appear in its public announcements for that quarter. The study provides
 examples showing how this screening approach can identify public
-announcements with collusive content. In addition to our study using an LLM,
-the other key advantage is that we evaluate performance by engaging in a
-human audit of the LLM's output. The audit both provides systematic evidence
-on the performance of an LLM and helps identify its strengths and weaknesses.
-
+announcements with collusive content. Our study differs in terms of methods 
+and objectives and, more specifically, the use of an LLM and the conducting 
+of a human audit. The human audit allows us to evaluate the performance of 
+our LLM-based screen and to advance our 
+understanding of the content used by firms to coordinate in reducing competition. 
 \medskip
 
 \textbf{Roadmap }
 
-The data used in our analysis along with the development process for the LLM screen are described in Section 2. 
-A key part of the process is using a benchmark sample of collusive and non-collusive transcripts to refine the prompt. 
-The results from the large-scale LLM analysis are reviewed in Section 3. There we report the frequency with which 
-the LLM finds a company transcript to have collusive content, how that frequency varies across different sectors, 
-and how the LLM performs on the benchmark sample. In order to systematically evaluate the LLM's effectiveness 
-in substituting for human experts, a human audit is conducted of the LLM's output in Section 4. For the company 
-transcripts with the highest LLM score, a human auditor reviews the LLM-identified excerpts and determines if 
-there is indeed collusive content. As part of that audit, Section 5 evaluates the content identified by the LLM 
-to address two questions. First, how is the LLM getting it right but also how is it getting it wrong? Second, 
-what is the specific manner in which firms are publicly communicating to coordinate their conduct? Section 6 
-has a case study of the Brazilian domestic airline industry which illustrates the potential value of an LLM 
-in finding cases to pursue. Section 7 concludes with some thoughts on how this study can contribute to enforcement.
+The data used in our analysis along with the development process for the LLM 
+screen are described in Section 2. The output from the large-scale LLM analysis 
+is reviewed in Section 3. In Section 4, the procedure for the human audit is 
+described and the performance of the LLM is evaluated. The content identified 
+by the LLM is distilled and organized in Section 5. Section 6 discusses the role of an LLM in a screening 
+protocol. Finally, a case study of the Brazilian domestic airline industry 
+is provided in Section 7.

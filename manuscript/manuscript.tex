@@ -9,14 +9,14 @@
 \externaldocument{"si"}
 
 \begin{document}
-\title{Identifying Collusive Corporate Communications at Scale%
+\title{Collusive Content in Corporate Communications%
 \thanks{Replication code available at \url{https://github.com/eduardomazevedo/collusion-llm}.}
 }
 
 \author{Eduardo M. Azevedo%
-\thanks{Wharton School, University of Pennsylvania, 3733 Spruce Street, Philadelphia, PA 19104. \href{mailto:eazevedo@wharton.upenn.edu}{eazevedo@wharton.upenn.edu}, \url{https://eduardomazevedo.github.io/}.}
+\thanks{Department of Business Economics \& Public Policy, The Wharton School, University of Pennsylvania, 3733 Spruce Street, Philadelphia, PA 19104. \href{mailto:eazevedo@wharton.upenn.edu}{eazevedo@wharton.upenn.edu}, \url{https://eduardomazevedo.github.io/}.}
 \and Joseph E. Harrington, Jr.%
-\thanks{Wharton School, University of Pennsylvania, 3733 Spruce Street, Philadelphia, PA 19104. \href{mailto:harrij@wharton.upenn.edu}{harrij@wharton.upenn.edu}, \url{https://joeharrington5201922.github.io/}.}
+\thanks{Department of Business Economics \& Public Policy, The Wharton School, University of Pennsylvania, 3733 Spruce Street, Philadelphia, PA 19104. \href{mailto:harrij@wharton.upenn.edu}{harrij@wharton.upenn.edu}, \url{https://joeharrington5201922.github.io/}.}
 \and Ioan O. Rusu%
 \thanks{School of Economics, Drexel University, 3141 Chestnut Street, Philadelphia, PA 19104. \href{mailto:ir79@drexel.edu}{ir79@drexel.edu}.}
 }
@@ -24,12 +24,6 @@
 \date{\today}
 
 \maketitle
-
-\begin{center}    
-PRELIMINARY AND INCOMPLETE
-
-PLEASE DO NOT CITE OR CIRCULATE WITHOUT PERMISSION
-\end{center}
 
 \begin{abstract}
 {\footnotesize
@@ -54,7 +48,7 @@ PLEASE DO NOT CITE OR CIRCULATE WITHOUT PERMISSION
 \input{basic_results_stats.tex}
 \subsection{LLM Performance in the Benchmark Sample}
 \input{benchmark_performance.tex}
-\subsection{Correlates of Collusive Communication}
+\subsection{Correlates of Collusive Content}
 \input{correlates.tex}
 \SectionFloatBarrier
 
@@ -65,13 +59,15 @@ PLEASE DO NOT CITE OR CIRCULATE WITHOUT PERMISSION
 \input{audit_performance.tex}
 \SectionFloatBarrier
 
-\section{\label{sec:content}Content Analysis}
-\subsection{Types of Collusive Communications}
+\section{\label{sec:content}Synthesis of Collusive Content}
+\subsection{Overview}
 \input{audit_types.tex}
 \subsection{Types of LLM Errors}
 \input{audit_errors.tex}
-\subsection{Takeaways}
-\input{audit_takeaways.tex}
+\SectionFloatBarrier
+
+\section{\label{sec:detection}Detection of Collusive Content}
+\input{detection.tex}
 \SectionFloatBarrier
 
 \section{\label{sec:case}Case Study}

@@ -1,8 +1,26 @@
-We now examine the correlates of collusive communication and consider three types: firm sector, firm size, and call year. LLM-flagged is used as our binary indicator of collusive communication. This has the issue of being a noisy proxy for collusive communication, due to the significant rate of false positives. But the other measures are also imperfect, and LLM-flagged has the advantage of a larger sample size.
+We now examine the correlates of collusive communication and consider three types: firm sector, firm size, and call year. LLM-flagged is used as our binary indicator of collusive communication. 
+This has the issue of being a noisy proxy for collusive communication. But the other measures are also imperfect, and LLM-flagged has the advantage of a larger sample size.
 
-The clearest pattern is the heterogeneity by sector, displayed in Figure \ref{fig:segment_tag_rates}. We split the sample into top level GICS sector definitions. There is considerable heterogeneity around the average rate of collusive communications of \data{correlates_collusive_communication/llm_tagged_collusive_pct_percentage1}. The sector with the lowest rate of collusive communications is health care (\data{correlates_collusive_communication/sector_healthcare_rate_percentage1}), and the highest is materials (\data{correlates_collusive_communication/sector_materials_rate_percentage1}). Encompassing many commodities such as chemicals, the high prevalence of collusive content for the materials sector is consistent with the empirical evidence on cartels.
+The clearest pattern is the heterogeneity by sector, displayed in Figure \ref{fig:segment_tag_rates}. 
+We split the sample into top level GICS sector definitions. 
+There is considerable heterogeneity around the average rate of collusive communications of
+ \data{correlates_collusive_communication/llm_tagged_collusive_pct_percentage1}. 
+The sector with the lowest rate of collusive communications is health care 
+(\data{correlates_collusive_communication/sector_healthcare_rate_percentage1}), 
+and the highest is materials (\data{correlates_collusive_communication/sector_materials_rate_percentage1}). 
+Encompassing many commodities, 
+the high prevalence of collusive content for the materials sector is consistent 
+with the empirical evidence on cartels.
 
-Based on our knowledge of cartels, we also identified three-digit sectors with a well-established record of collusion. Almost all of them have significantly higher rates of collusive communications than the average. The highest rates are paper \& packaging and cement \& glass, with rates about eight times the average. The only exception is heavy construction, which interestingly has a much lower rate of collusive communications than the average. A possible reason is that this segment is known for collusion with bidding rings in public works projects. But this type of collusion is not facilitated by public communications as in the other high collusion segments.
+Based on our knowledge of cartels, we identified the three-digit sectors most prone
+to collusion. They encompass 19 sectors listed in the legend of Table 5.
+Aggregating them into two-digit sectors, Table 5 shows that all but Heavy Construction have rates
+of collusive content significantly higher than the average. Paper \& Packaging 
+has eight times the average rate and Cement \& Glass has seven times 
+the average rate. That Heavy Construction is below average is likely due to 
+collusion tending to occur through bidding rings at procurement auctions. 
+This type of collusion is not facilitated by 
+public communications as in the other high collusion segments.
 
 % Figure: tag rate by sector
 \begin{figure}[!htbp]
@@ -46,3 +64,19 @@ Likewise, Figure \ref{fig:year_tag_rates} suggests a mild decrease in collusive 
     \textit{Notes:} This figure shows the fraction of communications tagged as collusive by the LLM over time. The chart displays temporal trends in collusive communication detection across the sample period. Data includes \data{correlates_collusive_communication/year_valid_observations_int} transcripts in the call year analysis. Error bars represent 95\% confidence intervals.
     \end{minipage}
 \end{figure}
+
+\medskip
+
+\textbf{Summary }
+
+The output of the LLM is highly selective. An initial query with
+a threshold score of 75 weeds out more than 99\% of company transcripts. 
+However, there is a randomness in the LLM's output which makes it critical to 
+run multiple queries. Doing so another ten times and using the mean score weeds
+out another 86\%. This leaves us with 0.12\% of the corpus. Critically, the
+LLM is able to rediscover a substantive number of the collusive messages from
+the benchmark sample and almost entirely excludes the noncollusive messages for
+a very low false positive rate. 
+Finally, it is finding much more collusive content in sectors known to be 
+prone for collusion. In the next section, we subject the LLM's output to a 
+human audit.

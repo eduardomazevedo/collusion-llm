@@ -1,11 +1,23 @@
-Next we turn to investigating the content of firms' communications. For the \data{audit/true_positive_count_int} true positive transcripts, the Supplementary Information categorizes them according to the type of collusive content. Here, we focus on the five most common categories which are:\footnote{Some excerpts have content spanning more than one category, which will be apparent in some of the quoted passages. When the entire transcript is read, there are likely to be even more cases in which content encompassed multiple categories. For this reason, the number assigned to each category is not meant to be definitive but only to give a rough sense of its frequency.}
-\begin{itemize}
+As described in the preceding section, the human audit reviewed the \data{audit/sample_count_int} 
+transcripts with the highest LLM-validated scores and found \data{audit/true_positive_count_int} 
+of them contained collusive content. We now want to scrutinize the LLM-generated 
+excerpts from those \data{audit/true_positive_count_int} transcripts in order 
+to understand how that content is facilitating coordinated conduct to reduce competition.
+Though the content is diverse and spans a wide set of markets, we find that more 
+than 90\% of the content falls into one of five categories:\footnote{Some excerpts 
+have content spanning more than one category, which will be apparent in some of 
+the quoted passages. When the entire transcript is read, there are likely to be 
+even more cases in which content encompassed multiple categories. For this reason, 
+the number assigned to each category is not meant to be definitive but only to 
+give a rough sense of its frequency.}
+
+\begin{enumerate}
     \item A firm announces the industry has reduced supply or capacity and references competitors or the industry in a manner supportive of such conduct. (40 transcripts)
     \item A firm announces the industry needs to reduce supply or capacity or to show discipline. (30 transcripts)
     \item A firm announces the industry has shown or will show supply or capacity or price discipline. (12 transcripts)
     \item A firm announces the industry needs to raise prices. (12 transcripts)
     \item A firm announces it is being or will be less aggressive in pricing and references competitors’ conduct in a manner encouraging similar conduct. (8 transcripts)
-\end{itemize}
+\end{enumerate}
 
 \subsubsection{Category 1: The industry has reduced supply or capacity and references competitors or the industry in a manner supportive of such conduct}
 The most common collusive content is that the industry has reduced supply or capacity and refers to competitors or the industry to facilitate such conduct. This type of content is present in 37\% of the 109 true positive transcripts. In emphasizing supply or capacity cuts, a firm may highlight how those reductions are in the industry’s best interests. For example:\footnote{For each quoted excerpt, we include in square brackets the company name, event type, and date, as reported in Compustat, corresponding to the original transcript that was provided in the LLM query. While previously documented cases like airlines are in the set of true positives, we chose not to use excerpts from them (even though some are highly illustrative) in order to focus on new episodes identified by the LLM. As the passages are from the LLM-generated excerpts, the sentences may be from different parts of the transcript and not appear together as they are presented here.}
@@ -212,7 +224,7 @@ The called-for price increases may be in the context of responding to cost incre
 \mbox{[\data{quoted_excerpt_labels/audit_types/q305524}]}
 \end{quote}
 
-\subsubsection{Category 5: The firm is being or will be less aggressive in pricing and references competitors’ conduct in a manner encouraging similar conduct}
+\subsection{Category 5: The firm is being or will be less aggressive in pricing and references competitors’ conduct in a manner encouraging similar conduct}
 In eight transcripts, the firm announced it has raised price or will raise price and, when referencing competitors’ pricing, encouraged them to do so or commended them for having done so.
 
 \begin{quote}
@@ -258,6 +270,21 @@ Finally, one transcript facilitated hub-and-spoke collusion as a manufacturer-hu
 \mbox{[\data{quoted_excerpt_labels/audit_types/q548932}]}
 \end{quote}
 
-\subsubsection{Summary}
+\subsubsection{Takeaways}
 
-The pool of true positives provides encouraging evidence for an LLM being part of a screening protocol. Out of hundreds of thousands of transcripts, the LLM managed to identify a small number that contained collusive content and would be worthy of further investigation. In addition, it did so for content spanning many different forms – reducing supply, constraining capacity, raising prices, stemming price decreases – with messages that conveyed what the industry needs to do, what it did and should continue to do, and a firm acting a leader for the industry. At the same time, it has its limitations as reflected in many false positives. We next turn to examining those false positive transcripts towards understanding how the LLM was misled.
+Public announcements often take the form of a firm announcing that the industry has been, will be, 
+or needs to be less competitive either in terms of reduced supply, reduced capacity, 
+or high prices (which can mean price increases, stemming price decreases, or ending 
+a price war). Alternatively, a firm may make reference to its own conduct being less 
+aggressive (``exerting leadership'') and then calling upon competitors to engage in 
+similar conduct (``can't do it alone''). While almost all messages fall into these 
+categories, there is considerable diversity within a category in terms of the content. 
+A firm may say the ``industry is oversupplied'', there is a ``severe imbalance between 
+supply and demand'', or express the need to ``rationalize capacity''. When it comes to 
+price, it may be noted that a ``price war is unsustainable", the need to end the 
+``negative death spiral of pricing'', and the desire to achieve ``price restoration''. 
+More general references to conduct can take the form of ``exercising self-discipline", 
+``eliminating reckless behavior'', pursuing a ``disciplined approach to value creation'', 
+or achieving a ``healthier competitive environment''. A firm may underscore a 
+``price-over-volume strategy'' or putting ``value over volume''. In sum, the set of 
+messages is limited but the content used to express it is rich. 

@@ -1,8 +1,20 @@
-To assess the performance of the LLM, we conducted an audit of the LLM's
-output.\footnote{%
-The auditor is one of the paper's authors, Joseph Harrington.} Balancing the
-value of reviewing more transcripts against the time it takes to review
-them, we decided to review the top 300 transcripts - which makes up one-half of the LLM-validated transcripts - subject to including all
+This study seeks to contribute to our understanding of the use of 
+public announcements to collude and to developing a screening tool for 
+detecting such public announcements. The human audit serves both those 
+objectives.\footnote{%
+The auditor is one of the paper's authors, Joseph Harrington.} 
+ First, it distills and organizes collusive content towards 
+understanding the type of content that is being used to coordinate firms' 
+conduct. Second, it evaluates the performance of the LLM and thereby 
+assesses how well it does in substituting for human experts. In this 
+section, the procedure for the human audit is described and the 
+performance of the LLM is evaluated. In Section 5, the collusive content 
+is analyzed and organized to deliver some takeaways about how firms are 
+seeking to reduce competition.
+
+Balancing the value of reviewing more transcripts against the time it takes to review
+them, we decided to review the top 300 transcripts - which makes up one-half 
+of the LLM-validated transcripts - subject to including all
 transcripts with the same score. This resulted in \data{audit/sample_count_int}
 transcripts which comprise all those with a score of at least
 \data{audit/score_min_float2}. The scores ranged from
@@ -15,12 +27,11 @@ from Loblaw Companies which was a member of the Canadian bread cartel.
 Notably, the transcript received a score of 86.25 which was the highest
 score in the sample.}
 
-\begin{table}[htbp]
-    \centering
-    \caption{Human audit summary statistics}
+\begin{center}
+    \captionof{table}{Human audit summary statistics}
     \label{tab:audit_summary}
     \input{../data/outputs/tables/human_audit_summary_stats.tex}
-\end{table}
+\end{center}
 
 \begin{figure}[htbp]
     \centering
@@ -82,24 +93,9 @@ auditor summarized the content that might have led the LLM to give the
 transcript a high score. In some cases, there is no relevant content in
 which case it is labelled \textquotedblleft no content\textquotedblright .
 The LLM's output along with the human auditor's evaluation and summary are
-provided in Online Appendix A. Of course, the human auditor may be mistaken
-in their judgment -- in the sense that the content did not result in firms
+provided in Online Appendix A.\footnote{%
+Of course, the human auditor may be mistaken
+in their judgment - in the sense that the content did not result in firms
 coordinating their conduct to reduce competition - but the goal is not to
 identify actual episodes of collusion but to determine if an LLM can replace
-human experts.\footnote{%
-Determining the efficacy of an LLM or a human auditor in identifying
-communications that resulted in coordination would require assessing effect,
-either through observational reporting, as in
-\textcite{harrington2022collusion}, or empirical analysis, as in
-\textcite{aryal2022coordinated}.}
-
-The ensuing analysis addresses three questions. First, how accurate is an
-LLM in identifying collusive content? Accuracy will be measured by the true
-positive rate. This exercise will inform us of the usefulness of an LLM at
-substituting for human experts in evaluating public communications. Second,
-what describes the collusive content of true positives? That is, what is the
-basis for concluding a firm's announcement facilitates collusion? This
-analysis will advance our understanding of firm conduct. Third, when the LLM
-gets it wrong, how does it get it wrong? That will inform us of the LLM's
-limitations and may suggest how to improve its performance. The latter two
-questions are addressed in Section 5.
+human experts.}

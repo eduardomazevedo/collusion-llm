@@ -1,9 +1,35 @@
-Our transcript text data comes from the Capital IQ transcripts database (currently branded as S\&P Global Machine Readable Transcripts). The dataset includes earnings calls, investor day presentations, industry conferences, analyst meetings, and other public corporate communications.
+Our transcript text data comes from the Capital IQ transcripts database 
+(currently branded as S\&P Global Machine Readable Transcripts). The 
+dataset includes earnings calls, investor day presentations, industry 
+conferences, analyst meetings, and other public corporate communications.
 
-The transcripts span from \data{summary_stats/dataset_overview/first_date} to \data{summary_stats/dataset_overview/last_date}, covering \data{summary_stats/dataset_overview/unique_companies_int} companies. Our dataset comprises \data{summary_stats/dataset_overview/total_transcripts_int} transcripts. The average call lasts \data{summary_stats/audio_characteristics/mean_length_description}. In total, it would take \data{summary_stats/audio_characteristics/total_audio_years_int} years of uninterrupted audio to listen to all calls. Capital IQ provides verbatim transcriptions of these calls, including remarks by company executives and the subsequent question-and-answer sessions with analysts and investors. Speakers are identified and tracked across the transcripts.
+The transcripts span from \data{summary_stats/dataset_overview/first_date} 
+to \data{summary_stats/dataset_overview/last_date}, covering
+ \data{summary_stats/dataset_overview/unique_companies_int} companies.
+  Our dataset comprises \data{summary_stats/dataset_overview/total_transcripts_int} 
+  transcripts. The average call lasts \data{summary_stats/audio_characteristics/mean_length_description}. 
+  In total, it would take \data{summary_stats/audio_characteristics/total_audio_years_int} 
+  years of uninterrupted audio to listen to all calls. Capital IQ provides 
+  verbatim transcriptions of these calls, including remarks by company 
+  executives and the subsequent question-and-answer sessions with analysts 
+  and investors. Speakers are identified and tracked across the transcripts.
 
-The data includes company identifiers, call dates, and call types. We merge Compustat data at the company-year level to obtain basic information like sector and market capitalization.
+The data includes company identifiers, call dates, and call types. 
+We merge Compustat data at the company-year level to obtain basic 
+information like sector and market capitalization.
 
 \input{../data/outputs/tables/summary_stats_dataset.tex}
 
-We use expert ratings of collusive and non-collusive transcripts from \textcite{aryal2022coordinated}.\footnote{\url{https://doi.org/10.5281/zenodo.5664420}} They collected earnings calls from 11 airlines from 2002 to 2016, a period during which major airlines allegedly tried to enforce ``capacity discipline'' through public communications. They rated the transcripts as collusive or non-collusive with a keyword search and manual review. They only coded as collusive the transcripts where all three authors agreed that the transcript was collusive. Their data includes \data{summary_stats/tagging_performance/aryal_total_transcripts_int} transcripts accessed through the LexisNexis database and the investment news website Seeking Alpha, with about \data{summary_stats/tagging_performance/aryal_collusive_rate_pct_percentage0} being coded as collusive. We use \data{summary_stats/tagging_performance/aryal_transcripts_in_ciq_int} of these transcripts that are available in the Capital IQ dataset.
+We use expert ratings of collusive and non-collusive transcripts from
+ \textcite{aryal2022coordinated}.\footnote{\url{https://doi.org/10.5281/zenodo.5664420}} 
+ They collected earnings calls from 11 airlines from 2002 to 2016, a 
+ period during which major airlines allegedly tried to enforce ``capacity discipline'' 
+ through public communications. They rated the transcripts as collusive
+ or non-collusive with a keyword search and manual review. They only 
+ coded as collusive the transcripts where all three authors agreed that 
+ the transcript was collusive. Their data includes 
+ \data{summary_stats/tagging_performance/aryal_total_transcripts_int} 
+ transcripts accessed through the LexisNexis database and the investment 
+ news website Seeking Alpha, with about \data{summary_stats/tagging_performance/aryal_collusive_rate_pct_percentage0} 
+ being coded as collusive. We use \data{summary_stats/tagging_performance/aryal_transcripts_in_ciq_int} 
+ of these transcripts that are available in the Capital IQ dataset.

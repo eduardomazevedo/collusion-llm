@@ -4,29 +4,59 @@ Our analysis pipeline is illustrated in Figure \ref{fig:workflow_two_column_scal
 
 \textbf{Construction of human-labeled benchmark sample}
 
-We constructed a human-labeled benchmark sample using two sources. The first is the \textcite{aryal2022coordinated} transcripts, with their binary assessment of collusion. The second are transcripts from U-Haul's parent company, Amerco. Some of these transcripts were previously discussed and considered collusive by \textcite{harrington2022collusion}. Citing these communications, the FTC charged U-Haul with an ``invitation to collude'' in \textcite{uhaul2010ftc}, resulting in a settlement. We reviewed these transcripts ourselves and provided collusion severity scores on a 0-100 scale. To obtain a binary classification for the U-Haul sample, we set a threshold value of 50. This leaves us with a benchmark sample of \data{summary_stats/tagging_performance/benchmark_sample_count_int} transcripts.
+We constructed a human-labeled benchmark sample using two sources. 
+The first is the \textcite{aryal2022coordinated} transcripts, with 
+their binary assessment of collusion. The second are transcripts 
+from U-Haul's parent company, Amerco. Some of these transcripts 
+were previously discussed and considered collusive by \textcite{harrington2022collusion}. 
+Citing these communications, the FTC charged U-Haul with an ``invitation to collude'' 
+in \textcite{uhaul2010ftc}, resulting in a settlement. We reviewed 
+these transcripts ourselves and provided collusion severity scores 
+on a 0-100 scale. To obtain a binary classification for the U-Haul 
+sample, we set a threshold value of 50. This leaves us with a 
+benchmark sample of \data{summary_stats/tagging_performance/benchmark_sample_count_int} transcripts.
 
 \textbf{Development and evaluation of prompts and LLM models}
 
 
-With the benchmark sample in hand, we developed and evaluated prompts and experimented with different LLM models (see supplementary information). We ultimately selected \textit{gpt-4o-mini-2024-07-18} (temperature=1.0) and the following zero-shot prompt:
+With the benchmark sample in hand, we developed and evaluated 
+prompts and experimented with different LLM models (see supplementary 
+information). We ultimately selected \textit{gpt-4o-mini-2024-07-18} (temperature=1.0) and the following zero-shot prompt:
 \begin{quote}
     \textit{You’re an expert in detecting subtle collusive intent in company earnings calls. You know firms can try to avoid scrutiny if they express intentions to reduce supply or increase prices, or they can imply it would be good if industry capacity were limited or prices were kept high. Analyze the following transcript of a public company communication and identify any signs that the company is trying to coordinate with competitors to limit capacity or keep prices high. Provide a score from 0 to 100, where 0 means no evidence of collusive intent and 100 means strong evidence of collusive intent. Additionally, provide a very brief explanation of your assessment. Also provide a list of excerpts that support your assessment.}
 \end{quote}
 
-This prompt was crafted to mention the broad types of collusive actions (i.e. maintaining high prices, limiting capacity), and specify clearly that we target a company's intention to coordinate on such actions.
+This prompt was crafted to mention the broad types of collusive actions 
+(i.e. maintaining high prices, limiting capacity), and specify 
+clearly that we target a company's intention to coordinate on such actions.
 
 \textbf{Large-scale analysis of Capital IQ transcripts}
 
 
-We applied the best-performing prompt and model to the full Capital IQ transcript dataset (N=\data{summary_stats/dataset_overview/total_transcripts_int}). We define a transcript as {\textbf{LLM-flagged}} if it has an initial collusion score of at least 75. These are transcripts where the initial LLM assessment was that there is significant evidence of collusive intent. This flagged \data{summary_stats/tagging_performance/llm_tagged_count_int} transcripts.
+We applied the best-performing prompt and model to the full 
+Capital IQ transcript dataset (N=\data{summary_stats/dataset_overview/total_transcripts_int}). 
+We define a transcript as {\textbf{LLM-flagged}} if it has an initial 
+collusion score of at least 75. These are transcripts where the initial 
+LLM assessment was that there is significant evidence of collusive intent. 
+This flagged \data{summary_stats/tagging_performance/llm_tagged_count_int} transcripts.
 
 \textbf{LLM Validation of LLM-flagged transcripts}
 
 
-Because the LLM we use generates non-deterministic outputs for the same given transcript/prompt pair, a single evaluation of a transcript may reflect idiosyncratic sampling noise rather than a stable assessment. To address this issue and to produce a more robust output, we ran an additional ten repeated queries on the LLM-flagged transcripts. We then define as {\textbf{LLM-validated}} transcripts those whose average score remained at least 75 after the validation. This leaves us with \data{summary_stats/tagging_performance/llm_validation_tagged_int} transcripts.
+Because the LLM we use generates non-deterministic outputs for the same 
+given transcript/prompt pair, a single evaluation of a transcript may 
+reflect idiosyncratic sampling noise rather than a stable assessment. 
+To address this issue and to produce a more robust output, we ran an 
+additional ten repeated queries on the LLM-flagged transcripts. We then 
+define as {\textbf{LLM-validated}} transcripts those whose average 
+score remained at least 75 after the validation. This leaves us with
+ \data{summary_stats/tagging_performance/llm_validation_tagged_int} transcripts.
 
 \textbf{Human audit of LLM-validated transcripts}
 
 
-Finally, we manually audited the top \data{summary_stats/tagging_performance/human_audit_sample_count_int} LLM-validated transcripts. The audit procedure is crucial for our evaluation of the LLM's performance, and we describe it in detail in section \ref{sec:audit}.
+Finally, we manually audited the top \data{summary_stats/tagging_performance/human_audit_sample_count_int} 
+LLM-validated transcripts. The audit is crucial for both of the study's objectives: 
+understanding the content used to facilitate coordinated conduct to reduce 
+competition and evaluating the performance of an LLM as a screen for enforcers.
+ The audit procedure is described in detail in section \ref{sec:audit}.
