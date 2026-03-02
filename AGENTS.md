@@ -14,7 +14,7 @@
 ## Coding Style & Analysis Scripting
 - Python 3.13; PEP8, 4-space indents, snake_case, PascalCase for classes; lean on helpers in `modules/utils.py`.
 - Version prompt keys (e.g., `SimpleCapacityV8.1.1`) and keep schemas aligned with `modules/llm.py`. Run scripts from `ROOT` set in `.env`.
-- Analysis scripts should be linear/notebook-friendly (#%%), with a top docstring and minimal boilerplate. Use `.venv` for execution. For ad-hoc analysis, use `scratch.py`, print results only, and delete afterward.
+- Analysis scripts should be linear/notebook-friendly (#%%), with a top docstring and minimal boilerplate. Use `.venv` for execution. For ad-hoc analysis, place scripts in `scratch/` (for example, `scratch/scratch.py`), print results only, and delete afterward when appropriate.
 - No repo-wide test suite is checked in; add `pytest` cases under `tests/` when introducing new logic.
 
 ## Data & Artifacts
@@ -90,7 +90,7 @@ Description of the variable, including data type, scale, and any special values 
 - Scripts that calculate stats that do not fit neatly into a table should output a yaml file in `data/yaml/`. These include basic stats like number of observations, etc.
 - Analysis scripts should be written sequentially, without unecessary definitions of functions, without pointless main blocks. Instead it should be data science friendly, with #%% blocks that can be run interactively.
 - Every script should have a docstring that explains what it does tersely at the top.
-- If I ask you questions about the data that require analysis, create a file on root called scratch.py to do your analysis. Make it print useful output but not change any files. Delete after we are 100% done with the extra analysis.
+- If I ask you questions about the data that require analysis, create a script in `scratch/` (for example, `scratch/scratch.py`) to do your analysis. Make it print useful output but not change any files unless I explicitly ask for saved outputs in `scratch_outputs/`. Delete the scratch script after we are 100% done with the extra analysis, unless I ask to keep it.
 - We always use our `.venv` virtual environment. Use it when running your own code.
 
 ## Latex
@@ -146,4 +146,3 @@ The downstream analysis (once queries database is done) uses Snakemake for repro
 - Creates analysis datasets
 - Generates summary statistics
 - All rules defined in `Snakefile`
-
