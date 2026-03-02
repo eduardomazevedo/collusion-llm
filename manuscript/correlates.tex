@@ -1,7 +1,7 @@
 We now examine the correlates of collusive communication and consider three types: firm sector, firm size, and call year. LLM-flagged is used as our binary indicator of collusive communication. 
 This has the issue of being a noisy proxy for collusive communication. But the other measures are also imperfect, and LLM-flagged has the advantage of a larger sample size.
 
-The clearest pattern is the heterogeneity by sector, displayed in Figure \ref{fig:segment_tag_rates}. 
+The clearest pattern is the heterogeneity by sector, displayed in Figures \ref{fig:gics_sector_tag_rates} and \ref{fig:high_collusion_sic_tag_rates}. 
 We split the sample into top level GICS sector definitions. 
 There is considerable heterogeneity around the average rate of collusive communications of
  \data{correlates_collusive_communication/llm_tagged_collusive_pct_percentage1}. 
@@ -22,16 +22,29 @@ collusion tending to occur through bidding rings at procurement auctions.
 This type of collusion is not facilitated by 
 public communications as in the other high collusion segments.
 
-% Figure: tag rate by sector
+% Figure: tag rate by GICS sector
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\textwidth]{../data/outputs/figures/segment_tag_rates_llm.pdf}
-\caption{LLM Flagged Rate by Sector and High Collusion Segments}
-\label{fig:segment_tag_rates}
+\includegraphics[width=0.85\textwidth]{../data/outputs/figures/gics_sector_tag_rates_llm.pdf}
+\caption{LLM Flagged Rate by Sector}
+\label{fig:gics_sector_tag_rates}
 \begin{minipage}{\textwidth}
 \vspace{1em}
 \footnotesize
-\textit{Notes:} Fraction of LLM-flagged collusive communications across industry sectors (GICS) and segments that are notorious for high collusion. The segments are defined using SIC codes: (1) Heavy Construction—Highway and Street Construction, Except Elevated Highways (161) and Heavy Construction, Except Highway and Street (162), (2) Wood Products—Millwork, Veneer, Plywood, and Structural Wood (243), (3) Paper \& Packaging—Pulp Mills (261), Paper Mills (262), Paperboard Mills (263), and Paperboard Containers and Boxes (265), (4) Commodity Chemicals—Industrial Inorganic Chemicals (281), Paints, Varnishes, Lacquers, Enamels, and Allied Products (285), Industrial Organic Chemicals (286), and Agricultural Chemicals (287), (5) Cement \& Glass—Flat Glass (321), Cement, Hydraulic (324), and Concrete, Gypsum, and Plaster Products (327), (6) Primary Metals—Steel Works, Blast Furnaces, and Rolling and Finishing Mills (331) and Primary Smelting and Refining of Nonferrous (333), and (7) Ocean Shipping—Deep Sea Foreign Transportation of Freight (441) and Deep Sea Domestic Transportation of Freight (442). These segments were selected based on theoretical predictions of collusion risk (e.g., homogeneous products, high transport costs, capacity constraints) and historical cartel cases. Data includes \data{correlates_collusive_communication/sector_valid_observations_int} transcripts. Error bars represent 95\% confidence intervals.
+\textit{Notes:} Fraction of LLM-flagged collusive communications across industry sectors (GICS) represented in the full transcript dataset, excluding GICS 60--Real Estate. Error bars represent 95\% confidence intervals.
+\end{minipage}
+\end{figure}
+
+% Figure: tag rate by unaggregated high-collusion SIC codes
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{../data/outputs/figures/high_collusion_sic_tag_rates_llm.pdf}
+\caption{LLM Flagged Rate by High Collusion Segments}
+\label{fig:high_collusion_sic_tag_rates}
+\begin{minipage}{\textwidth}
+\vspace{1em}
+\footnotesize
+\textit{Notes:} Fraction of LLM-flagged collusive communications across segments that are notorious for high collusion, excluding Deep Sea Domestic Freight Transporation and Highway \& Street Construction, which don't appear in our transcript dataset. These segments were selected based on theoretical predictions of collusion risk (e.g., homogeneous products, high transport costs, capacity constraints) and historical cartel cases. Error bars represent 95\% confidence intervals.
 \end{minipage}
 \end{figure}
 

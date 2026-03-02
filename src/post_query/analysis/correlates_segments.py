@@ -51,6 +51,28 @@ HIGH_COLLUSION_SEGMENTS = [
     ('Ocean Shipping', ['441', '442'], 'prefix'),
 ]
 
+# Unaggregated SIC codes used for high-collusion segment display.
+HIGH_COLLUSION_SIC_CODES = [
+    ("161", "Highway & Street Construction (except elevated)"),
+    ("162", "Heavy Construction (except highway & street)"),
+    ("243", "Millwork, Veneer, Plywood, Structural Wood"),
+    ("261", "Pulp Mills"),
+    ("262", "Paper Mills"),
+    ("263", "Paperboard Mills"),
+    ("265", "Paperboard Containers & Boxes"),
+    ("281", "Industrial Inorganic Chemicals"),
+    ("285", "Paints, Varnishes, Lacquers, Enamels"),
+    ("286", "Industrial Organic Chemicals"),
+    ("287", "Agricultural Chemicals"),
+    ("321", "Flat Glass"),
+    ("324", "Cement, Hydraulic"),
+    ("327", "Concrete, Gypsum, Plaster Products"),
+    ("331", "Steel Works, Blast Furnaces, Rolling Mills"),
+    ("333", "Primary Smelting/Refining of Nonferrous"),
+    ("441", "Deep Sea Foreign Freight Transportation"),
+    ("442", "Deep Sea Domestic Freight Transportation"),
+]
+
 #%%
 def proportion_ci(count, nobs, alpha=0.05):
     low, high = proportion_confint(count, nobs, alpha=alpha, method='wilson')
@@ -199,7 +221,97 @@ def get_high_collusion_segments(detailed_df):
     
     return pd.DataFrame(segment_results)
 
-def analyze_segments(combined_df, overall_llm_rate=None):
+
+def get_high_collusion_sic_codes(detailed_df):
+    """Extract unaggregated SIC-code rows for the predefined high-collusion SIC list."""
+    sic_df = detailed_df[detailed_df['classification_system'] == 'sic'].copy()
+    sic_df['code4'] = sic_df['code'].astype(str).str.zfill(4)
+
+    rows = []
+    missing_codes = []
+
+    for sic3, label in HIGH_COLLUSION_SIC_CODES:
+        code4 = str(sic3).zfill(4)
+        matches = sic_df[sic_df['code4'] == code4].copy()
+
+        if len(matches) == 0:
+            missing_codes.append(sic3)
+            continue
+
+        # Keep the most detailed representation for that exact code.
+        matches = matches.sort_values('level', ascending=False).drop_duplicates(subset=['code4'], keep='first')
+        n = int(matches['n_transcripts'].sum())
+        num_hits = int(matches['n_llm_flagged'].sum())
+        tag_pct = float(num_hits / n * 100) if n > 0 else 0.0
+
+        rows.append({
+            'group_name': label,
+            'sic3': sic3,
+            'n': n,
+            'num_hits': num_hits,
+            'tag_pct': round(tag_pct, 2),
+        })
+
+    if missing_codes:
+        print("Missing high-collusion SIC codes in data: " + ", ".join(missing_codes))
+
+    return pd.DataFrame(rows)
+
+
+def create_single_group_figure(group_df, output_name, color, overall_avg):
+    """Create a single horizontal-bar figure with CI and full-dataset average legend line."""
+    if len(group_df) == 0:
+        print(f"Warning: no data available for {output_name}, skipping figure.")
+        return
+
+    # For barh without y-axis inversion, descending sort displays top-to-bottom from low to high.
+    plot_df = group_df.sort_values("tag_pct", ascending=False).reset_index(drop=True)
+
+    # Slightly taller figure for more labels.
+    fig_height = max(5.5, 0.45 * len(plot_df) + 1.5)
+    fig, ax = plt.subplots(figsize=(10, fig_height))
+
+    values = plot_df['tag_pct'].values
+    ci_low = plot_df['ci_low'].values
+    ci_high = plot_df['ci_high'].values
+    xerr_low = np.maximum(0, values - ci_low)
+    xerr_high = np.maximum(0, ci_high - values)
+
+    y_positions = np.arange(len(plot_df))
+    ax.barh(
+        y_positions,
+        values,
+        xerr=[xerr_low, xerr_high],
+        color=color,
+        edgecolor=STYLE_CONFIG["edge_color"],
+        linewidth=STYLE_CONFIG["edge_width"],
+        ecolor=STYLE_CONFIG["error_color"],
+    )
+
+    max_val = np.nanmax(np.concatenate([values, ci_high])) if len(values) > 0 else 1.0
+    x_max = max(1.0, max_val * 1.15)
+    ax.set_xlim(0, x_max)
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(plot_df['group_name'])
+    ax.set_xlabel("LLM Flagged as Collusive (%)")
+    ax.grid(axis='x')
+
+    # Legend should only show the dashed full-dataset average line, with value.
+    ax.axvline(
+        x=overall_avg,
+        color=STYLE_CONFIG["line_color"],
+        linestyle='--',
+        label=f"Full Dataset Average ({overall_avg:.2f}%)",
+    )
+    ax.legend(loc='upper right')
+
+    plt.tight_layout()
+    path_base = figure_dir / output_name
+    fig.savefig(f"{path_base}.png", dpi=300, bbox_inches='tight')
+    fig.savefig(f"{path_base}.pdf", bbox_inches='tight')
+    plt.close(fig)
+
+def analyze_segments(combined_df, unaggregated_sic_df, overall_llm_rate=None):
     """
     Generate combined analysis for GICS sectors and high collusion segments.
     Creates table and figure with both groups clearly distinguished.
@@ -230,6 +342,13 @@ def analyze_segments(combined_df, overall_llm_rate=None):
         lambda r: proportion_ci(int(r['num_hits']), int(r['n'])), axis=1, result_type='expand'
     )
     
+    # Keep only SIC codes with observed data for the unaggregated figure.
+    unaggregated_sic_df = unaggregated_sic_df[unaggregated_sic_df['n'] > 0].copy()
+    if len(unaggregated_sic_df) > 0:
+        unaggregated_sic_df[['ci_low', 'ci_high']] = unaggregated_sic_df.apply(
+            lambda r: proportion_ci(int(r['num_hits']), int(r['n'])), axis=1, result_type='expand'
+        )
+
     # Combine for table (sectors first, then segments)
     combined_sorted = pd.concat([sectors, segments], ignore_index=True)
     
@@ -392,6 +511,26 @@ def analyze_segments(combined_df, overall_llm_rate=None):
     with open(figure_dir / "segment_tag_rates_llm.txt", "w") as f:
         f.write("LLM tag rate by sector and high collusion segment (horizontal bar chart with full-width header bars). Produced by correlates_segments.py. Note: Custom figure size (10x8), not standard 1x1/16x9 format.")
     plt.close(fig)
+
+    # Save GICS-only figure (10 sectors currently mapped in the pipeline).
+    create_single_group_figure(
+        sectors[['group_name', 'tag_pct', 'ci_low', 'ci_high']].copy(),
+        "gics_sector_tag_rates_llm",
+        GHIBLI_COLORS[1],
+        overall_avg,
+    )
+    with open(figure_dir / "gics_sector_tag_rates_llm.txt", "w") as f:
+        f.write("LLM flagged rate by GICS sectors (excluding unmapped sector code 60 in current lookup), with full-dataset average line and 95% CI. Produced by correlates_segments.py.")
+
+    # Save unaggregated high-collusion SIC-only figure (only SIC rows with data).
+    create_single_group_figure(
+        unaggregated_sic_df[['group_name', 'tag_pct', 'ci_low', 'ci_high']].copy(),
+        "high_collusion_sic_tag_rates_llm",
+        GHIBLI_COLORS[0],
+        overall_avg,
+    )
+    with open(figure_dir / "high_collusion_sic_tag_rates_llm.txt", "w") as f:
+        f.write("LLM flagged rate by unaggregated high-collusion SIC codes with observed data, full-dataset average line, and 95% CI. Produced by correlates_segments.py.")
     
     # Calculate statistics for each group type (sectors and segments already sorted and calculated above)
     sector_stats = {
@@ -428,6 +567,11 @@ segment_df = get_high_collusion_segments(detailed_df)
 print(f"Found {len(segment_df)} high collusion segments")
 
 #%%
+print("\nExtracting unaggregated high-collusion SIC codes...")
+unaggregated_sic_df = get_high_collusion_sic_codes(detailed_df)
+print(f"Found {len(unaggregated_sic_df)} unaggregated high-collusion SIC code rows")
+
+#%%
 # Combine sectors and segments
 print("\nCombining sectors and segments...")
 combined_df = pd.concat([sector_df, segment_df], ignore_index=True)
@@ -450,7 +594,11 @@ else:
 #%%
 # Analyze combined data
 print("\nAnalyzing combined sectors and segments...")
-sector_stats, segment_stats = analyze_segments(combined_df, overall_llm_rate=overall_llm_rate)
+sector_stats, segment_stats = analyze_segments(
+    combined_df,
+    unaggregated_sic_df,
+    overall_llm_rate=overall_llm_rate
+)
 print("Completed analysis")
 
 # Get sector rates for healthcare (minimum) and materials (maximum) for LaTeX
