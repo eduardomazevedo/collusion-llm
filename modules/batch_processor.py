@@ -13,6 +13,7 @@ Sources:
 """
 from openai import OpenAI
 import json
+import os
 import config
 import modules.capiq as capiq
 from modules.queries_db import insert_query_result
@@ -110,12 +111,12 @@ class BatchProcessor:
         :param max_tokens: Maximum tokens in the response.
         """
         self.provider = provider.lower() if provider else config.PROVIDER
-        self.model = config.OPENAI_MODEL
-        self.prompts_path =config.PROMPTS_PATH
+        self.model = model or config.OPENAI_MODEL
+        self.prompts_path = prompts_path or config.PROMPTS_PATH
         self.prompts = self._load_prompts()
         self.client = OpenAI()
-        self.temperature = config.TEMPERATURE
-        self.max_tokens = config.MAX_TOKENS
+        self.temperature = temperature if temperature is not None else config.TEMPERATURE
+        self.max_tokens = max_tokens if max_tokens is not None else config.MAX_TOKENS
 
     def _load_prompts(self):
         """Load prompts from the prompts JSON file."""
@@ -149,13 +150,16 @@ class BatchProcessor:
         # Get transcript texts
         transcript_texts = capiq.get_transcripts(transcriptids)
         
-        # Create batch input file
-        with open(output_path, "w") as f:
-            for transcriptid in transcriptids:
+        # Create batch input file atomically to avoid partial/truncated reads.
+        tmp_path = f"{output_path}.tmp.{os.getpid()}"
+        with open(tmp_path, "w") as f:
+            for i, transcriptid in enumerate(transcriptids, start=1):
                 if transcriptid in transcript_texts:
                     transcript_data = json.loads(transcript_texts[transcriptid])
                     request = {
-                        "custom_id": f"request-{transcriptid}",
+                        # Include a sequence suffix so duplicated transcript IDs
+                        # can appear in the same batch file when we need repeats.
+                        "custom_id": f"request-{transcriptid}-{i}",
                         "method": "POST",
                         "url": "/v1/chat/completions",
                         "body": {
@@ -170,6 +174,7 @@ class BatchProcessor:
                         }
                     }
                     f.write(json.dumps(request) + "\n")
+        os.replace(tmp_path, output_path)
 
         return output_path
 

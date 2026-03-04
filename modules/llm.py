@@ -23,13 +23,21 @@ import modules.capiq as capiq
 from modules.queries_db import insert_query_result
 import os
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 
 class LLMQuery:
     """Class to manage LLM queries across multiple providers."""
 
-    def __init__(self, provider=None, model=None, prompts_path=None, temperature=None, max_tokens=None):
+    def __init__(
+        self,
+        provider=None,
+        model=None,
+        prompts_path=None,
+        temperature=None,
+        max_tokens=None,
+        reasoning_effort: Optional[str] = None,
+    ):
         """
         Initializes the LLMQuery class.
 
@@ -46,6 +54,7 @@ class LLMQuery:
         self.client = OpenAI()
         self.temperature = temperature or config.TEMPERATURE
         self.max_tokens = max_tokens or config.MAX_TOKENS
+        self.reasoning_effort = reasoning_effort or "medium"
         self.model_config = self._load_model_config()
 
     def _load_prompts(self):
@@ -94,6 +103,10 @@ class LLMQuery:
         if response_model is None:
             raise ValueError(f"Invalid response format: {prompt_config['response_format']}")
 
+        # Use Responses API for reasoning-native models.
+        if self._should_use_responses_reasoning():
+            return self._generate_response_responses_api(prompt_config, response_model, user_input)
+
         # Check model capabilities
         supports_structured = self.model_config.get("supports_structured_output", False)
         supports_json = self.model_config.get("supports_json_output", False)
@@ -111,12 +124,11 @@ class LLMQuery:
             "temperature": self.temperature
         }
         
-        # Handle max tokens parameter based on model type
-        if self.model.startswith('o'):
-            # o1 models use max_completion_tokens
+        # Handle max tokens parameter based on model family.
+        # Reasoning models and GPT-5 family require max_completion_tokens.
+        if self.model.startswith('o') or self.model.startswith('gpt-5'):
             completion_params["max_completion_tokens"] = self.max_tokens
         else:
-            # All other models use max_tokens
             completion_params["max_tokens"] = self.max_tokens
 
         # Handle response format based on model capabilities
@@ -222,6 +234,73 @@ class LLMQuery:
             
             # Convert to JSON string
             return json.dumps(extracted_data), token_info
+
+    def _should_use_responses_reasoning(self) -> bool:
+        """Determine if this model should use Responses API reasoning path."""
+        api_mode = self.model_config.get("api_mode")
+        if api_mode == "responses_reasoning":
+            return True
+        return self.model.startswith("o") or self.model.startswith("gpt-5")
+
+    def _build_json_schema_format(self, response_model: BaseModel) -> Dict[str, Any]:
+        """Build strict JSON schema format block for Responses API."""
+        schema = response_model.model_json_schema()
+
+        def enforce_no_additional_props(node: Any) -> None:
+            if isinstance(node, dict):
+                if node.get("type") == "object":
+                    node.setdefault("additionalProperties", False)
+                for value in node.values():
+                    enforce_no_additional_props(value)
+            elif isinstance(node, list):
+                for item in node:
+                    enforce_no_additional_props(item)
+
+        enforce_no_additional_props(schema)
+        return {
+            "type": "json_schema",
+            "name": f"{response_model.__name__}",
+            "schema": schema,
+            "strict": True,
+        }
+
+    def _generate_response_responses_api(self, prompt_config, response_model, user_input):
+        """Generate response using Responses API with reasoning controls."""
+        input_payload = [
+            {
+                "role": "system",
+                "content": [{"type": "input_text", "text": prompt_config["system_message"]}],
+            },
+            {
+                "role": "user",
+                "content": [{"type": "input_text", "text": user_input}],
+            },
+        ]
+
+        params = {
+            "model": self.model,
+            "input": input_payload,
+            "reasoning": {"effort": self.reasoning_effort},
+            "max_output_tokens": self.max_tokens,
+            "text": {"format": self._build_json_schema_format(response_model)},
+        }
+
+        response = self.client.responses.create(**params)
+
+        output_text = getattr(response, "output_text", None)
+        if not output_text:
+            raise ValueError("Responses API returned empty output_text.")
+
+        # Validate against expected response model and normalize to canonical JSON string.
+        parsed = response_model.model_validate_json(output_text)
+
+        usage = getattr(response, "usage", None)
+        token_info = {
+            "input_tokens": getattr(usage, "input_tokens", None) if usage else None,
+            "output_tokens": getattr(usage, "output_tokens", None) if usage else None,
+        }
+
+        return parsed.model_dump_json(), token_info
 
     def apply_prompt_to_transcripts(self, prompt_name, transcriptids):
         """

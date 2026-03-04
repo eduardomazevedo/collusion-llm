@@ -37,6 +37,86 @@
           "supports_json_output": true,
           "supports_batch": true
         },
+        "gpt-5-nano": {
+          "input_token_price": 0.0000001,
+          "output_token_price": 0.0000004,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "gpt-5-mini": {
+          "input_token_price": 0.0000004,
+          "output_token_price": 0.0000016,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "gpt-5": {
+          "input_token_price": 0.000002,
+          "output_token_price": 0.000008,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "gpt-5.1": {
+          "input_token_price": 0.000002,
+          "output_token_price": 0.000008,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "gpt-5.2": {
+          "input_token_price": 0.000002,
+          "output_token_price": 0.000008,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "gpt-5.3-chat-latest": {
+          "input_token_price": 0.000002,
+          "output_token_price": 0.000008,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "o4-mini": {
+          "input_token_price": 0.0000011,
+          "output_token_price": 0.0000044,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "o3-mini": {
+          "input_token_price": 0.0000011,
+          "output_token_price": 0.0000044,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "o3": {
+          "input_token_price": 0.000002,
+          "output_token_price": 0.000008,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
+        "o1": {
+          "input_token_price": 0.000015,
+          "output_token_price": 0.00006,
+          "supports_structured_output": true,
+          "supports_json_output": true,
+          "supports_batch": true,
+          "api_mode": "responses_reasoning"
+        },
         "gpt-4-turbo": {
           "input_token_price": 0.00001,
           "output_token_price": 0.00003,
