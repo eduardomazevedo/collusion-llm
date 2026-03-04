@@ -32,6 +32,17 @@
 
 We assess LLM responses on the benchmark sample against the human ratings. Table \ref{tab:si_prompt_benchmark_first_run} reports results using only the first query for each prompt-transcript pair, while Table \ref{tab:si_prompt_benchmark_avg11} reports results using the average across the initial query and 10 repeated queries for each prompt-transcript pair.
 
+For benchmarking we report the following metrics based on the corresponding confusion matrix for each prompt:
+\begingroup
+\scriptsize
+\[
+\text{Precision}=\frac{TP}{TP+FP},\quad
+\text{Recall}=\frac{TP}{TP+FN},\quad
+\text{Specificity}=\frac{TN}{TN+FP},\quad
+\text{F1}=2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}.
+\]
+\endgroup
+
 \begin{table}[ht]
     \centering
     \caption{Prompt Benchmarking Against Human Ratings (First LLM Run)}
