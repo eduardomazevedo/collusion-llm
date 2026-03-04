@@ -30,6 +30,38 @@
 
 \section{Performance of Alternative LLM Models and Prompts}
 
+We assess LLM responses on the benchmark sample against the human ratings. Table \ref{tab:si_prompt_benchmark_first_run} reports results using only the first query for each prompt-transcript pair, while Table \ref{tab:si_prompt_benchmark_avg11} reports results using the average across the initial query and 10 repeated queries for each prompt-transcript pair.
+
+\begin{table}[ht]
+    \centering
+    \caption{Prompt Benchmarking Against Human Ratings (First LLM Run)}
+    \label{tab:si_prompt_benchmark_first_run}
+    \setlength{\tabcolsep}{3pt}
+    \scriptsize
+    \resizebox{\textwidth}{!}{\input{../data/outputs/tables/prompt_benchmark_first_run.tex}}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the LLM response score, binarized at 75. Where the LLM output includes both a score and a binary flag, we report the metrics on separate rows. All prompts are run using the gpt-4o-mini model on all benchmark sample transcripts.
+    \end{minipage}
+\end{table}
+\FloatBarrier
+
+\begin{table}[ht]
+    \centering
+    \caption{Prompt Benchmarking Against Human Ratings (Average of 11 LLM Runs)}
+    \label{tab:si_prompt_benchmark_avg11}
+    \setlength{\tabcolsep}{3pt}
+    \scriptsize
+    \resizebox{\textwidth}{!}{\input{../data/outputs/tables/prompt_benchmark_avg11.tex}}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the average LLM response score across the initial run and 10 repeated queries, binarized at 75. Where the LLM output includes both a score and a binary flag, we report the metrics on separate rows, and assign the flag value using a threshold of 0.5 for the averaged flag from the LLM responses. All prompts are run using the gpt-4o-mini model on all benchmark sample transcripts.
+    \end{minipage}
+\end{table}
+\FloatBarrier
+
 \section{Companies with True Positive Transcripts (Number = 71)}
 \begin{longtable}{|l|l|}
 \caption{Companies with Collusive Content from the Human Audit}
