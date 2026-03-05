@@ -96,6 +96,7 @@ Description of the variable, including data type, scale, and any special values 
 ## Latex
 - The paper manuscript files are in `./manuscript/`.
 - The main latex file defines command `\newcommand{\data}[1]{\input{../data/constants/#1.txt}\unskip}` to read the constants in `data/constants/`.
+- Always run LaTeX builds from the directory containing the target `.tex` file (e.g., `cd manuscript` before `latexmk -pdf si.tex` or `latexmk -pdf manuscript.tex`). Do not run `latexmk -pdf manuscript/si.tex` from repo root, because it creates unnecessary build artifacts (`.aux`, `.fls`, `.fdb_latexmk`, `.log`, etc.) in the root.
 
 ### Using the `\data{}` Command for Constants
 The `\data{}` command automatically imports numerical and text constants from YAML files processed by `src/post_query/exports/populate_constants.py`. The script converts YAML data into multiple format variants for flexible LaTeX usage:
