@@ -4,10 +4,6 @@
 % Data reading
 \newcommand{\data}[1]{\input{../data/constants/#1.txt}\unskip}
 
-% External references for any separately compiled online appendix.
-\usepackage{xr}
-\externaldocument{"si"}
-
 \begin{document}
 \title{Collusive Content in Corporate Communications%
 \thanks{Replication code available at \url{https://github.com/eduardomazevedo/collusion-llm}.}
@@ -79,5 +75,24 @@
 \FloatBarrier
 
 \printbibliography
+
+\clearpage
+\begin{center}
+{\huge Appendix}{\huge\par}
+\par\end{center}
+\vspace{1em}
+
+\appendix
+\setcounter{table}{0}
+\makeatletter
+\@addtoreset{table}{section}
+\makeatother
+\renewcommand{\thetable}{\thesection.\arabic{table}}
+\input{si_alternative_prompts.tex}
+% \input{si_alternative_llms.tex}
+\input{si_human_audit_sample_assessment.tex}
+\input{si_companies_human_audit.tex}
+\input{si_categorization_collusive_content.tex}
+\input{si_content_analysis_false_positives.tex}
 
 \end{document}
