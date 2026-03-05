@@ -1,0 +1,18 @@
+\section{Performance of Alternative LLMs}
+
+To compare model performance while holding the prompt fixed, we benchmark alternative LLMs using the \texttt{SimpleCapacityV8.1.1} prompt on the benchmark sample. Table \ref{tab:si_model_benchmark_first_run} reports pooled confusion-matrix metrics using the first usable LLM response score for each model-transcript pair.
+
+\begin{table}[ht]
+    \centering
+    \caption{Model Benchmarking Against Human Ratings (First LLM Run)}
+    \label{tab:si_model_benchmark_first_run}
+    \setlength{\tabcolsep}{3pt}
+    \scriptsize
+    \resizebox{\textwidth}{!}{\input{../data/outputs/tables/model_benchmark_first_run.tex}}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the LLM response score, binarized at 75. Prompt is fixed at \texttt{SimpleCapacityV8.1.1}. Column \texttt{N} reports the number of benchmark transcripts with a usable score for each model at the time this table is generated.
+    \end{minipage}
+\end{table}
+\FloatBarrier
