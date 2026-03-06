@@ -1,0 +1,127 @@
+\documentclass[12pt]{article}
+\usepackage{booktabs}
+
+\begin{document}
+
+\section*{LLM Multi-Transcript Results}
+
+This document reports combined multi-transcript LLM assessments for GOL and LATAM earnings calls (2012--2016) using two prompt variants.
+
+\subsection*{Prompt: SimpleCapacityV8.1.1\_MultiTranscript\_V2}
+
+\textbf{Prompt text:}
+\begin{quote}\small
+You're an expert in detecting subtle collusive intent in company earnings
+calls. You know firms can try to avoid scrutiny if they express intentions
+to reduce supply or increase prices, or they can imply it would be good if
+industry capacity were limited or prices were kept high. Analyze the
+following transcripts of public company communications and identify any
+signs that the companies are trying to coordinate with competitors to limit
+capacity or keep prices high. Specifically, focus on any evidence that the
+companies might be signalling or responding to a signal from each other to
+facilitate coordination. Provide a score from 0 to 100, where 0 means no
+evidence of collusive intent and 100 means strong evidence of collusive
+intent. Additionally, provide a very brief explanation of your assessment.
+Also provide a list of excerpts that support your assessment. Finally,
+create a tex table with columns theme, evidence, interpretation to summarize
+your analysis of their potentially collusive communication.
+\end{quote}
+
+\textbf{Transcripts:} 40 total (LATAM: 20; GOL: 20)\\
+\textbf{Combined token count:} 350,352\\
+\textbf{Score:} 5\\
+
+\textbf{Reasoning:} Across multiple earnings calls, both LATAM Airlines Group and GOL Linhas A\'ereas Inteligentes consistently emphasize capacity discipline, fleet right-sizing, and cost control measures in response to challenging macroeconomic conditions, especially currency devaluation and reduced demand. While they indicate coordination with partners and focus on maintaining high yields, there is no explicit or implicit evidence of signaling or communication intended to fix prices, limit capacity beyond market demand, or facilitate coordination with competitors. The companies discuss regulatory approvals, mergers, and network optimization without suggesting collusive conduct. Thus, collusive intent is minimal or absent in these communications.
+
+\textbf{Excerpts:}
+\begin{itemize}
+\item LAN: ``LAN is moving to expand capacity but with significant flexibility to adjust to demand conditions in different markets.''
+\item LAN: ``We have staggered expirations of freight releases and we maintain fleet flexibility.''
+\item LAN and TAM: ``Working hard to complete merger and begin synergy generation; no mention of coordination on pricing or capacity with competitors.''
+\item GOL: ``Implemented capacity cuts and fleet rightsizing in response to economic conditions; focus on cost control and efficiency.''
+\item GOL: ``Providing best fares and improving products; noting competitive capacity additions by others but no signal of collusion.''
+\item Several references to regulatory approvals, market pressures, and business challenges without collusive language.
+\end{itemize}
+
+\textbf{Table (LLM output)}
+\begin{table}[ht]
+\centering
+\footnotesize
+\begin{tabular}{p{0.24\textwidth}p{0.38\textwidth}p{0.30\textwidth}}
+\toprule
+Theme & Evidence & Interpretation \\
+\midrule
+Capacity Discipline & Frequent mention of capacity management, rightsizing, and flexibility to adjust capacity according to market demand. & Reflects competitive market behavior, not collusive limitation of supply. \\
+Fleet and Cost Management & Discussions of fleet reductions, lease negotiations, and cost-cutting initiatives. & Indicative of efficiency efforts rather than coordination with competitors. \\
+Revenue and Pricing & Emphasis on maximizing yields, competitive pricing, and segment differentiation (corporate vs leisure). & Focus on market-driven pricing strategies, no explicit price signaling observed. \\
+Regulatory Environment & Mentions of regulatory approvals, antitrust clearances, and compliance. & Routine business operations; no evidence of collusive agreements or signaling. \\
+Partnerships and Alliances & Descriptions of mergers, code-sharing agreements, and alliances (e.g., LATAM-TAM merger, GOL-Delta partnership). & Business integrations and partnerships to enhance competitiveness; no collusive intent detected. \\
+Competitor Activity & Acknowledgment of competitors increasing or decreasing capacity; acting independently. & Market competition dynamics without coordination signals. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Prompt: SimpleCapacityV8.1.1\_MultiTranscript\_V1}
+
+\textbf{Prompt text:}
+\begin{quote}\small
+You're an expert in detecting subtle collusive intent in company earnings
+calls. You know firms can try to avoid scrutiny if they express intentions
+to reduce supply or increase prices, or they can imply it would be good if
+industry capacity were limited or prices were kept high. Analyze the
+following transcripts of public company communications and identify any
+signs that the companies are trying to coordinate with competitors to limit
+capacity or keep prices high. Provide a score from 0 to 100, where 0 means
+no evidence of collusive intent and 100 means strong evidence of collusive
+intent. Additionally, provide a very brief explanation of your assessment.
+Also provide a list of excerpts that support your assessment. Finally,
+create a tex table with columns theme, evidence, interpretation to summarize
+your analysis of their potentially collusive communication.
+\end{quote}
+
+\textbf{Transcripts:} 40 total (LATAM: 20; GOL: 20)\\
+\textbf{Combined token count:} 350,352\\
+\textbf{Score:} 5\\
+
+\textbf{Reasoning:} The transcripts of earnings calls for LATAM Airlines Group and Gol Linhas A\'ereas Inteligentes reflect a consistent focus on managing capacity and costs in response to challenging macroeconomic conditions, including currency devaluation, fuel price volatility, and demand fluctuations.
+
+Throughout the calls, the companies discuss capacity reductions, fleet rationalizations, and cost-saving initiatives to maintain profitability and improve financial positions. However, these discussions appear to represent legitimate business strategies and responses to market conditions rather than coordination or intent to limit capacity or keep prices artificially high through collusive behavior.
+
+There is no explicit or implicit language suggesting agreements with competitors, signaling intentions to fix prices, or to collectively reduce industry capacity to restrict competition. Capacity decisions are described as flexible and responsive to demand, often with references to competitive pressures and operational challenges.
+
+Therefore, the companies' communications indicate prudent, independent business planning rather than collusive arrangements.
+
+\textbf{Excerpts:}
+\begin{itemize}
+\item LAN Airlines: ``Passenger capacity growth reached 13.3\% this quarter... This expansion was partially offset...'' indicating independent capacity adjustments.
+\item LAN Airlines: ``Growth in the regional business has been driven by...'' no mention of coordination with competitors.
+\item LATAM Airlines Group Q2 2012: ``Continued competition within the region...'' acknowledges competition rather than cooperation.
+\item LATAM Airlines Group Q4 2012: ``Considering the current situation, we have decreased our capacity growth estimates for international operations for 2013 and are evaluating alternatives to rationalize our fleet plan.''
+\item LATAM Airlines Group Q1 2013: ``We have been able to maintain our company-wide cost reductions...'' reflecting internal cost management.
+\item GOL Airlines Q4 2011: ``GOL has announced a capacity cut as of March...'' showing independent capacity decisions.
+\item GOL Airlines Q1 2016: ``GOL is the largest low-cost airline in Latin America... The company has standardized its fleet...'' indicating independent competitive strategy.
+\item GOL Airlines Q2 and Q3 2016: Frequent mention of capacity reductions to match demand and improve margins, with no indication of collusive conduct.
+\item GOL Airlines Q4 2016: ``Due to rationalization of capacity...'' and ``Load factor increase'' reflecting normal market behaviour.
+\item Throughout, no language about agreements with competitors or strategies to fix prices or limit supply for anti-competitive purposes.
+\end{itemize}
+
+\textbf{Table (LLM output)}
+\begin{table}[ht]
+\centering
+\footnotesize
+\begin{tabular}{p{0.24\textwidth}p{0.38\textwidth}p{0.30\textwidth}}
+\toprule
+Theme & Evidence & Interpretation \\
+\midrule
+Capacity Management & Frequent references to capacity reductions, fleet rationalizations, and flexible adjustments to match demand (e.g., LAN Airlines, LATAM calls) & Represents independent business decisions responsive to market demand, not collusion \\
+Competitive Market Acknowledgement & Statements recognize competitive pressures and competition within regions (e.g., LATAM: ``increased competition within the region'') & Indicates no collusive agreement; companies operate in competitive markets \\
+Cost Control & Discussions of internal cost-saving initiatives, renegotiations, and operational efficiencies (e.g., overhead reductions, fleet efficiency) & Valid independent cost management, non-collusive \\
+Lack of Collusive Language & No mentions of coordination with competitors, agreements to fix prices, or restrict supply & Absence of collusive intent \\
+Ancillary Revenue & Emphasis on ancillary revenue growth and customer service improvements & Normal competitive strategy, no implication of collusion \\
+Regulatory and Market Environment & Frequent mentions of addressing regulatory concerns, antitrust approvals, and responding to macroeconomic conditions & Indicates regulatory compliance and reactive market strategy \\
+Flexibility and Responsiveness & Statements on flexibility in capacity deployment and pricing & Reflects standard competitive behavior, not coordinated action \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
