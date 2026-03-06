@@ -1,0 +1,58 @@
+\section{Performance of Alternative Prompts and LLMs}\label{sec:app_prompt_comparison}
+
+We assess LLM responses on the benchmark sample against the human ratings for U-Haul and the airline industry. First, in Table~\ref{tab:si_prompt_benchmark_first_run} we compare different prompt versions, using the same gpt-4o-mini model, based on the first LLM response for each transcript-prompt pair (the exact text of the prompts will be available in the replication package). For robustness, we also repeat each transcript-prompt query another 10 times using the same model, and show the corresponding metrics based on the average of the 11 LLM responses (Table~\ref{tab:si_prompt_benchmark_avg11}). We report the following metrics based on the corresponding confusion matrix for each prompt:
+\begingroup
+\scriptsize
+\[
+\text{Precision}=\frac{TP}{TP+FP},\quad \text{Recall}=\frac{TP}{TP+FN},\quad \text{Specificity}=\frac{TN}{TN+FP},\quad \text{F1}=2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}.
+\]
+\endgroup
+
+We also compare LLM responses using different models from OpenAI that are suitable for our task. In Table~\ref{tab:si_model_benchmark_first_run} we compute for each model the same metrics we did for the prompt comparison, using the first LLM response for each transcript-model pair, and keeping the \texttt{SimpleCapacityV8.1.1} prompt fixed. Since some of the older models do not allow imposing a specific schema for the LLM response, we use a version of this prompt that simply adds to the original a concise description of the desired schema, following the guidance of OpenAI.
+
+Note that the metrics we report here are just meant to provide a clearer way to compare quantitatively the responses across different prompts or models, but are not exhaustively assessing their performance. Our decision to use the \texttt{SimpleCapacityV8.1.1} prompt and gpt-4o-mini model for our large scale analysis of the full transcript sample was also largely guided by the other information the LLM responses contained (i.e. excerpts and reasoning). Moreover, specifically for the LLM selection, we considered the cost and token context size along with the quality of the responses, to ensure the feasibility of our large-scale analysis. We acknowledge that other prompt versions might be used, along with newer, more advanced models which are released frequently, to improve the LLM assessment for this analysis.
+
+\begin{table}[!htbp]
+    \centering
+    \caption{Prompt Variants Benchmarking (First LLM Run)}
+    \label{tab:si_prompt_benchmark_first_run}
+    \setlength{\tabcolsep}{3pt}
+    \scriptsize
+    \resizebox{\textwidth}{!}{\input{../data/outputs/tables/prompt_benchmark_first_run.tex}}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the LLM response score, binarized at 75. Where the LLM output includes both a score and a binary flag, we report the metrics on separate rows. All prompts are run using the gpt-4o-mini model on all benchmark sample transcripts.
+    \end{minipage}
+\end{table}
+\FloatBarrier
+
+\begin{table}[ht]
+    \centering
+    \caption{Prompt Variants Benchmarking (11 LLM Runs)}
+    \label{tab:si_prompt_benchmark_avg11}
+    \setlength{\tabcolsep}{3pt}
+    \scriptsize
+    \resizebox{\textwidth}{!}{\input{../data/outputs/tables/prompt_benchmark_avg11.tex}}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the average LLM response score across the initial run and 10 repeated queries, binarized at 75. Where the LLM output includes both a score and a binary flag, we report the metrics on separate rows, and assign the flag value using a threshold of 0.5 for the averaged flag from the LLM responses. All prompts are run using the gpt-4o-mini model on all benchmark sample transcripts.
+    \end{minipage}
+\end{table}
+\FloatBarrier
+
+\begin{table}[ht]
+    \centering
+    \caption{LLMs Benchmarking (First LLM Run)}
+    \label{tab:si_model_benchmark_first_run}
+    \setlength{\tabcolsep}{3pt}
+    \scriptsize
+    \resizebox{\textwidth}{!}{\input{../data/outputs/tables/model_benchmark_first_run.tex}}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the LLM response score, binarized at 75. Prompt is fixed at \texttt{SimpleCapacityV8.1.1}. Column \texttt{N} reports the number of benchmark transcripts with a usable score for each model at the time this table is generated.
+    \end{minipage}
+\end{table}
+\FloatBarrier
