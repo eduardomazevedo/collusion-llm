@@ -354,6 +354,23 @@ def model_context_window(model: str) -> Optional[int]:
     return windows.get(model)
 
 
+def shrink_transcript_tail(text: str, keep_ratio: float, min_chars: int = 1200) -> str:
+    """Trim transcript text from the end while keeping at least min_chars."""
+    if not text:
+        return text
+    keep_ratio = max(0.01, min(1.0, float(keep_ratio)))
+    keep_len = max(min_chars, int(len(text) * keep_ratio))
+    keep_len = min(keep_len, len(text))
+    return text[:keep_len]
+
+
+def is_context_limit_error(error: Optional[str]) -> bool:
+    if not error:
+        return False
+    e = str(error).lower()
+    return ("context_length_exceeded" in e) or ("maximum context length" in e)
+
+
 def run_chat_text_call(
     model: str,
     prompt_name: str,
@@ -471,39 +488,44 @@ def run_model(
         print(f"[model] {model}: no deficits; skipping.")
         return df
 
-    # Pre-skip transcripts that are guaranteed to exceed context budget.
+    # Build model-local inputs so any trimming does not affect other models.
+    model_inputs: Dict[int, str] = {
+        int(tid): prepared_inputs[int(tid)] for tid in to_run_ids if int(tid) in prepared_inputs
+    }
+
+    # Pre-trim transcripts that are estimated to exceed context budget.
     input_token_estimates = get_prompt_input_token_estimates(prompt_name, to_run_ids)
     output_cap = max_tokens_cap(model, config.MAX_TOKENS)
     context_window = model_context_window(model)
     if context_window is not None:
         input_budget = context_window - output_cap
-        over_limit_ids = [
-            tid for tid in to_run_ids
-            if tid in input_token_estimates and input_token_estimates[tid] > input_budget
-        ]
+        trimmed = 0
+        over_limit_ids = []
+        for tid in to_run_ids:
+            est = input_token_estimates.get(int(tid))
+            if est is None or est <= input_budget or int(tid) not in model_inputs:
+                continue
+            over_limit_ids.append(int(tid))
+            keep_ratio = (input_budget / float(est)) * 0.96
+            before_len = len(model_inputs[int(tid)])
+            model_inputs[int(tid)] = shrink_transcript_tail(model_inputs[int(tid)], keep_ratio)
+            after_len = len(model_inputs[int(tid)])
+            if after_len < before_len:
+                trimmed += 1
+
         if over_limit_ids:
-            for tid in over_limit_ids:
-                print(
-                    f"[model] {model}: skipping transcriptid={tid} | "
-                    f"estimated_input_tokens={input_token_estimates[tid]} > budget={input_budget}"
-                )
-            to_run_ids = [tid for tid in to_run_ids if tid not in set(over_limit_ids)]
+            print(
+                f"[model] {model}: pre-trimmed {trimmed}/{len(over_limit_ids)} over-limit transcripts "
+                f"(budget={input_budget} input tokens)."
+            )
             df = update_row(
                 df,
                 model,
                 prompt_name,
                 target_runs,
-                {
-                    "to_run": len(to_run_ids),
-                    "failed_count": len(over_limit_ids),
-                    "last_error": f"PreSkipContextLimit:{len(over_limit_ids)}",
-                },
+                {"last_error": f"PreTrimContextLimit:{len(over_limit_ids)}"},
             )
             save_tracker(df)
-            print(
-                f"[model] {model}: pre-skipped {len(over_limit_ids)} over-limit transcripts; "
-                f"remaining_to_run={len(to_run_ids)}"
-            )
 
     if not to_run_ids:
         df = update_row(
@@ -537,10 +559,10 @@ def run_model(
         return llm
 
     def run_one(tid: int):
-        if tid not in prepared_inputs:
+        if tid not in model_inputs:
             return tid, None, None, None, "MissingTranscriptPayload"
 
-        transcript_input = prepared_inputs[tid]
+        transcript_input = model_inputs[tid]
         normalized = None
         in_tok = None
         out_tok = None
@@ -573,6 +595,13 @@ def run_model(
             if normalized is not None:
                 return tid, normalized, in_tok, out_tok, None
 
+            # If context is still too large, trim more from the end and retry.
+            if attempt < max_attempts and is_context_limit_error(error):
+                trimmed_input = shrink_transcript_tail(transcript_input, keep_ratio=0.90)
+                if len(trimmed_input) < len(transcript_input):
+                    transcript_input = trimmed_input
+                    continue
+
             if attempt < max_attempts:
                 time.sleep(retry_delay * (2 ** (attempt - 1)))
 
@@ -597,39 +626,39 @@ def run_model(
         futures = {ex.submit(run_one, tid): tid for tid in to_run_ids}
         for i, fut in enumerate(cf.as_completed(futures), start=1):
             tid, normalized, in_tok, out_tok, error = fut.result()
-        if normalized is None:
-            failed += 1
-            last_error = error
-            print(f"[model] {model}: failed transcriptid={tid} | error={error}")
-        else:
-            try:
-                llm_for_cfg = get_llm()
-                insert_with_retry(
-                    prompt_name=prompt_name,
-                    transcriptid=int(tid),
-                    response=normalized,
-                    model_name=model,
-                    temperature=llm_for_cfg.temperature,
-                    max_response=llm_for_cfg.max_tokens,
-                    input_tokens=in_tok,
-                    output_tokens=out_tok,
-                )
-                saved += 1
-            except Exception as e:
+            if normalized is None:
                 failed += 1
-                last_error = f"{type(e).__name__}: {str(e)}"
-                print(f"[model] {model}: DB save failed transcriptid={tid} | {last_error}")
+                last_error = error
+                print(f"[model] {model}: failed transcriptid={tid} | error={error}")
+            else:
+                try:
+                    llm_for_cfg = get_llm()
+                    insert_with_retry(
+                        prompt_name=prompt_name,
+                        transcriptid=int(tid),
+                        response=normalized,
+                        model_name=model,
+                        temperature=llm_for_cfg.temperature,
+                        max_response=llm_for_cfg.max_tokens,
+                        input_tokens=in_tok,
+                        output_tokens=out_tok,
+                    )
+                    saved += 1
+                except Exception as e:
+                    failed += 1
+                    last_error = f"{type(e).__name__}: {str(e)}"
+                    print(f"[model] {model}: DB save failed transcriptid={tid} | {last_error}")
 
-        if i % 10 == 0 or i == len(to_run_ids):
-            print(f"[model] {model}: progress {i}/{len(to_run_ids)} | saved={saved} failed={failed}")
-            df = update_row(
-                df,
-                model,
-                prompt_name,
-                target_runs,
-                {"saved_count": saved, "failed_count": failed, "last_error": last_error},
-            )
-            save_tracker(df)
+            if i % 10 == 0 or i == len(to_run_ids):
+                print(f"[model] {model}: progress {i}/{len(to_run_ids)} | saved={saved} failed={failed}")
+                df = update_row(
+                    df,
+                    model,
+                    prompt_name,
+                    target_runs,
+                    {"saved_count": saved, "failed_count": failed, "last_error": last_error},
+                )
+                save_tracker(df)
 
     final_status = "completed" if failed == 0 else "partial"
     df = update_row(

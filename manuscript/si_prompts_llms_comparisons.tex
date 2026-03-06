@@ -8,7 +8,7 @@ We assess LLM responses on the benchmark sample against the human ratings for U-
 \]
 \endgroup
 
-We also compare LLM responses using different models from OpenAI that are suitable for our task. In Table~\ref{tab:si_model_benchmark_first_run} we compute for each model the same metrics we did for the prompt comparison, using the first LLM response for each transcript-model pair, and keeping the \texttt{SimpleCapacityV8.1.1} prompt fixed. Since some of the older models do not allow imposing a specific schema for the LLM response, we use a version of this prompt that simply adds to the original a concise description of the desired schema, following the guidance of OpenAI.
+We also compare LLM responses using different models from OpenAI that are suitable for our task. In Table~\ref{tab:si_model_benchmark_first_run} we compute for each model the same metrics we did for the prompt comparison, using the first LLM response for each transcript-model pair, and keeping the SimpleCapacityV8.1.1 prompt fixed. The models are grouped such that \textit{modern} models are those that can be queried with a defined schema structure that the response will follow, the \textit{reasoning-only} models are part of the most recent class of LLMs that produce responses following a more refined logic meant to improve quality, and the \textit{older} models are a small selection of earlier LLMs which didn't allow imposing a response schema, so we used a version of the prompt that simply added to the original a concise description of the desired schema, following the guidance of OpenAI.
 
 Note that the metrics we report here are just meant to provide a clearer way to compare quantitatively the responses across different prompts or models, but are not exhaustively assessing their performance. Our decision to use the \texttt{SimpleCapacityV8.1.1} prompt and gpt-4o-mini model for our large scale analysis of the full transcript sample was also largely guided by the other information the LLM responses contained (i.e. excerpts and reasoning). Moreover, specifically for the LLM selection, we considered the cost and token context size along with the quality of the responses, to ensure the feasibility of our large-scale analysis. We acknowledge that other prompt versions might be used, along with newer, more advanced models which are released frequently, to improve the LLM assessment for this analysis.
 
@@ -52,7 +52,7 @@ Note that the metrics we report here are just meant to provide a clearer way to 
     \begin{minipage}{\textwidth}
         \vspace{1em}
         \footnotesize
-        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the LLM response score, binarized at 75. Prompt is fixed at \texttt{SimpleCapacityV8.1.1}. Column \texttt{N} reports the number of benchmark transcripts with a usable score for each model at the time this table is generated.
+        \textit{Notes:} Reported metrics use the \textcite{aryal2022coordinated} manual binary indicator for capacity discipline, our manual score rating for U-Haul transcripts, binarized at 50, and the LLM response score, binarized at 75. Prompt is fixed at \texttt{SimpleCapacityV8.1.1}. For the model marked with (*), due to its context window size, 28/389 transcripts had to be trimmed (last approx. 7\% of tokens) to fit into single LLM queries.
     \end{minipage}
 \end{table}
 \FloatBarrier

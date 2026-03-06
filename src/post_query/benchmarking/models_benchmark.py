@@ -29,6 +29,8 @@ from modules.utils import extract_score_from_unstructured_response
 DEFAULT_PROMPT_MODERN = "SimpleCapacityV8.1.1"
 DEFAULT_PROMPT_LEGACY = "SimpleCapacityV8.1.1_JSON"
 REASONING_ONLY_MODELS = ["gpt-5.1", "gpt-5.2", "gpt-5.3-chat-latest"]
+EXCLUDED_OLD_MODELS = {"gpt-4", "gpt-3.5-turbo-instruct"}
+TRIMMED_OLD_MODELS = {"gpt-3.5-turbo", "davinci-002", "babbage-002"}
 SCORES_PATH = os.path.join(config.DATA_DIR, "benchmarking", "model_transcript_scores.csv")
 METRICS_PATH = os.path.join(config.DATA_DIR, "benchmarking", "model_metrics.csv")
 TABLES_DIR = os.path.join(config.DATA_DIR, "outputs", "tables")
@@ -101,6 +103,8 @@ def build_model_specs(modern_models: List[str]) -> List[Dict[str, str]]:
             }
         )
     for m in ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"]:
+        if m in EXCLUDED_OLD_MODELS:
+            continue
         specs.append(
             {
                 "model": m,
@@ -108,14 +112,7 @@ def build_model_specs(modern_models: List[str]) -> List[Dict[str, str]]:
                 "prompt_name": DEFAULT_PROMPT_LEGACY,
             }
         )
-    for m in ["gpt-3.5-turbo-instruct", "davinci-002", "babbage-002"]:
-        specs.append(
-            {
-                "model": m,
-                "panel": "Legacy Completion Models (JSON Prompt)",
-                "prompt_name": DEFAULT_PROMPT_LEGACY,
-            }
-        )
+    # Legacy completion models intentionally excluded from appendix table.
     return specs
 
 
@@ -283,14 +280,15 @@ def write_outputs(scores: pd.DataFrame, metrics: pd.DataFrame) -> None:
 
 def to_table_display(metrics: pd.DataFrame) -> pd.DataFrame:
     df = metrics.copy()
+    df["model"] = df["model"].apply(
+        lambda m: f"{m}(*)" if m in TRIMMED_OLD_MODELS else m
+    )
     df = df[
-        ["panel", "model", "n_used", "n_total", "tp", "fp", "tn", "fn", "precision", "recall", "specificity", "f1"]
+        ["panel", "model", "tp", "fp", "tn", "fn", "precision", "recall", "specificity", "f1"]
     ].rename(
         columns={
             "panel": "Panel",
             "model": "Model",
-            "n_used": "N",
-            "n_total": "N Total",
             "tp": "TP",
             "fp": "FP",
             "tn": "TN",
@@ -302,7 +300,7 @@ def to_table_display(metrics: pd.DataFrame) -> pd.DataFrame:
         }
     )
 
-    for col in ["N", "N Total", "TP", "FP", "TN", "FN"]:
+    for col in ["TP", "FP", "TN", "FN"]:
         df[col] = df[col].apply(lambda x: "" if pd.isna(x) else str(int(x)))
     for col in ["Precision", "Recall", "Specificity", "F1"]:
         df[col] = df[col].apply(lambda x: "" if pd.isna(x) else f"{float(x):.3f}")
@@ -319,9 +317,9 @@ def write_table_assets(metrics: pd.DataFrame) -> None:
     display = to_table_display(metrics)
     display.to_csv(csv_path, index=False)
 
-    cols = ["Model", "N", "N Total", "TP", "FP", "TN", "FN", "Precision", "Recall", "Specificity", "F1"]
+    cols = ["Model", "TP", "FP", "TN", "FN", "Precision", "Recall", "Specificity", "F1"]
     lines = []
-    lines.append("\\begin{tabular}{lrrrrrrrrrr}")
+    lines.append("\\begin{tabular}{lrrrrrrrr}")
     lines.append("\\toprule")
     lines.append(" & ".join(cols) + " \\\\")
     lines.append("\\midrule")
@@ -335,7 +333,7 @@ def write_table_assets(metrics: pd.DataFrame) -> None:
         panel_df = display[display["Panel"] == panel]
         if panel_df.empty:
             continue
-        lines.append(f"\\multicolumn{{11}}{{l}}{{\\textbf{{{panel}}}}} \\\\")
+        lines.append(f"\\multicolumn{{9}}{{l}}{{\\textbf{{{panel}}}}} \\\\")
         lines.append("\\midrule")
         for _, row in panel_df.iterrows():
             lines.append(" & ".join([str(row[c]) for c in cols]) + " \\\\")
