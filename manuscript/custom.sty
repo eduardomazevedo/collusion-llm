@@ -109,8 +109,10 @@
 % Colors
 \RequirePackage{xcolor}
 \definecolor{ghibli_palette_red}{RGB}{255, 92, 92}
+\definecolor{crimson_red}{RGB}{123, 0, 0}
 \definecolor{ghibli_palette_gold}{RGB}{255, 215, 0}
 \definecolor{ghibli_palette_deep_teal}{RGB}{59, 105, 120}
+\definecolor{deep_teal_dark}{RGB}{40, 72, 82}
 \definecolor{ghibli_palette_cream}{RGB}{249, 245, 227}
 \definecolor{ghibli_palette_light_gray}{RGB}{218, 218, 218}
 \definecolor{ghibli_palette_gray}{RGB}{108, 122, 142}
@@ -125,7 +127,7 @@
 \RequirePackage{amsthm}
 \RequirePackage{amssymb}
 \RequirePackage{fullpage}
-\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{hyperref}
 \RequirePackage{subcaption}
 \IfFileExists{placeins.sty}{\RequirePackage{placeins}}{\providecommand{\FloatBarrier}{}}
 \RequirePackage{afterpage}
@@ -160,10 +162,10 @@
 
 % Apply the color links
 \hypersetup{
-    colorlinks=true,       % Enable colored links
-    linkcolor=ghibli_palette_red,      % Color for internal links (e.g., equations, sections)
-    citecolor=ghibli_palette_deep_teal,      % Color for citations
-    urlcolor=ghibli_palette_deep_teal        % Color for URLs
+    colorlinks=true,
+    linkcolor=crimson_red,
+    citecolor=deep_teal_dark,
+    urlcolor=deep_teal_dark
 }
 
 % Theorem environments setup
