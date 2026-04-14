@@ -40,9 +40,8 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Standardized the apostrophe style across the section.
 - Lightly reflowed a couple of the longest quotations to reduce layout pressure.
 
-## manuscript/audit_takeaways.tex
-- This file is **not currently included** in `manuscript/manuscript.tex`.
-- If this text is obsolete, consider deleting or archiving it. If it is meant to appear in the paper, it is currently orphaned. --> yes delete from repo
+## manuscript/audit_takeaways.tex [DONE]
+- Deleted the orphaned file from the repo.
 
 ## manuscript/detection.tex
 - Typo: “the industry **large**” should be “the industry **at large**.”
