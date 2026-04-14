@@ -50,11 +50,9 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Standardized the date ranges to the 2012-2016 / 2022-2023 style.
 - Added an inline TODO comment for the potentially confusing mean-score example in the concluding footnote.
 
-## manuscript/concluding_remarks.tex
-- Grammar issue: “episodes which vastly **adds**” should be “episodes which vastly **add**.”
-- Grammar issue: “it **is assesses** the performance” should be corrected.
-- Awkward phrasing: “conduct **deploying** an underexplored communication practice” reads awkwardly; the prior wording may have been smoother.
-- Wording issue: “whether it results in **effect**” should probably be “whether it results in **effects**.”
+## manuscript/concluding_remarks.tex [DONE]
+- Fixed the grammar issues (“add,” “assesses,” and “effects”).
+- Smoothed the opening phrasing to “conduct through an underexplored communication practice.”
 
 ## manuscript/online_appendix.tex
 - It cites papers but does **not print a bibliography**, which triggers a PDF warning about missing citation destinations. ---> Add bibliography and TOC to SI.
