@@ -59,8 +59,8 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Added `\\printbibliography` so the appendix can stand on its own without citation-destination warnings.
 - Left the appendix structure otherwise unchanged.
 
-## manuscript/si.tex
-  - This is a stale file replaced by the online appendix.tex. Delete si.tex
+## manuscript/si.tex [DONE]
+- Deleted the stale supplementary-information driver that had been replaced by `online_appendix.tex`.
 
 ## manuscript/si_alternative_llms.tex
 - This file looks like a **partial / older duplicate** of material now covered in `si_prompts_llms_comparisons.tex`.
