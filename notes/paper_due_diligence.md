@@ -26,13 +26,11 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Simplified “towards understanding” to “to understand.”
 - Made the auditor references more consistent.
 
-## manuscript/audit_performance.tex
-- Important substantive wording issue: “The true positive rate is **decreasing** in the score…” appears inconsistent with the next sentence, which says the highest bin has a higher true positive rate than the lowest bin. This likely should be **increasing in the score**.
-- Typo: “faciliating” should be “facilitating.”
-- Typo: “that that a high false positive rate” has a duplicated “that.”
-- Typo: “sufficently” should be “sufficiently.”
-- The sentence with the appendix table was moved into a footnote; that is fine.
-- Some counts are hard-coded in prose (e.g. 71 companies, 192 false positives, 163, 67, 48, 14, 29). That is okay if stable, but if the underlying data may change, it would be safer to pull them from constants. --> indeed make these automated.
+## manuscript/audit_performance.tex [DONE]
+- Corrected the substantive direction: the true positive rate is increasing in the score.
+- Fixed the facilitating / duplicated-word / sufficiently typos.
+- Replaced the company-count hard-coding with `\\data{}` constants where available.
+- Rewrote the false-positive summary to avoid brittle hard-coded subgroup counts in the prose.
 
 ## manuscript/audit_errors.tex
 - Grammar issue near the start: “the transcripts refer to the firm’s competitive conduct or the state of market competition **though did not connect** it…” should be “**but did not connect** it…”
