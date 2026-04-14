@@ -21,10 +21,10 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Fixed the “Transportation” typo in the figure notes.
 - Improved the wording around “LLM-flagged status.”
 
-## manuscript/audit_description.tex
-- Fragile hard-coded footnote reference: “provided in the linked assessment file in **footnote~15**.” This should not hard-code a footnote number because it will drift if earlier footnotes change.
-- Minor style issue: “towards understanding” could be simplified to “to understand.”
-- Minor pronoun consistency issue: the text switches between singular auditor and plural pronouns in places.
+## manuscript/audit_description.tex [DONE]
+- Replaced the hard-coded footnote number with a relative reference to the preceding footnote.
+- Simplified “towards understanding” to “to understand.”
+- Made the auditor references more consistent.
 
 ## manuscript/audit_performance.tex
 - Important substantive wording issue: “The true positive rate is **decreasing** in the score…” appears inconsistent with the next sentence, which says the highest bin has a higher true positive rate than the lowest bin. This likely should be **increasing in the score**.
