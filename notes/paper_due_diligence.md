@@ -36,9 +36,9 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Fixed the grammar at the start of the section.
 - Tightened the wording around transcripts referring to reduced industry supply or capacity.
 
-## manuscript/audit_types.tex
-- Minor style point: there is some inconsistency between straight and curly apostrophes/quotation style across the section. --> pick a convention and stick to it
-- Several long quotations generate overfull boxes in the PDF build. Not urgent, but they could be line-broken or slightly shortened if desired.
+## manuscript/audit_types.tex [DONE]
+- Standardized the apostrophe style across the section.
+- Lightly reflowed a couple of the longest quotations to reduce layout pressure.
 
 ## manuscript/audit_takeaways.tex
 - This file is **not currently included** in `manuscript/manuscript.tex`.
