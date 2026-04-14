@@ -54,10 +54,10 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Fixed the grammar issues (“add,” “assesses,” and “effects”).
 - Smoothed the opening phrasing to “conduct through an underexplored communication practice.”
 
-## manuscript/online_appendix.tex
-- It cites papers but does **not print a bibliography**, which triggers a PDF warning about missing citation destinations. ---> Add bibliography and TOC to SI.
-- Inconsistency with `si.tex`: this file does **not** include `si_human_audit_sample_assessment.tex`, whereas `si.tex` does.
-- The appendix structure itself is otherwise coherent.
+## manuscript/online_appendix.tex [DONE]
+- Added a table of contents.
+- Added `\\printbibliography` so the appendix can stand on its own without citation-destination warnings.
+- Left the appendix structure otherwise unchanged.
 
 ## manuscript/si.tex
   - This is a stale file replaced by the online appendix.tex. Delete si.tex
