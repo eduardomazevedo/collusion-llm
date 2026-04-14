@@ -22,6 +22,8 @@ rule all:
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
         "data/yaml/audit.yaml",
+        "data/datasets/ask_airline_year.csv",
+        "data/outputs/figures/ask_by_airline_2011_2016_16x9.pdf",
         "data/outputs/tables/detailed_industry_results.csv",
         # LLM flag outputs
         "data/outputs/tables/market_value_deciles_llm.csv",
@@ -73,6 +75,41 @@ rule download_transcript_detail:
         wrds=1
     shell:
         f"{PYTHON_CMD} src/pre_query/data_preparation/download_capiq_details.py"
+
+rule download_anac_raw:
+    """
+    Download ANAC raw airline capacity files used in the airline case study.
+    """
+    output:
+        expand("data/raw/anac/{year}.csv", year=range(2011, 2017))
+    shell:
+        "bash ./src/pre_query/data_preparation/download_anac.sh"
+
+rule case_airlines_capacities_dataset:
+    """
+    Build airline-year ASK dataset for the airline case study.
+    """
+    input:
+        expand("data/raw/anac/{year}.csv", year=range(2011, 2017))
+    output:
+        "data/datasets/ask_airline_year.csv"
+    shell:
+        f"{PYTHON_CMD} src/post_query/analysis/case_airlines_capacities_dataset.py"
+
+rule case_airlines_capacities_figure:
+    """
+    Build airline ASK case-study figures and description note.
+    """
+    input:
+        "data/datasets/ask_airline_year.csv"
+    output:
+        fig_1x1_png="data/outputs/figures/ask_by_airline_2011_2016_1x1.png",
+        fig_1x1_pdf="data/outputs/figures/ask_by_airline_2011_2016_1x1.pdf",
+        fig_16x9_png="data/outputs/figures/ask_by_airline_2011_2016_16x9.png",
+        fig_16x9_pdf="data/outputs/figures/ask_by_airline_2011_2016_16x9.pdf",
+        txt="data/outputs/figures/ask_by_airline_2011_2016.txt"
+    shell:
+        f"{PYTHON_CMD} src/post_query/analysis/case_airlines_capacities_analysis.py"
 
 rule download_compustat_us:
     """
