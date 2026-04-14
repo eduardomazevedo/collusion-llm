@@ -5,7 +5,7 @@ This project uses Large Language Models (LLMs) to detect potential collusive beh
 # Quick Start
 Steps 1-4 can be run upon cloning the repo
 
-## 1. Initial setup (creates venv, downloads data, initializes database)
+## 1. Initial setup (assumes `uv` is installed; creates `.venv`, downloads data, initializes database)
 ```
 bash ./src/setup/setup.sh
 ```
@@ -27,7 +27,7 @@ bash ./src/cli/db_manager.sh init     # Initialize queries database with two tab
 ```
 source .venv/bin/activate
 snakemake --cores 2  # For downstream analysis
-``` 
+```
 
 # Testing and Running New Prompts
 
@@ -117,7 +117,7 @@ bash src/cli/db_manager.sh --export-queries
 
 # TO export follow up analysis queries (or a subset, using options)
 bash src/cli/db_manager.sh --export-analysis
-``` 
+```
 
 # Example .env file (used for config)
 OPENAI_API_KEY = abc123
