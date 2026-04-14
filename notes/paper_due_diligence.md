@@ -13,9 +13,8 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 ## manuscript/methods.tex [DONE]
 - Standardized the cross-reference to “Section~\\ref{sec:audit}.”
 
-## manuscript/basic_results_stats.tex
-- No major factual issues found.
-- Caption style is a bit inconsistent with the rest of the paper (some captions end with periods, some do not). -> pick a convention and stick through it in the whole paper.
+## manuscript/basic_results_stats.tex [DONE]
+- Standardized the captions in this section to omit final periods, matching the dominant convention in the paper.
 
 ## manuscript/correlates.tex
 - Important reference issue: the text says “Figure 6” twice instead of using `Figure~\ref{...}`. This is brittle and should probably refer to `Figure~\ref{fig:high_collusion_sic_tag_rates}`.
