@@ -6,8 +6,8 @@
 ## Build, Run & Data Commands
 - Bootstrap + venv: `bash ./src/setup/setup.sh` then `source .venv/bin/activate`.
 - Configure Drive sync: `rclone config` (remote `collusion-llm`).
-- DB ops: `bash ./src/cli/db_manager.sh download|init|--export-queries|--export-analysis`.
-- Pipeline: `snakemake --cores 2`.
+- Pipeline: `snakemake --cores 2` (downloads `queries.sqlite`, rebuilds `transcript_detail.feather`, then runs downstream analysis).
+- DB ops: `bash ./src/cli/db_manager.sh download|init|status|--export-queries|--export-analysis` for manual DB management.
 - Prompt benchmarking: `bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> [--source joe --balanced 50]`.
 - Batching: `bash ./src/query_submission/batch_queries/run_batch.sh <company_ids> <prompt_name> --operation create|submit|status` or `run_big_batch.sh <prompt_name> create|submit|all`.
 

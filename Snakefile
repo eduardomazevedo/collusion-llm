@@ -5,6 +5,8 @@ PYTHON_CMD = 'PYTHONPATH="{workflow.basedir}:${{PYTHONPATH:-}}" python'
 
 rule all:
     input:
+        "data/datasets/queries.sqlite",
+        "data/datasets/transcript_detail.feather",
         "data/raw/compustat/compustat_us.feather",
         "data/raw/compustat/compustat_global.feather",
         "data/intermediaries/gvkey_table.feather",
@@ -46,6 +48,30 @@ rule all:
         "data/outputs/figures/mean_score_validated_samples_16x9.pdf",
         "data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf",
         "data/constants/.populated"
+
+rule download_queries_db:
+    """
+    Download the queries database from Google Drive.
+    This workflow assumes paper replication uses an already-built queries DB.
+    """
+    output:
+        "data/datasets/queries.sqlite"
+    shell:
+        "bash ./src/cli/db_manager.sh download"
+
+rule download_transcript_detail:
+    """
+    Download WRDS transcript detail and deduplicate transcript versions.
+    When the queries DB exists, prefer transcript IDs present in that DB.
+    """
+    input:
+        "data/datasets/queries.sqlite"
+    output:
+        "data/datasets/transcript_detail.feather"
+    resources:
+        wrds=1
+    shell:
+        f"{PYTHON_CMD} src/pre_query/data_preparation/download_capiq_details.py"
 
 rule download_compustat_us:
     """

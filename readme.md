@@ -3,9 +3,9 @@
 This project uses Large Language Models (LLMs) to detect potential collusive behavior in corporate earnings call transcripts. The system analyzes public company communications to identify signs of price-fixing or capacity limitation coordination between competitors.
 
 # Quick Start
-Steps 1-4 can be run upon cloning the repo
+Steps 1-3 can be run upon cloning the repo.
 
-## 1. Initial setup (assumes `uv` is installed; creates `.venv`, downloads data, initializes database)
+## 1. Initial setup (assumes `uv` is installed; creates `.venv` and downloads non-WRDS setup data)
 ```
 bash ./src/setup/setup.sh
 ```
@@ -17,16 +17,24 @@ This step can be skipped if remote is already set correctly.
 rclone config
 ```
 
-## 3. Download existing database or initialize new one
-```
-bash ./src/cli/db_manager.sh download  # Get latest database
-bash ./src/cli/db_manager.sh init     # Initialize queries database with two tables; Don't use if database already exists.
-```
-
-## 4. Run analysis pipeline
+## 3. Run analysis pipeline
 ```
 source .venv/bin/activate
-snakemake --cores 2  # For downstream analysis
+snakemake --cores 2
+```
+
+For paper replication, Snakemake now handles the key upstream inputs in the intended order:
+1. download the latest `data/datasets/queries.sqlite` from Google Drive
+2. rebuild `data/datasets/transcript_detail.feather` from WRDS
+3. deduplicate transcript versions using the downloaded queries DB as the preferred transcript-version source
+4. run the downstream analysis pipeline
+
+## Manual database operations
+These commands are still available for inspection and maintenance:
+```
+bash ./src/cli/db_manager.sh download  # Get latest database manually
+bash ./src/cli/db_manager.sh init      # Initialize queries database with two tables; don't use if database already exists
+bash ./src/cli/db_manager.sh status    # Show local database status
 ```
 
 # Testing and Running New Prompts
