@@ -68,7 +68,6 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 ## manuscript/si_alternative_prompts.tex [DONE]
 - Deleted the unused duplicate appendix fragment.
 
-## manuscript/si_human_audit_sample_assessment.tex
-- The main issue is structural: it is included in `si.tex` but not in `online_appendix.tex`.
-- delete
+## manuscript/si_human_audit_sample_assessment.tex [DONE]
+- Deleted the now-unused appendix fragment that had only been included through the stale `si.tex` driver.
 
