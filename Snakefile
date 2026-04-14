@@ -21,6 +21,7 @@ rule all:
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
+        "data/yaml/audit.yaml",
         "data/outputs/tables/detailed_industry_results.csv",
         # LLM flag outputs
         "data/outputs/tables/market_value_deciles_llm.csv",
@@ -291,6 +292,18 @@ rule benchmarking_analysis:
     shell:
         f"{PYTHON_CMD} src/post_query/analysis/benchmarking_analysis.py"
 
+rule audit_analysis:
+    """
+    Generate human audit summary statistics and audit-specific YAML constants.
+    """
+    input:
+        dataset="data/datasets/main_analysis_dataset.feather",
+        audit_file="assets/human_audit_final.xlsx"
+    output:
+        yaml="data/yaml/audit.yaml"
+    shell:
+        f"{PYTHON_CMD} src/post_query/analysis/audit_analysis.py"
+
 rule summary_stats_dataset:
     """
     Generate publication-ready summary statistics table for dataset characteristics.
@@ -373,6 +386,7 @@ rule populate_constants:
         "data/yaml/summary_stats.yaml",
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
+        "data/yaml/audit.yaml",
         "data/yaml/quoted_excerpt_labels.yaml",
         "data/outputs/tables/segment_tag_rates_llm.csv"
     output:
