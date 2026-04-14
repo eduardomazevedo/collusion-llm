@@ -44,6 +44,9 @@ rule all:
         "data/outputs/figures/year_tag_rates_human_audit_1x1.png",
         # Benchmarking outputs
         "data/outputs/tables/benchmarking_combined.csv",
+        "data/outputs/tables/prompt_benchmark_first_run.tex",
+        "data/outputs/tables/prompt_benchmark_avg11.tex",
+        "data/outputs/tables/model_benchmark_first_run.tex",
         "data/outputs/tables/summary_stats_dataset.csv",
         "data/outputs/tables/summary_stats_results.csv",
         # Score distribution figures
@@ -308,6 +311,38 @@ rule correlates_others:
         year_fig_audit="data/outputs/figures/year_tag_rates_human_audit_1x1.png"
     shell:
         f"{PYTHON_CMD} src/post_query/analysis/correlates_others.py"
+
+rule prompts_benchmark:
+    """
+    Generate appendix prompt-benchmarking tables against human ratings.
+    """
+    input:
+        queries_db="data/datasets/queries.sqlite",
+        human_ratings="data/datasets/human_ratings.csv"
+    output:
+        first_csv="data/outputs/tables/prompt_benchmark_first_run.csv",
+        first_tex="data/outputs/tables/prompt_benchmark_first_run.tex",
+        first_txt="data/outputs/tables/prompt_benchmark_first_run.txt",
+        avg_csv="data/outputs/tables/prompt_benchmark_avg11.csv",
+        avg_tex="data/outputs/tables/prompt_benchmark_avg11.tex",
+        avg_txt="data/outputs/tables/prompt_benchmark_avg11.txt"
+    shell:
+        f"{PYTHON_CMD} src/post_query/benchmarking/prompts_benchmark.py"
+
+rule models_benchmark:
+    """
+    Generate appendix model-benchmarking table against human ratings.
+    """
+    input:
+        queries_db="data/datasets/queries.sqlite",
+        human_ratings="data/datasets/human_ratings.csv",
+        llm_config="assets/llm_config.json"
+    output:
+        csv="data/outputs/tables/model_benchmark_first_run.csv",
+        tex="data/outputs/tables/model_benchmark_first_run.tex",
+        txt="data/outputs/tables/model_benchmark_first_run.txt"
+    shell:
+        f"{PYTHON_CMD} src/post_query/benchmarking/models_benchmark.py"
 
 rule benchmarking_analysis:
     """
