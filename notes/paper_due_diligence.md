@@ -16,10 +16,10 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 ## manuscript/basic_results_stats.tex [DONE]
 - Standardized the captions in this section to omit final periods, matching the dominant convention in the paper.
 
-## manuscript/correlates.tex
-- Important reference issue: the text says “Figure 6” twice instead of using `Figure~\ref{...}`. This is brittle and should probably refer to `Figure~\ref{fig:high_collusion_sic_tag_rates}`.
-- Typo in figure notes: “Deep Sea Domestic Freight **Transporation**” should be “**Transportation**.”
-- Slight wording issue: “LLM-flagged is used as our binary indicator” would read better as “LLM-flagged status is used…”
+## manuscript/correlates.tex [DONE]
+- Replaced brittle literal “Figure 6” references with `Figure~\\ref{fig:high_collusion_sic_tag_rates}`.
+- Fixed the “Transportation” typo in the figure notes.
+- Improved the wording around “LLM-flagged status.”
 
 ## manuscript/audit_description.tex
 - Fragile hard-coded footnote reference: “provided in the linked assessment file in **footnote~15**.” This should not hard-code a footnote number because it will drift if earlier footnotes change.
