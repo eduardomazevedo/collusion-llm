@@ -5,10 +5,10 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 ## manuscript/abstract.tex [DONE]
 - Fixed unclear antecedent in the abstract by replacing “it” with “the communication.”
 
-## manuscript/introduction.tex
-- Typo: “public **communciations**” should be “public **communications**.”
-- Slightly awkward phrasing: “This study has two objectives. First, **it is to** advance…” could be tightened.
-- Awkward phrasing: “prompts were experimented with and refined” reads clumsily.
+## manuscript/introduction.tex [DONE]
+- Fixed typo in “public communications.”
+- Tightened the statement of the paper's two objectives.
+- Rephrased the prompt-development sentence for clearer prose.
 
 ## manuscript/methods.tex
 - Minor style issue: “The audit procedure is described in **section** \ref{sec:audit}” should probably be “**Section** \ref{sec:audit}.”
