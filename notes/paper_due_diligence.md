@@ -62,10 +62,8 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 ## manuscript/si.tex [DONE]
 - Deleted the stale supplementary-information driver that had been replaced by `online_appendix.tex`.
 
-## manuscript/si_alternative_llms.tex
-- This file looks like a **partial / older duplicate** of material now covered in `si_prompts_llms_comparisons.tex`.
-- It is not currently included by the main manuscript or by `online_appendix.tex`.
-- delete
+## manuscript/si_alternative_llms.tex [DONE]
+- Deleted the unused duplicate appendix fragment.
 
 ## manuscript/si_alternative_prompts.tex
 - This file also looks like a **partial / older duplicate** of material now covered in `si_prompts_llms_comparisons.tex`.
