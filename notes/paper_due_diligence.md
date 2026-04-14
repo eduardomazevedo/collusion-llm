@@ -10,8 +10,8 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Tightened the statement of the paper's two objectives.
 - Rephrased the prompt-development sentence for clearer prose.
 
-## manuscript/methods.tex
-- Minor style issue: “The audit procedure is described in **section** \ref{sec:audit}” should probably be “**Section** \ref{sec:audit}.”
+## manuscript/methods.tex [DONE]
+- Standardized the cross-reference to “Section~\\ref{sec:audit}.”
 
 ## manuscript/basic_results_stats.tex
 - No major factual issues found.
