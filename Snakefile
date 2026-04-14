@@ -1,6 +1,8 @@
 # Snakefile for Collusion LLM project
 # This workflow manages the data processing pipeline
 
+PYTHON_CMD = 'PYTHONPATH="{workflow.basedir}:${{PYTHONPATH:-}}" python'
+
 rule all:
     input:
         "data/raw/compustat/compustat_us.feather",
@@ -57,7 +59,7 @@ rule download_compustat_us:
     resources:
         wrds=1
     shell:
-        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/download_compustat_us.py"
+        f"{PYTHON_CMD} src/pre_query/compustat/download_compustat_us.py"
 
 rule download_compustat_global:
     """
@@ -71,7 +73,7 @@ rule download_compustat_global:
     resources:
         wrds=1
     shell:
-        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/download_compustat_global.py"
+        f"{PYTHON_CMD} src/pre_query/compustat/download_compustat_global.py"
 
 rule get_gvkey:
     """
@@ -86,7 +88,7 @@ rule get_gvkey:
     resources:
         wrds=1
     shell:
-        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/get_gvkey.py"
+        f"{PYTHON_CMD} src/pre_query/compustat/get_gvkey.py"
 
 rule company_year_dataset:
     """
@@ -100,7 +102,7 @@ rule company_year_dataset:
     output:
         "data/datasets/company_year_compustat.feather"
     shell:
-        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/pre_query/compustat/company_year_dataset.py"
+        f"{PYTHON_CMD} src/pre_query/compustat/company_year_dataset.py"
 
 rule download_industry_classifications:
     """
@@ -115,7 +117,7 @@ rule download_industry_classifications:
     resources:
         wrds=1
     shell:
-        "python src/post_query/analysis/download_industry_classifications.py"
+        f"{PYTHON_CMD} src/post_query/analysis/download_industry_classifications.py"
 
 rule create_top_transcripts:
     """
@@ -130,7 +132,7 @@ rule create_top_transcripts:
         top_transcripts="data/intermediaries/top_transcripts.csv",
         original_score="data/intermediaries/original_score.csv"
     shell:
-        "python src/post_query/analysis/top_transcript_list.py"
+        f"{PYTHON_CMD} src/post_query/analysis/top_transcript_list.py"
 
 rule main_dataset:
     """
@@ -149,7 +151,7 @@ rule main_dataset:
     output:
         "data/datasets/main_analysis_dataset.feather"
     shell:
-        "python src/post_query/analysis/main_dataset.py"
+        f"{PYTHON_CMD} src/post_query/analysis/main_dataset.py"
 
 rule top_transcript_data:
     """
@@ -166,7 +168,7 @@ rule top_transcript_data:
         full="data/outputs/top_transcript_data_for_joe.csv",
         core="data/datasets/top_transcripts_data.csv"
     shell:
-        "python src/post_query/analysis/top_transcript_data.py"
+        f"{PYTHON_CMD} src/post_query/analysis/top_transcript_data.py"
 
 rule summary_stats:
     """
@@ -179,7 +181,7 @@ rule summary_stats:
     output:
         yaml="data/yaml/summary_stats.yaml"
     shell:
-        "python src/post_query/analysis/summary_stats.py"
+        f"{PYTHON_CMD} src/post_query/analysis/summary_stats.py"
 
 rule detailed_industry_results:
     """
@@ -195,7 +197,7 @@ rule detailed_industry_results:
     output:
         "data/outputs/tables/detailed_industry_results.csv"
     shell:
-        "python src/post_query/analysis/detailed_industry_results.py"
+        f"{PYTHON_CMD} src/post_query/analysis/detailed_industry_results.py"
 
 rule correlates_segments:
     """
@@ -213,7 +215,7 @@ rule correlates_segments:
         segment_table_llm="data/outputs/tables/segment_tag_rates_llm.csv",
         segment_fig_llm="data/outputs/figures/segment_tag_rates_llm.png"
     shell:
-        "python src/post_query/analysis/correlates_segments.py"
+        f"{PYTHON_CMD} src/post_query/analysis/correlates_segments.py"
 
 rule correlates_others:
     """
@@ -241,7 +243,7 @@ rule correlates_others:
         mv_fig_audit="data/outputs/figures/market_value_deciles_human_audit_1x1.png",
         year_fig_audit="data/outputs/figures/year_tag_rates_human_audit_1x1.png"
     shell:
-        "python src/post_query/analysis/correlates_others.py"
+        f"{PYTHON_CMD} src/post_query/analysis/correlates_others.py"
 
 rule benchmarking_analysis:
     """
@@ -261,7 +263,7 @@ rule benchmarking_analysis:
         audit_csv="data/outputs/tables/human_audit_validation.csv",
         yaml="data/yaml/benchmarking.yaml"
     shell:
-        "python src/post_query/analysis/benchmarking_analysis.py"
+        f"{PYTHON_CMD} src/post_query/analysis/benchmarking_analysis.py"
 
 rule summary_stats_dataset:
     """
@@ -276,7 +278,7 @@ rule summary_stats_dataset:
         tex="data/outputs/tables/summary_stats_dataset.tex",
         txt="data/outputs/tables/summary_stats_dataset.txt"
     shell:
-        "python src/post_query/analysis/summary_stats_dataset.py"
+        f"{PYTHON_CMD} src/post_query/analysis/summary_stats_dataset.py"
 
 rule summary_stats_results:
     """
@@ -291,7 +293,7 @@ rule summary_stats_results:
         tex="data/outputs/tables/summary_stats_results.tex",
         txt="data/outputs/tables/summary_stats_results.txt"
     shell:
-        "python src/post_query/analysis/summary_stats_results.py"
+        f"{PYTHON_CMD} src/post_query/analysis/summary_stats_results.py"
 
 rule score_histogram_figures:
     """
@@ -306,7 +308,7 @@ rule score_histogram_figures:
         original_16x9="data/outputs/figures/original_score_entire_sample_16x9.pdf",
         mean_16x9="data/outputs/figures/mean_score_validated_samples_16x9.pdf"
     shell:
-        "PYTHONPATH=\"{workflow.basedir}:$PYTHONPATH\" python src/post_query/analysis/fig_scores_histogram.py"
+        f"{PYTHON_CMD} src/post_query/analysis/fig_scores_histogram.py"
 
 rule scatter_scores_figure:
     """
@@ -319,7 +321,7 @@ rule scatter_scores_figure:
     output:
         scatter_16x9="data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf"
     shell:
-        "PYTHONPATH=\"{workflow.basedir}:$PYTHONPATH\" python src/post_query/analysis/fig_scatter_scores.py"
+        f"{PYTHON_CMD} src/post_query/analysis/fig_scatter_scores.py"
 
 rule quoted_excerpt_labels:
     """
@@ -334,7 +336,7 @@ rule quoted_excerpt_labels:
     output:
         "data/yaml/quoted_excerpt_labels.yaml"
     shell:
-        "PYTHONPATH={workflow.basedir}:$PYTHONPATH python src/post_query/exports/quoted_excerpt_labels.py"
+        f"{PYTHON_CMD} src/post_query/exports/quoted_excerpt_labels.py"
 
 rule populate_constants:
     """
@@ -350,4 +352,4 @@ rule populate_constants:
     output:
         "data/constants/.populated"
     shell:
-        "python src/post_query/exports/populate_constants.py && touch data/constants/.populated"
+        f"{PYTHON_CMD} src/post_query/exports/populate_constants.py && touch data/constants/.populated"
