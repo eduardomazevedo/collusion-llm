@@ -43,8 +43,8 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 ## manuscript/audit_takeaways.tex [DONE]
 - Deleted the orphaned file from the repo.
 
-## manuscript/detection.tex
-- Typo: “the industry **large**” should be “the industry **at large**.”
+## manuscript/detection.tex [DONE]
+- Fixed “the industry at large.”
 
 ## manuscript/case.tex
 - Minor style point: date ranges are expressed both as “2012 to 2016” and “2012--16”; standardize --> 2012-2016 is better.
