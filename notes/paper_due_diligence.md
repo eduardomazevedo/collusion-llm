@@ -32,9 +32,9 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 - Replaced the company-count hard-coding with `\\data{}` constants where available.
 - Rewrote the false-positive summary to avoid brittle hard-coded subgroup counts in the prose.
 
-## manuscript/audit_errors.tex
-- Grammar issue near the start: “the transcripts refer to the firm’s competitive conduct or the state of market competition **though did not connect** it…” should be “**but did not connect** it…”
-- Minor style issue: “There are some transcripts referring…” could be tightened.
+## manuscript/audit_errors.tex [DONE]
+- Fixed the grammar at the start of the section.
+- Tightened the wording around transcripts referring to reduced industry supply or capacity.
 
 ## manuscript/audit_types.tex
 - Minor style point: there is some inconsistency between straight and curly apostrophes/quotation style across the section. --> pick a convention and stick to it
