@@ -2,8 +2,8 @@
 
 Review based on manual reading of the LaTeX sources in `manuscript/` plus compile checks for `manuscript.tex`, `online_appendix.tex`, and `si.tex`.
 
-## manuscript/abstract.tex
-- Minor wording issue: “the audit distills and organizes the content to identify systematic ways in which **it** is facilitating coordinated conduct” has an unclear antecedent for “it.”
+## manuscript/abstract.tex [DONE]
+- Fixed unclear antecedent in the abstract by replacing “it” with “the communication.”
 
 ## manuscript/introduction.tex
 - Typo: “public **communciations**” should be “public **communications**.”
