@@ -46,9 +46,9 @@ Review based on manual reading of the LaTeX sources in `manuscript/` plus compil
 ## manuscript/detection.tex [DONE]
 - Fixed “the industry at large.”
 
-## manuscript/case.tex
-- Minor style point: date ranges are expressed both as “2012 to 2016” and “2012--16”; standardize --> 2012-2016 is better.
-- One line in the concluding footnote reports a mean score of 65 for a transcript discussed after saying these are LLM-flagged transcripts; that may be perfectly fine because flagging used the original score, but some readers may briefly find it confusing. -> put a [TODO investigate] note there for humans to double check
+## manuscript/case.tex [DONE]
+- Standardized the date ranges to the 2012-2016 / 2022-2023 style.
+- Added an inline TODO comment for the potentially confusing mean-score example in the concluding footnote.
 
 ## manuscript/concluding_remarks.tex
 - Grammar issue: “episodes which vastly **adds**” should be “episodes which vastly **add**.”
