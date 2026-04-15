@@ -59,13 +59,13 @@ rule all:
 
 rule download_queries_db:
     """
-    Download the queries database from Google Drive.
+    Download the public replication queries database from Google Drive.
     This workflow assumes paper replication uses an already-built queries DB.
     """
     output:
         "data/datasets/queries.sqlite"
     shell:
-        "bash ./src/cli/db_manager.sh download"
+        "bash ./src/cli/download_public_google_drive.sh 1MTFPFwWTLjIkeHrs7EsHo6uQ0gyEy-fV data/datasets/queries.sqlite queries.sqlite"
 
 rule download_transcript_detail:
     """

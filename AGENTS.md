@@ -6,7 +6,7 @@
 ## Build, Run & Data Commands
 - Bootstrap environment: `uv sync`.
 - Create `.env` from `.env.example`, fill in needed credentials, and set `ROOT` to the repo path before running credentialed workflows.
-- Configure Drive sync: `rclone config` (remote `collusion-llm`).
+- Configure Drive sync only when needed for active query/database workflows: `rclone config` (remote `collusion-llm`). Standard replication should use the public-download workflow instead.
 - Pipeline: `snakemake --cores 2` (downloads `queries.sqlite`, rebuilds `transcript_detail.feather`, then runs downstream analysis).
 - DB ops: `bash ./src/cli/db_manager.sh download|init|status|--export-queries|--export-analysis` for manual DB management.
 - Prompt benchmarking: `bash ./src/query_submission/single_queries/run_benchmark.sh <prompt_name> [--source joe --balanced 50]`.
@@ -19,7 +19,7 @@
 - No repo-wide test suite is checked in; add `pytest` cases under `tests/` when introducing new logic.
 
 ## Data & Artifacts
-- Key data dirs: `datasets/` (core inputs), `intermediaries/`, `outputs/` (tables/figures), `raw/`, `yaml/`, `cache/`. Use rclone for heavy artifacts.
+- Key data dirs: `datasets/` (core inputs), `intermediaries/`, `outputs/` (tables/figures), `raw/`, `yaml/`, `cache/`. For replication, prefer the public-download workflow; use rclone only for active query/database workflows and heavy artifacts.
 - When accessing data files in scripts, use os.path.join instead of writing out the full path (this ensures code can be run from Windows and Mac machines using different file path convetions)
 - Maintain codebooks in `data_codebook/` matching dataset paths (description, generating script, variable notes).
 - Outputs: tables usually CSV + LaTeX; large exploratory tables may be CSV-only. Figures should ship as PDF and PNG in 1:1 and 16:9 without titles. Place a sibling `.txt` note describing each table/figure and its producing script. Misc stats go to `data/yaml/`.
@@ -53,7 +53,7 @@
 - `data/raw/` has raw downloaded datasets.
 - `data/yaml` has yaml files written by our analysis scripts. These keep track of important stats that do not fit neatly into a table (eg number of observations). These are used to produce the `data/constants/`.
 - `data_codebook/` has markdown files documenting all datasets with same folder structure as `data/`. Each codebook should have: terse description of the data, which script generates it, and list of all variables with descriptions.
-- We use a Google Drive remote for storage. Should be set up as rclone remote set in config.py `RCLONE_REMOTE = "collusion-llm"` for the user.
+- We use a Google Drive remote for active query/database workflows. For standard replication, prefer public downloads instead. When needed, the rclone remote in config.py is `RCLONE_REMOTE = "collusion-llm"`.
 
 ### Codebook Template
 ```markdown

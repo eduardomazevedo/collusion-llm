@@ -27,26 +27,28 @@ ROOT=/absolute/path/to/collusion-llm
 
 Some steps will not work without a properly configured `.env`, especially WRDS- and OpenAI-dependent workflows.
 
-## 3. Configure rclone for Google Drive sync
-If running for the first time, create remote named 'collusion-llm'.
-This step can be skipped if remote is already set correctly.
-```
-rclone config
-```
-
-## 4. Run analysis pipeline
+## 3. Run analysis pipeline
 ```
 uv run snakemake --cores 2
 ```
 
 For paper replication, Snakemake now handles the key upstream inputs in the intended order:
-1. download the latest `data/datasets/queries.sqlite` from Google Drive
-2. rebuild `data/datasets/transcript_detail.feather` from WRDS
-3. deduplicate transcript versions using the downloaded queries DB as the preferred transcript-version source
-4. run the downstream analysis pipeline
+1. download the public replication `data/datasets/queries.sqlite` from Google Drive
+2. download the public human ratings and ANAC raw files from Google Drive
+3. rebuild `data/datasets/transcript_detail.feather` from WRDS
+4. deduplicate transcript versions using the downloaded queries DB as the preferred transcript-version source
+5. run the downstream analysis pipeline
+
+## Optional: configure rclone for active query workflows
+You do not need `rclone` for paper replication.
+
+`rclone` is only needed if you want to use the repo for manual database management or for running and syncing your own query database. If running for the first time, create remote named `collusion-llm`.
+```
+rclone config
+```
 
 ## Manual database operations
-These commands are still available for inspection and maintenance:
+These commands are still available for inspection and maintenance, but they require `rclone` and are not needed for standard replication:
 ```
 bash ./src/cli/db_manager.sh download  # Get latest database manually
 bash ./src/cli/db_manager.sh init      # Initialize queries database with two tables; don't use if database already exists
