@@ -8,15 +8,13 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
 # Change to project root directory
 cd "$PROJECT_ROOT"
 
-# List of scripts to run with their locations
-# Transcript detail and the queries database are now handled by Snakemake
-# so that transcript deduplication can follow the downloaded queries DB.
+# List of scripts to run with their locations.
+# NOTE: transcript_detail.feather is created later by Snakemake (WRDS step),
+# so scripts that depend on transcript_detail should not run during bootstrap.
 SCRIPTS=(
     "$SCRIPT_DIR/setup_venv.sh"
     "$SCRIPT_DIR/download_credentials.sh"
     "$PROJECT_ROOT/src/pre_query/data_preparation/download_human_ratings.sh"
-    "$PROJECT_ROOT/src/pre_query/data_preparation/export_companies.sh"
-    "$PROJECT_ROOT/src/pre_query/data_preparation/format_human_ratings.sh"
 )
 
 # Iterate over the scripts and execute each one
@@ -29,3 +27,6 @@ for SCRIPT_PATH in "${SCRIPTS[@]}"; do
         echo "Script $SCRIPT_PATH not found"
     fi
 done
+
+echo "Setup bootstrap complete."
+echo "Next step: run 'snakemake --cores 2' to download/build transcript_detail and downstream datasets."

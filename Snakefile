@@ -7,6 +7,8 @@ rule all:
     input:
         "data/datasets/queries.sqlite",
         "data/datasets/transcript_detail.feather",
+        "data/datasets/human_ratings.csv",
+        "data/intermediaries/companies_transcripts.csv",
         "data/raw/compustat/compustat_us.feather",
         "data/raw/compustat/compustat_global.feather",
         "data/intermediaries/gvkey_table.feather",
@@ -78,6 +80,30 @@ rule download_transcript_detail:
         wrds=1
     shell:
         f"{PYTHON_CMD} src/pre_query/data_preparation/download_capiq_details.py"
+
+rule format_human_ratings:
+    """
+    Build combined human_ratings.csv from Joe and ACL ratings after transcript_detail exists.
+    """
+    input:
+        transcript_detail="data/datasets/transcript_detail.feather",
+        joe_scores="data/raw/human_ratings/joe_scores.csv",
+        acl_scores="data/raw/human_ratings/acl_scores.csv"
+    output:
+        "data/datasets/human_ratings.csv"
+    shell:
+        f"{PYTHON_CMD} src/pre_query/data_preparation/format_human_ratings.py"
+
+rule export_companies_transcripts:
+    """
+    Export company-transcript mapping used by batch-query tooling.
+    """
+    input:
+        transcript_detail="data/datasets/transcript_detail.feather"
+    output:
+        "data/intermediaries/companies_transcripts.csv"
+    shell:
+        f"{PYTHON_CMD} src/pre_query/data_preparation/export_companies.py"
 
 rule download_anac_raw:
     """
