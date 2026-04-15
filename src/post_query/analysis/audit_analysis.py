@@ -345,40 +345,74 @@ save_figure(
 print("Computing company counts for true positives...")
 company_counts = {}
 unique_company_count = None
-if "companyname" in audit_tf.columns:
-    true_pos_df = audit_tf[audit_tf["audit_label"] == "T"].copy()
-    true_pos_df["companyname_clean"] = true_pos_df["companyname"].astype(str).str.strip()
-    true_pos_df["companyname_norm"] = true_pos_df["companyname_clean"].map(
-        lambda s: unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode("ascii")
+
+
+def normalize_company_name(value):
+    return unicodedata.normalize("NFKD", str(value)).encode("ascii", "ignore").decode("ascii").strip()
+
+
+true_pos_df = audit_tf[audit_tf["audit_label"] == "T"].copy()
+transcript_meta = pd.read_feather(
+    config.TRANSCRIPT_DETAIL_PATH,
+    columns=["transcriptid", "companyid", "companyname"],
+).rename(columns={"companyname": "companyname_meta"})
+
+true_pos_df = true_pos_df.merge(
+    transcript_meta,
+    left_on="transcript_id",
+    right_on="transcriptid",
+    how="left",
+)
+
+missing_meta_count = int(true_pos_df["companyid"].isna().sum())
+if missing_meta_count:
+    print(
+        f"WARNING: missing transcript metadata for {missing_meta_count} true positives; "
+        "falling back to audit spreadsheet names for those rows."
     )
+
+true_pos_df["companyname_canonical"] = true_pos_df["companyname_meta"]
+if "companyname" in true_pos_df.columns:
+    true_pos_df.loc[
+        true_pos_df["companyname_canonical"].isna(), "companyname_canonical"
+    ] = true_pos_df.loc[
+        true_pos_df["companyname_canonical"].isna(), "companyname"
+    ]
+
+true_pos_df["companyname_norm"] = true_pos_df["companyname_canonical"].map(
+    normalize_company_name
+)
+
+if true_pos_df["companyid"].notna().any():
+    unique_company_count = int(true_pos_df["companyid"].dropna().nunique())
+    if true_pos_df["companyid"].isna().any():
+        fallback_unique_count = int(
+            true_pos_df.loc[true_pos_df["companyid"].isna(), "companyname_norm"].nunique()
+        )
+        unique_company_count += fallback_unique_count
+else:
     unique_company_count = int(true_pos_df["companyname_norm"].nunique())
 
-    target_companies = {
-        # NOTE: In assets/human_audit_final.xlsx, GOL appears with a spreadsheet
-        # encoding issue as something like "Gol Linhas A√©reas Inteligentes S.A.".
-        # After the Unicode normalization above, that becomes
-        # "Gol Linhas Areas Inteligentes S.A." ("Areas", not "Aereas").
-        # This breaks the generic exact/contains matching logic that works for the
-        # other companies, so we handle GOL explicitly here.
-        "gol_linhas_aereas_inteligentes": "Gol Linhas Areas Inteligentes",
-        "micron_technology": "Micron Technology",
-        "norske_skogindustrier": "Norske Skogindustrier",
-        "coca_cola_bottlers_japan": "Coca-Cola Bottlers Japan",
-    }
-    for key, company in target_companies.items():
-        if key == "gol_linhas_aereas_inteligentes":
-            mask = true_pos_df["companyname_norm"].str.lower().str.contains(
-                company.lower(), na=False
-            )
-        else:
-            mask = true_pos_df["companyname_norm"].str.lower() == company.lower()
-            if not mask.any():
-                mask = true_pos_df["companyname_norm"].str.lower().str.contains(
-                    company.lower(), na=False
-                )
-        company_counts[key] = int(mask.sum())
-else:
-    print("companyname column missing; skipping company counts.")
+print(f"  Unique true-positive companies: {unique_company_count}")
+
+# Use transcript metadata as the authoritative company identity source for
+# company-level audit counts. The human audit spreadsheet is manually maintained
+# and can contain stale/variant company names (e.g. Daqo New Energy vs.
+# Daqo New Energy Corp.).
+target_companies = {
+    "gol_linhas_aereas_inteligentes": "Gol Linhas Aereas Inteligentes",
+    "micron_technology": "Micron Technology",
+    "norske_skogindustrier": "Norske Skogindustrier",
+    "coca_cola_bottlers_japan": "Coca-Cola Bottlers Japan",
+}
+for key, company in target_companies.items():
+    mask = true_pos_df["companyname_norm"].str.lower() == company.lower()
+    if not mask.any():
+        mask = true_pos_df["companyname_norm"].str.lower().str.contains(
+            company.lower(), na=False
+        )
+    company_counts[key] = int(mask.sum())
+    print(f"  {key}: {company_counts[key]}")
 
 #%%
 # Save YAML constants
