@@ -1,6 +1,34 @@
 # Snakefile for Collusion LLM project
 # This workflow manages the data processing pipeline
 
+import os
+from snakemake.exceptions import WorkflowError
+from dotenv import dotenv_values
+
+ENV_PATH = os.path.join(workflow.basedir, ".env")
+ENV_EXAMPLE_PATH = os.path.join(workflow.basedir, ".env.example")
+
+if not os.path.exists(ENV_PATH):
+    raise WorkflowError(
+        "Missing .env in the repository root. Copy .env.example to .env and set at least ROOT to the absolute path of this repository."
+    )
+
+env_values = dotenv_values(ENV_PATH)
+root = env_values.get("ROOT")
+
+if not root:
+    raise WorkflowError(
+        "Missing ROOT in .env. Set ROOT to the absolute path of this repository, for example by copying values from .env.example and updating ROOT."
+    )
+
+root = os.path.abspath(os.path.expanduser(root))
+workflow_basedir = os.path.abspath(workflow.basedir)
+
+if root != workflow_basedir:
+    raise WorkflowError(
+        f"ROOT in .env points to '{root}', but this Snakefile is in '{workflow_basedir}'. Update .env so ROOT matches the repository root."
+    )
+
 PYTHON_CMD = 'PYTHONPATH="{workflow.basedir}:${{PYTHONPATH:-}}" python'
 
 rule all:
