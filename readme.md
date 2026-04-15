@@ -3,21 +3,31 @@
 This project uses Large Language Models (LLMs) to detect potential collusive behavior in corporate earnings call transcripts. The system analyzes public company communications to identify signs of price-fixing or capacity limitation coordination between competitors.
 
 # Quick Start
-Steps 1-3 can be run upon cloning the repo.
+Steps 1-4 can be run upon cloning the repo.
 
-## 1. Initial setup (assumes `uv` is installed; creates `.venv` and downloads non-WRDS setup data)
+## 1. Initial setup (assumes `uv` is installed; creates `.venv`, creates `.env` from `.env.example` if needed, and downloads non-WRDS setup data)
 ```
 bash ./src/setup/setup.sh
 ```
 
-## 2. Configure rclone for Google Drive sync
+## 2. Fill in your credentials in `.env`
+The setup script creates `.env` from `.env.example` on first run and sets `ROOT` automatically.
+You should then open `.env` and fill in any missing credentials:
+```
+OPENAI_API_KEY=your_openai_api_key_here
+WRDS_USERNAME=your_wrds_username_here
+WRDS_PASSWORD=your_wrds_password_here
+ROOT=/absolute/path/to/collusion-llm
+```
+
+## 3. Configure rclone for Google Drive sync
 If running for the first time, create remote named 'collusion-llm'.
 This step can be skipped if remote is already set correctly.
 ```
 rclone config
 ```
 
-## 3. Run analysis pipeline
+## 4. Run analysis pipeline
 ```
 source .venv/bin/activate
 snakemake --cores 2
@@ -128,9 +138,9 @@ bash src/cli/db_manager.sh --export-analysis
 ```
 
 # Example .env file (used for config)
-OPENAI_API_KEY = abc123
-WRDS_USERNAME = sauron
-WRDS_PASSWORD = mordor123
+OPENAI_API_KEY=abc123
+WRDS_USERNAME=sauron
+WRDS_PASSWORD=mordor123
 ROOT=/Users/sauron/projects/collusion-llm
 
 

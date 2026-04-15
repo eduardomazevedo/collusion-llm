@@ -13,7 +13,7 @@ cd "$PROJECT_ROOT"
 # so scripts that depend on transcript_detail should not run during bootstrap.
 SCRIPTS=(
     "$SCRIPT_DIR/setup_venv.sh"
-    "$SCRIPT_DIR/download_credentials.sh"
+    "$SCRIPT_DIR/init_env.sh"
     "$PROJECT_ROOT/src/pre_query/data_preparation/download_human_ratings.sh"
 )
 
@@ -29,4 +29,5 @@ for SCRIPT_PATH in "${SCRIPTS[@]}"; do
 done
 
 echo "Setup bootstrap complete."
+echo "If needed, edit .env to add your credentials."
 echo "Next step: run 'snakemake --cores 2' to download/build transcript_detail and downstream datasets."
