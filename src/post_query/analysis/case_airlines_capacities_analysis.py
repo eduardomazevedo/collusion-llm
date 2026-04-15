@@ -55,7 +55,7 @@ color_map = {
 }
 
 #%%
-# Plot
+# Plot (series labels at line ends — no legend)
 fig, ax = plt.subplots()
 for airline in airline_order:
     g = df_plot[df_plot["empresa_sigla"].eq(airline)]
@@ -65,14 +65,54 @@ for airline in airline_order:
     ax.plot(
         g["ano"],
         g["ask_billion"],
-        label=airline_labels.get(airline, airline),
         color=color_map[airline],
-        marker="o"
+        marker="o",
     )
 
 ax.set_xlabel("Year")
 ax.set_ylabel("Available seat kilometers (billions)")
-ax.legend(frameon=False)
+
+# Annotate airline names at the last observation (right-labeled series)
+endpoints = []
+for airline in airline_order:
+    g = df_plot[df_plot["empresa_sigla"].eq(airline)]
+    if g.empty:
+        continue
+    last = g.sort_values("ano").iloc[-1]
+    endpoints.append(
+        {
+            "x": float(last["ano"]),
+            "y": float(last["ask_billion"]),
+            "name": airline_labels.get(airline, airline),
+            "color": color_map[airline],
+        }
+    )
+
+# Stack vertical text offsets in points when endpoints are close in ASK (e.g. GOL vs LATAM)
+endpoints.sort(key=lambda e: -e["y"])
+offsets_pt = [0] * len(endpoints)
+for i in range(1, len(endpoints)):
+    dy_data = endpoints[i - 1]["y"] - endpoints[i]["y"]
+    if dy_data < 3.5:
+        offsets_pt[i] = offsets_pt[i - 1] + 12
+    else:
+        offsets_pt[i] = 0
+
+for ep, dy in zip(endpoints, offsets_pt):
+    ax.annotate(
+        ep["name"],
+        xy=(ep["x"], ep["y"]),
+        xytext=(8, dy),
+        textcoords="offset points",
+        ha="left",
+        va="center",
+        fontsize=10,
+        color=ep["color"],
+    )
+
+x_min = float(df_plot["ano"].min())
+x_max = float(df_plot["ano"].max())
+ax.set_xlim(x_min - 0.35, x_max + 0.95)
 fig.tight_layout()
 
 #%%
