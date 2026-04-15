@@ -160,12 +160,22 @@
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds}
 \RequirePackage{adjustbox}
 
-% Apply the color links
+% Apply link colors robustly.
+% Note: this controls links created by LaTeX/hyperref. Some PDF viewers
+% auto-detect visible URLs and may still overlay their own default blue; that
+% behavior cannot be fully controlled from the PDF itself.
+\urlstyle{same}
 \hypersetup{
     colorlinks=true,
+    breaklinks=true,
     linkcolor=crimson_red,
     citecolor=deep_teal_dark,
-    urlcolor=deep_teal_dark
+    urlcolor=deep_teal_dark,
+    filecolor=deep_teal_dark,
+    menucolor=deep_teal_dark,
+    runcolor=deep_teal_dark,
+    anchorcolor=crimson_red,
+    pdfborder={0 0 0}
 }
 
 % Theorem environments setup
