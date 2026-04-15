@@ -354,15 +354,28 @@ if "companyname" in audit_tf.columns:
     unique_company_count = int(true_pos_df["companyname_norm"].nunique())
 
     target_companies = {
-        "gol_linhas_aereas_inteligentes": "Gol Linhas Aereas Inteligentes",
+        # NOTE: In assets/human_audit_final.xlsx, GOL appears with a spreadsheet
+        # encoding issue as something like "Gol Linhas A√©reas Inteligentes S.A.".
+        # After the Unicode normalization above, that becomes
+        # "Gol Linhas Areas Inteligentes S.A." ("Areas", not "Aereas").
+        # This breaks the generic exact/contains matching logic that works for the
+        # other companies, so we handle GOL explicitly here.
+        "gol_linhas_aereas_inteligentes": "Gol Linhas Areas Inteligentes",
         "micron_technology": "Micron Technology",
         "norske_skogindustrier": "Norske Skogindustrier",
         "coca_cola_bottlers_japan": "Coca-Cola Bottlers Japan",
     }
     for key, company in target_companies.items():
-        mask = true_pos_df["companyname_norm"].str.lower() == company.lower()
-        if not mask.any():
-            mask = true_pos_df["companyname_norm"].str.lower().str.contains(company.lower())
+        if key == "gol_linhas_aereas_inteligentes":
+            mask = true_pos_df["companyname_norm"].str.lower().str.contains(
+                company.lower(), na=False
+            )
+        else:
+            mask = true_pos_df["companyname_norm"].str.lower() == company.lower()
+            if not mask.any():
+                mask = true_pos_df["companyname_norm"].str.lower().str.contains(
+                    company.lower(), na=False
+                )
         company_counts[key] = int(mask.sum())
 else:
     print("companyname column missing; skipping company counts.")
