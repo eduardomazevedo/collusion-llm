@@ -33,11 +33,10 @@ uv run snakemake --cores 2
 ```
 
 For paper replication, Snakemake now handles the key upstream inputs in the intended order:
-1. download the public replication `data/datasets/queries.sqlite` from Google Drive
-2. download the public human ratings and ANAC raw files from Google Drive
-3. rebuild `data/datasets/transcript_detail.feather` from WRDS
-4. deduplicate transcript versions using the downloaded queries DB as the preferred transcript-version source
-5. run the downstream analysis pipeline
+1. download the public replication data bundle inputs (`queries.sqlite`, human ratings, and ANAC raw files) from Google Drive
+2. rebuild `data/datasets/transcript_detail.feather` from WRDS
+3. deduplicate transcript versions using the downloaded queries DB as the preferred transcript-version source
+4. run the downstream analysis pipeline
 
 ## Optional: configure rclone for active query workflows
 You do not need `rclone` for paper replication.

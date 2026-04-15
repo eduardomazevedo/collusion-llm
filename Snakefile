@@ -57,15 +57,18 @@ rule all:
         "data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf",
         "data/constants/.populated"
 
-rule download_queries_db:
+rule download_replication_data:
     """
-    Download the public replication queries database from Google Drive.
-    This workflow assumes paper replication uses an already-built queries DB.
+    Download public replication inputs from Google Drive.
+    Includes the queries database, human ratings, and ANAC raw files.
     """
     output:
-        "data/datasets/queries.sqlite"
+        "data/datasets/queries.sqlite",
+        "data/raw/human_ratings/joe_scores.csv",
+        "data/raw/human_ratings/acl_scores.csv",
+        expand("data/raw/anac/{year}.csv", year=range(2011, 2017))
     shell:
-        "bash ./src/cli/download_public_google_drive.sh 1MTFPFwWTLjIkeHrs7EsHo6uQ0gyEy-fV data/datasets/queries.sqlite queries.sqlite"
+        "bash ./src/pre_query/data_preparation/download_replication_data.sh"
 
 rule download_transcript_detail:
     """
@@ -104,15 +107,6 @@ rule export_companies_transcripts:
         "data/intermediaries/companies_transcripts.csv"
     shell:
         f"{PYTHON_CMD} src/pre_query/data_preparation/export_companies.py"
-
-rule download_anac_raw:
-    """
-    Download ANAC raw airline capacity files used in the airline case study.
-    """
-    output:
-        expand("data/raw/anac/{year}.csv", year=range(2011, 2017))
-    shell:
-        "bash ./src/pre_query/data_preparation/download_anac.sh"
 
 rule case_airlines_capacities_dataset:
     """
