@@ -1,19 +1,19 @@
-It is now well documented (though perhaps not well known) that firms use
+It is well documented that firms use
 public communications to collude. Private litigation has delivered
 compelling evidence of communications through earnings calls and semi-public
 industry meetings which resulted in firms jointly reducing their capacities
 in the airlines and steel industries.\footnote{%
 All of the cases referenced in this and the ensuing paragraph (with the
 exception of the EU tire manufacturers case) can be found in
-\textcite{harrington2022collusion}.} In addition, plaintiffs have documented
+\textcite{harrington2022collusion}.} Plaintiffs have documented
 public communications to
 facilitate coordination in the chicken and pork processing industries as
 well as to supplement private communications for a generic pharmaceuticals
 cartel.
 
-These public announcements can be quite egregious. In an earnings call, a
-Vice President for Delta Airlines explicitly called for airlines to
-coordinate capacity reductions in order to raise fares.
+These public announcements can be egregious. For example, a 
+Delta Airlines vice president explicitly called for airlines to
+coordinate capacity reductions in an earnings call:
 
 \begin{quotation}
 \noindent I think Delta can't do it alone. We have to do it in conjunction with the
@@ -30,7 +30,7 @@ for ``capacity discipline'' and commending the industry when it was achieved.
 The empirical analysis of \textcite{aryal2022coordinated} showed that these
 announcements did cause significant capacity reductions.
 
-There have also been some cases pursued by enforcers. Under Section 5, the
+There have also been some cases pursued by competition agencies. Under Section 5, the
 Federal Trade Commission issued consent decrees prohibiting certain public
 communications in the markets for print advertising and one-way truck
 rentals. The Dutch competition authority obtained a commitment against
@@ -54,22 +54,23 @@ conferences, announcements of future prices, statements on earnings calls,
 and in other public ways.''\footnote{\textit{In re Delta/AirTran Baggage Fee
 Antitrust Litig}., 733 F. Supp. 2d 1348, 1360 (N.D. Ga. 2010).}
 
-This study has two objectives. First, it advances our understanding of collusion through public communications. 
+This study has two objectives. First, to advance our understanding of collusion through public communications. 
 This type of collusive practice has only recently been the subject of analysis and, consequently, little is known about it. 
-Second, it translates this new knowledge into improved enforcement. There is the concern that the 
+Second, improve enforcement. There is the concern that the 
 few cases thus far pursued by public and private enforcers may be only the tip of the iceberg. 
 
-In order to 
-contribute to both objectives, we first make a methodological contribution by developing and then applying 
-a tool for finding corporate communications containing collusive content. In referring to "collusive content", 
-we mean any content that facilitates coordinated conduct among competitors to reduce competition. Using this tool, 
-we are able to discover many previously unidentified company transcripts containing collusive content. With those 
-transcripts, we distill and organize the associated collusive content in order to better understand how it could 
+To do so, we employ natural language processing using a large language model (LLM) to detect collusive content.
+We define "collusive content" 
+as content that facilitates coordinated conduct among competitors to reduce competition. 
+LLMs are able to pick this subtle intent considerably more accurately than traditional natural language processing.
+
+Using the LLM, we discover many previously unidentified company transcripts containing collusive content. With those 
+transcripts, we organize the associated collusive content to better understand how it could 
 affect competition. While we do not explore the effect of this communication on prices or quantities, our study 
-has the ancillary contribution of providing a set of candidate markets for conducting such an empirical analysis. 
-We hope researchers will exploit it. Turning to the enforcement objective, we show how this tool can be used by 
-competition agencies and plaintiff law firms to identify possible cases to prosecute or litigate. In addition, 
-our analysis of the content used in such communications provides the basis for writing guidelines to instruct 
+produces a set of candidate markets for conducting such an empirical analysis. 
+We hope researchers will exploit it. Turning to the enforcement objective, we show how the LLM can be used by 
+competition agencies and plaintiff law firms to identify possible cases to prosecute or litigate.  
+The analysis of the content used in such communications provides the basis for writing guidelines to instruct 
 firms what they should not be saying and what content may be the basis for an investigation.
 
 Achieving these objectives requires discovering communications with collusive content. When collusion involves private 
@@ -79,8 +80,7 @@ communications are in the public domain. The challenge is instead akin to findin
 There is a massive volume of public communications produced by thousands of companies and reviewing it all 
 in search of possible collusive content would seem a fool's errand.
 
-To meet this challenge, we develop a method for reviewing companies' public statements at scale. 
-The approach uses a large language model (LLM). The first step is to properly design a prompt. Guided 
+We discuss practical issues and limitations of the approach. The first step is to properly design a prompt. Guided 
 by some previously documented cases of collusion with public announcements, we experimented 
 with prompts and refined them to find one effective at flagging transcripts with collusive content. A scoring 
 process was then constructed by which the LLM assigns a score to each transcript. With the prompt 
@@ -90,8 +90,8 @@ is integral to both research objectives. First, the audit distills and organizes
 understand the collusive messages being conveyed by firms. Second, the audit evaluates the LLM's performance 
 and thus assesses its potential as a screening tool for enforcers.
 
-Prior to describing how it contributes to those two objectives, let us first summarize the output of the LLM. 
-To begin, it is very selective as it filters out 99.88\% of all transcripts which is consistent 
+Prior to describing how the LLM contributes to those two objectives, let us first summarize its output. 
+To begin, the LLM is very selective as it filters out \data{summary_stats/tagging_performance/llm_filter_out_rate_pct_percentage2} of all transcripts which is consistent 
 with our prior belief that collusive content is rare (though common enough to be an antitrust concern). 
 Critically, the LLM is able to systematically discover companies' announcements with collusive content. 
 In some instances, it rediscovers previously documented communications such as the aforementioned 
