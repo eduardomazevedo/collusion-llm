@@ -2,8 +2,8 @@
 """
 Script to convert YAML files to LaTeX constants.
 
-Takes all YAML files from output/yaml/ and converts them to text files in output/constants/
-that can be imported into LaTeX using \\input{../output/constants/path/to/field.txt}
+Takes all YAML files from data/yaml/ and converts them to text files in data/constants/
+that can be imported into LaTeX using \\input{../data/constants/path/to/field.txt}
 
 The script processes different data types:
 - Numbers: saved as _int.txt (with commas), _float0/_float1/_float2.txt (0/1/2 decimals), _percentage0/_percentage1/_percentage2.txt (escaped % with 0/1/2 decimals), _scientific.txt
@@ -206,8 +206,8 @@ def main():
             print(f"  ✗ Error processing {yaml_file.name}: {e}")
     
     print("\nDone! Constants are ready for LaTeX import.")
-    print("Usage in LaTeX: \\newcommand{\\data}[1]{\\input{../output/constants/#1.txt}\\unskip}")
-    print("Example: \\data{transcript-stats/n_transcripts_int}")
+    print("Usage in LaTeX: \\newcommand{\\data}[1]{\\input{../data/constants/#1.txt}\\unskip}")
+    print("Example: \\data{summary_stats/total_transcripts_int}")
 
 
 if __name__ == "__main__":
