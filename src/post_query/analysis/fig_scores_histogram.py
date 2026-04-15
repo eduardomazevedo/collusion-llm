@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.transforms import blended_transform_factory
 from pathlib import Path
 import os
 import sys
@@ -77,10 +78,26 @@ def create_entire_sample_histogram():
         ax.set_xlabel('Original LLM Score')
         ax.set_ylabel('Frequency')
         
-        # Add summary statistics
+        # Mean as vertical reference + annotation (no legend)
         mean_score = original_scores.mean()
-        ax.axvline(mean_score, color=STYLE_CONFIG["line_color"], linestyle='--', label=f'Mean: {mean_score:.1f}')
-        ax.legend()
+        ax.axvline(
+            mean_score,
+            color=STYLE_CONFIG["line_color"],
+            linestyle="--",
+            linewidth=plt.rcParams.get("lines.linewidth", 1.5),
+            alpha=STYLE_CONFIG["line_alpha"],
+        )
+        trans = blended_transform_factory(ax.transData, ax.transAxes)
+        ax.text(
+            mean_score,
+            0.97,
+            f"Mean = {mean_score:.1f}",
+            transform=trans,
+            ha="center",
+            va="top",
+            color=STYLE_CONFIG["text_color"],
+            fontsize=10,
+        )
         
         plt.tight_layout()
         

@@ -1,11 +1,12 @@
-# Collusion Detection with LLMs
+# Replication code for Azevedo, Harrington and Rusu "Collusive Content in Corporate Communications"
+ 
+This paper uses Large Language Models (LLMs) to detect potential collusive behavior in corporate earnings call transcripts. The repo is organized around a Snakemake file that replicates the analysis after downloading the data on queries we ran. The repo can be modified to create a new query database.
 
-This project uses Large Language Models (LLMs) to detect potential collusive behavior in corporate earnings call transcripts. The system analyzes public company communications to identify signs of price-fixing or capacity limitation coordination between competitors.
+Requirements: WRDS credentials, uv. Additional requirements to run queries: rclone to sync database, and OpenAI api key.
 
-# Quick Start
-Steps 1-4 can be run upon cloning the repo.
+# Replication Instructions
 
-## 1. Create the environment with `uv`
+## 1. Create python virtual environment 
 Assumes `uv` is installed.
 ```
 uv sync
@@ -19,13 +20,31 @@ cp .env.example .env
 
 Then edit `.env` so it includes:
 ```
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here (optional)
 WRDS_USERNAME=your_wrds_username_here
 WRDS_PASSWORD=your_wrds_password_here
 ROOT=/absolute/path/to/collusion-llm
 ```
 
 Some steps will not work without a properly configured `.env`, especially WRDS- and OpenAI-dependent workflows.
+
+## Public data download links
+Readers who just want the paper data inputs can download them directly from Google Drive without running the code.
+
+### Core replication files
+- `queries.sqlite`: https://drive.google.com/file/d/1MTFPFwWTLjIkeHrs7EsHo6uQ0gyEy-fV/view?usp=sharing
+- `joe_scores.csv`: https://drive.google.com/file/d/1z2eddx34O1f9M2JFJP-cvtYf7qzQ0qzj/view?usp=sharing
+- `acl_scores.csv`: https://drive.google.com/file/d/1oOQ9TZ8odcFrpZmbZ0a1ykNoBLdqtl-a/view?usp=sharing
+
+### ANAC raw files
+- `2011.csv`: https://drive.google.com/file/d/1SpcX-fQeWMU0EkFsAbcmggKuc8ADqiAp/view?usp=sharing
+- `2012.csv`: https://drive.google.com/file/d/1VMm6qPJT7rEi6TaWAFeo42Z-sKggK7mj/view?usp=sharing
+- `2013.csv`: https://drive.google.com/file/d/1qjPAh6sNkaHOAGV-cVmx06Xi9780F7IY/view?usp=sharing
+- `2014.csv`: https://drive.google.com/file/d/1AJLFJVSy1TwCgNxyt8G9DeJtYQ3Y6Jo1/view?usp=sharing
+- `2015.csv`: https://drive.google.com/file/d/1_-aq0U2K1wVnZ1s9_wWRJ1PKcEH0LeW8/view?usp=sharing
+- `2016.csv`: https://drive.google.com/file/d/1_WtLC6d-f8bmTijt9KDuGj95pSiZy7YL/view?usp=sharing
+
+Note: `data/datasets/transcript_detail.feather` is rebuilt from WRDS and is therefore not included in the public Google Drive bundle above.
 
 ## 3. Run analysis pipeline
 ```
@@ -113,43 +132,3 @@ bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> submit
 
 # Option 3: Create and submit in one command
 bash ./src/query_submission/batch_queries/run_big_batch.sh <prompt_name> all
-```
-
-What happens:
-
-**Batch Creation Phase:**
-- Loads transcript-company mappings and pre-calculated token sizes
-- Creates diagnostic CSV (`transcript_diagnostics.csv`) tracking each transcript's assignment
-- Groups transcripts by company into JSONL batch files in `data/cache/{prompt_name}_batches/`
-- Validates each batch stays within OpenAI limits (50K requests, 10M tokens)
-- Reports missing transcripts and token usage statistics
-
-**Submission and Monitoring Phase:**
-- Creates/updates `data/cache/batch_tracker.csv` with batch status, estimated costs, and progress
-- Monitors OpenAI's token queue limit (10M tokens max in flight)
-- Submits batches when queue capacity allows, waiting when necessary (batch completion slows down after many consecutive batch jobs; best practice is to pause batch submission for a day if progress is deemed too slow)
-- Long-running process (hours/days) with progress updates every 30 seconds
-- Automatically falls back to individual API calls for failed batches (despite estimating the in-progress batch queue from transcript token sizes and prompt token sizes, the queue at OpenAI might fill up sooner than expected; if a submitted batch goes over the queue limit, it is returned as failed; best practice is to allow "cool down time" by switching to individual API requests, or pausing submissions for a day)
-- Saves completed results directly to queries database
-- Tracks completion status to avoid reprocessing (useful when breaking and resuming processing for "cool down time")
-
-
-## Visualizing Data
-For easy inspection of LLM output use the following:
-```bash
-# To export all queries (or a subset, using options)
-bash src/cli/db_manager.sh --export-queries
-
-# TO export follow up analysis queries (or a subset, using options)
-bash src/cli/db_manager.sh --export-analysis
-```
-
-# Example .env file (used for config)
-OPENAI_API_KEY=abc123
-WRDS_USERNAME=sauron
-WRDS_PASSWORD=mordor123
-ROOT=/Users/sauron/projects/collusion-llm
-
-
-
-

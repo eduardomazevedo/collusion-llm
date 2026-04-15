@@ -118,6 +118,8 @@ n_countries = df['incorporation_country'].nunique()
 # Overall tagging rates
 llm_tagged = df['llm_flag'].sum()
 llm_tag_rate = llm_tagged / n_transcripts * 100
+# Share not LLM-flagged (100% minus flag rate); "filters out" in manuscript language
+llm_filter_out_rate_pct = 100.0 - llm_tag_rate
 
 # Benchmark sample statistics
 benchmark_sample = df['benchmark_sample'].sum()
@@ -260,6 +262,7 @@ summary_stats = {
     'tagging_performance': {
         'llm_tagged_count': int(llm_tagged),
         'llm_tag_rate_pct': float(llm_tag_rate),
+        'llm_filter_out_rate_pct': float(llm_filter_out_rate_pct),
         'benchmark_sample_count': int(benchmark_sample),
         'benchmark_sample_joe_count': int(benchmark_sample_joe_count),
         'benchmark_sample_aryal_count': int(benchmark_sample_aryal_count),
