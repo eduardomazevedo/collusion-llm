@@ -5,20 +5,27 @@ This project uses Large Language Models (LLMs) to detect potential collusive beh
 # Quick Start
 Steps 1-4 can be run upon cloning the repo.
 
-## 1. Initial setup (assumes `uv` is installed; creates `.venv`, creates `.env` from `.env.example` if needed, and downloads non-WRDS setup data)
+## 1. Create the environment with `uv`
+Assumes `uv` is installed.
 ```
-bash ./src/setup/setup.sh
+uv sync
 ```
 
-## 2. Fill in your credentials in `.env`
-The setup script creates `.env` from `.env.example` on first run and sets `ROOT` automatically.
-You should then open `.env` and fill in any missing credentials:
+## 2. Create and fill in `.env`
+Copy `.env.example` to `.env` and fill in any needed credentials:
+```
+cp .env.example .env
+```
+
+Then edit `.env` so it includes:
 ```
 OPENAI_API_KEY=your_openai_api_key_here
 WRDS_USERNAME=your_wrds_username_here
 WRDS_PASSWORD=your_wrds_password_here
 ROOT=/absolute/path/to/collusion-llm
 ```
+
+Some steps will not work without a properly configured `.env`, especially WRDS- and OpenAI-dependent workflows.
 
 ## 3. Configure rclone for Google Drive sync
 If running for the first time, create remote named 'collusion-llm'.
@@ -29,8 +36,7 @@ rclone config
 
 ## 4. Run analysis pipeline
 ```
-source .venv/bin/activate
-snakemake --cores 2
+uv run snakemake --cores 2
 ```
 
 For paper replication, Snakemake now handles the key upstream inputs in the intended order:

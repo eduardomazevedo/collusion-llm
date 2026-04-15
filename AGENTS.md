@@ -4,7 +4,8 @@
 - `modules/` for LLM, batch, and DB helpers; `src/` staged as `setup/` (env/data), `pre_query/` (WRDS pulls), `query_submission/` (single/batch prompts), `post_query/` (analysis/exports), and `cli/` (DB wrappers). `Snakefile` wires the pipeline. Prompts/config live in `assets/`. Data sits under `data/`; manuscripts in `manuscript/`; dataset codebooks mirror `data/` in `data_codebook/`.
 
 ## Build, Run & Data Commands
-- Bootstrap + venv: `bash ./src/setup/setup.sh` then `source .venv/bin/activate`.
+- Bootstrap environment: `uv sync`.
+- Create `.env` from `.env.example`, fill in needed credentials, and set `ROOT` to the repo path before running credentialed workflows.
 - Configure Drive sync: `rclone config` (remote `collusion-llm`).
 - Pipeline: `snakemake --cores 2` (downloads `queries.sqlite`, rebuilds `transcript_detail.feather`, then runs downstream analysis).
 - DB ops: `bash ./src/cli/db_manager.sh download|init|status|--export-queries|--export-analysis` for manual DB management.
