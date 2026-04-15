@@ -45,12 +45,12 @@ df_with_scores = df.merge(
 )
 
 #%%
-# Define colors for consistency using Ghibli color sequence
-# GHIBLI_COLORS: [Red, Teal, Gold, Blue, Green, Gray]
+# Define colors for consistency across 3-category validation plots
+# Mapping: Flagged=Teal, Validated=Red, Audit Validated=Gold
 COLORS = {
-    'LLM Flagged Only': GHIBLI_COLORS[0],      # Red (primary)
-    'LLM Validated': GHIBLI_COLORS[1],         # Deep Teal (secondary)
-    'Audit Validated': GHIBLI_COLORS[4]         # Green
+    'LLM Flagged Only': GHIBLI_COLORS[0],      # Deep Teal
+    'LLM Validated': GHIBLI_COLORS[1],         # Red
+    'Audit Validated': GHIBLI_COLORS[2]        # Gold
 }
 
 #%%
@@ -72,7 +72,7 @@ def create_entire_sample_histogram():
         fig, ax = plt.subplots(figsize=figsize)
         
         # Create histogram with 20 bins
-        ax.hist(original_scores, bins=20, color=GHIBLI_COLORS[0], 
+        ax.hist(original_scores, bins=20,
                 edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])
         
         ax.set_xlabel('Original LLM Score')
@@ -160,8 +160,8 @@ def create_validated_samples_mean_histogram():
         
         # Get scores for each group (in stacking order: bottom to top)
         groups_order = ['LLM Flagged Only', 'LLM Validated', 'Audit Validated']
-        # Use GHIBLI_COLORS sequence: Red, Teal, Green
-        colors_order = [GHIBLI_COLORS[0], GHIBLI_COLORS[1], GHIBLI_COLORS[4]]
+        # Use fixed mapping for validation status: Teal, Red, Gold
+        colors_order = [GHIBLI_COLORS[0], GHIBLI_COLORS[1], GHIBLI_COLORS[2]]
         
         scores_by_group = []
         labels = []

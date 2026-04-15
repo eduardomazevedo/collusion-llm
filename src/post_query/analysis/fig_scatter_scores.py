@@ -43,12 +43,12 @@ df_with_scores = df.merge(
 )
 
 #%%
-# Define colors for consistency using Ghibli color sequence
-# GHIBLI_COLORS: [Red, Teal, Gold, Blue, Green, Gray]
+# Define colors for consistency across 3-category validation plots
+# Mapping: Flagged=Teal, Validated=Red, Audit Validated=Gold
 COLORS = {
-    'LLM Flagged Only': GHIBLI_COLORS[0],      # Red (primary)
-    'LLM Validated': GHIBLI_COLORS[1],         # Deep Teal (secondary)
-    'Audit Validated': GHIBLI_COLORS[2]        # Gold (third in theme)
+    'LLM Flagged Only': GHIBLI_COLORS[0],      # Deep Teal
+    'LLM Validated': GHIBLI_COLORS[1],         # Red
+    'Audit Validated': GHIBLI_COLORS[2]        # Gold
 }
 
 #%%

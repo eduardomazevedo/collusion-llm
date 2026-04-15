@@ -16,6 +16,7 @@ import config
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.transforms import blended_transform_factory
 from statsmodels.stats.proportion import proportion_confint
 from pathlib import Path
 import yaml
@@ -296,14 +297,24 @@ def create_single_group_figure(group_df, output_name, color, overall_avg):
     ax.set_xlabel("LLM Flagged as Collusive (%)")
     ax.grid(axis='x')
 
-    # Legend should only show the dashed full-dataset average line, with value.
+    # Draw full-dataset average line and annotate near the top-right of the line.
     ax.axvline(
         x=overall_avg,
         color=STYLE_CONFIG["line_color"],
         linestyle='--',
-        label=f"Full Dataset Average ({overall_avg:.2f}%)",
     )
-    ax.legend(loc='upper right')
+    trans = blended_transform_factory(ax.transData, ax.transAxes)
+    text_x = min(x_max * 0.98, overall_avg + x_max * 0.015)
+    ax.text(
+        text_x,
+        0.96,
+        f"Full dataset average: {overall_avg:.2f}%",
+        transform=trans,
+        ha='left',
+        va='top',
+        color=STYLE_CONFIG["text_color"],
+        fontsize=10,
+    )
 
     plt.tight_layout()
     path_base = figure_dir / output_name
@@ -516,7 +527,7 @@ def analyze_segments(combined_df, unaggregated_sic_df, overall_llm_rate=None):
     create_single_group_figure(
         sectors[['group_name', 'tag_pct', 'ci_low', 'ci_high']].copy(),
         "gics_sector_tag_rates_llm",
-        GHIBLI_COLORS[1],
+        GHIBLI_COLORS[0],
         overall_avg,
     )
     with open(figure_dir / "gics_sector_tag_rates_llm.txt", "w") as f:

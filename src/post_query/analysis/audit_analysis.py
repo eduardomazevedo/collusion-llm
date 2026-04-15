@@ -326,7 +326,6 @@ fig, ax = plt.subplots()
 ax.hist(
     audit_tf[score_col],
     bins=10,
-    color=GHIBLI_COLORS[0],
     edgecolor=STYLE_CONFIG["edge_color"],
     linewidth=STYLE_CONFIG["edge_width"]
 )

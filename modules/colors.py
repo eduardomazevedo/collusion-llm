@@ -23,11 +23,11 @@ ghibli_palette = {
     "gold": "#FFD700",        # Howl's Moving Castle Gold (strong yellow)
 }
 
-# Standard categorical sequence (User pref: Red, then Teal, then common sense contrast)
+# Standard categorical sequence (User pref: Teal, then Red, then Gold)
 # This sequence ensures high contrast between adjacent categories.
 GHIBLI_COLORS = [
-    ghibli_palette["red"],        # 1. Primary Category
-    ghibli_palette["deep_teal"],  # 2. Secondary Category
+    ghibli_palette["deep_teal"],  # 1. Primary Category
+    ghibli_palette["red"],        # 2. Secondary Category
     ghibli_palette["gold"],       # 3. Highlight/Contrast
     ghibli_palette["blue"],       # 4. Cool tone
     ghibli_palette["green"],      # 5. Nature tone

@@ -99,7 +99,7 @@ def save_score_histogram(scores, name, description, bins=20, threshold=None):
         print(f"Skipping histogram {name}: no scores available.")
         return
     fig, ax = plt.subplots()
-    ax.hist(scores, bins=bins, color=GHIBLI_COLORS[0], 
+    ax.hist(scores, bins=bins,
             edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])
     if threshold is not None:
         ax.axvline(threshold, color=STYLE_CONFIG["line_color"], linestyle="--")

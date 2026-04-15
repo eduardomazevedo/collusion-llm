@@ -101,7 +101,7 @@ def save_score_histogram(scores, name, description, bins=20, threshold=None):
         print(f"Skipping histogram {name}: no scores available.")
         return
     fig, ax = plt.subplots()
-    ax.hist(scores, bins=bins, color=GHIBLI_COLORS[0], 
+    ax.hist(scores, bins=bins,
             edgecolor=STYLE_CONFIG["edge_color"], linewidth=STYLE_CONFIG["edge_width"])
     if threshold is not None:
         ax.axvline(threshold, color=STYLE_CONFIG["line_color"], linestyle="--")
@@ -190,7 +190,6 @@ def analyze_flag_by_market_value(df, flag_col, flag_name):
         mv_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
         fmt='o-',
-        color=GHIBLI_COLORS[1],
         ecolor=STYLE_CONFIG["error_color"]
     )
     # Add horizontal line for sample average
@@ -302,7 +301,6 @@ def analyze_flag_by_year(df, flag_col, flag_name):
         year_stats['tag_pct'],
         yerr=[yerr_low, yerr_high],
         fmt='o-',
-        color=GHIBLI_COLORS[1],
         ecolor=STYLE_CONFIG["error_color"]
     )
     # Add horizontal line for sample average
