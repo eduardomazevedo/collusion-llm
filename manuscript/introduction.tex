@@ -58,10 +58,17 @@ Antitrust Litig}., 733 F. Supp. 2d 1348, 1360 (N.D. Ga. 2010).}
 
 This study has two objectives. First, to advance our understanding of collusion through public communications. 
 This type of collusive practice has only recently been the subject of analysis and, consequently, little is known about it. 
-Second, improve enforcement. There is the concern that the 
+Second, to improve enforcement. There is the concern that the 
 few cases thus far pursued by public and private enforcers may be only the tip of the iceberg. 
 
-To do so, we employ natural language processing using a large language model (LLM) to detect collusive content.
+Achieving these objectives requires discovering communications with collusive content. When collusion involves private 
+communications, the challenge is that firms do their best to keep those communications secret. When it 
+involves public communications, the challenge is quite different. Accessibility is not a problem as the 
+communications are in the public domain. The challenge is instead akin to finding a "needle in a haystack." 
+There is a massive volume of public communications produced by thousands of companies and reviewing it all 
+in search of possible collusive content would seem a fool's errand.
+
+To tackle this problem, we employ natural language processing using a large language model (LLM) to detect collusive content.
 We define "collusive content" 
 as content that facilitates coordinated conduct among competitors to reduce competition. 
 Across NLP benchmarks, modern LLMs substantially outperform traditional methods on nuanced understanding tasks (\textcite{brown2020language}; \textcite{openai2023gpt4}).
@@ -75,12 +82,6 @@ competition agencies and plaintiff law firms to identify possible cases to prose
 The analysis of the content used in such communications provides the basis for writing guidelines to instruct 
 firms what they should not be saying and what content may be the basis for an investigation.
 
-Achieving these objectives requires discovering communications with collusive content. When collusion involves private 
-communications, the challenge is that firms do their best to keep those communications secret. When it 
-involves public communications, the challenge is quite different. Accessibility is not a problem as the 
-communications are in the public domain. The challenge is instead akin to finding a "needle in a haystack." 
-There is a massive volume of public communications produced by thousands of companies and reviewing it all 
-in search of possible collusive content would seem a fool's errand.
 
 We discuss practical issues and limitations of the approach. The first step is to properly design a prompt. Guided 
 by some previously documented cases of collusion with public announcements, we experimented 
