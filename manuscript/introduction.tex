@@ -64,7 +64,7 @@ few cases thus far pursued by public and private enforcers may be only the tip o
 To do so, we employ natural language processing using a large language model (LLM) to detect collusive content.
 We define "collusive content" 
 as content that facilitates coordinated conduct among competitors to reduce competition. 
-Across NLP benchmarks, modern LLMs substantially outperform traditional methods on nuanced language-understanding and comprehension tasks (\textcite{brown2020language}; \textcite{openai2023gpt4}).
+Across NLP benchmarks, modern LLMs substantially outperform traditional methods on nuanced understanding tasks (\textcite{brown2020language}; \textcite{openai2023gpt4}).
 
 Using the LLM, we discover many previously unidentified company transcripts containing collusive content. With those 
 transcripts, we organize the associated collusive content to better understand how it could 
@@ -86,7 +86,7 @@ We discuss practical issues and limitations of the approach. The first step is t
 by some previously documented cases of collusion with public announcements, we experimented 
 with prompts and refined them to find one effective at flagging transcripts with collusive content. A scoring 
 process was then constructed by which the LLM assigns a score to each transcript. With the prompt 
-and scoring process in place, around 500,000 transcripts were run through the LLM to look for collusive 
+and scoring process in place, \data{summary_stats/dataset_overview/total_transcripts_int} transcripts were run through the LLM to look for collusive 
 content. Those transcripts with the highest scores were then reviewed by a human expert. The human audit 
 is integral to both research objectives. First, the audit distills and organizes the content to 
 understand the collusive messages being conveyed by firms. Second, the audit evaluates the LLM's performance 
@@ -144,7 +144,7 @@ this is a healthy instrument for the health of the industry.''
 \noindent The LLM was able to discover these messages along with many other
 transcripts containing collusive content.
 
-The human audit reviews the 301 company transcripts assigned the
+The human audit reviews the \data{summary_stats/tagging_performance/human_audit_sample_count_int} company transcripts assigned the
 highest score by the LLM. While there is a rich variety of collusive content,
 more than 90\% of the transcripts can be placed into one of five categories:
 
@@ -242,7 +242,7 @@ The next three studies more directly examine the relationship between public
 announcements and collusive conduct. \textcite{harrington2022collusion} collects and
 categorizes all known cases in which there is evidence that firms
 coordinated using public announcements which reference rival firms. A
-typology of announcements is created which is reviewed in Section 4. \textcite{aryal2022coordinated}
+typology of announcements is created which is reviewed in Section~\ref{sec:content}. \textcite{aryal2022coordinated}
 and \textcite{sheng2024public} measure the effect of public
 announcements on firms' conduct. For the airlines industry, \textcite{aryal2022coordinated}
 find that when all airlines on a route have "capacity discipline" or
@@ -277,9 +277,9 @@ understanding of the content used by firms to coordinate in reducing competition
 \textbf{Roadmap }
 
 The data used in our analysis along with the development process for the LLM 
-screen are described in Section 2. The output from the large-scale LLM analysis 
-is summarized in Section 3. In Section 4, the procedure for the human audit is 
+screen are described in Section~\ref{sec:data}. The output from the large-scale LLM analysis 
+is summarized in Section~\ref{sec:basic}. In Section~\ref{sec:audit}, the procedure for the human audit is 
 described and the performance of the LLM is evaluated. The content identified 
-by the LLM is distilled and organized in Section 5. Section 6 discusses the role of an LLM in a screening 
+by the LLM is distilled and organized in Section~\ref{sec:content}. Section~\ref{sec:detection} discusses the role of an LLM in a screening 
 protocol. Finally, a case study of the Brazilian domestic airline industry 
-is provided in Section 7.
+is provided in Section~\ref{sec:case}.
