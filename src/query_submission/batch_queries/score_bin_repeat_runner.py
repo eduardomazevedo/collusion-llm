@@ -415,7 +415,9 @@ def create_batch(sample, tracker, checksum):
         "inserted_rows": pd.NA,
         "skipped_existing_rows": pd.NA,
     }
-    tracker = pd.concat([tracker, pd.DataFrame([row])], ignore_index=True)
+    tracker.loc[len(tracker), TRACKER_COLUMNS] = [
+        row[column] for column in TRACKER_COLUMNS
+    ]
     save_tracker(tracker)
 
     print(f"Created: {output_path}")
