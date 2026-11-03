@@ -15,6 +15,7 @@ Examples:
     python score_bin_repeat_runner.py submit --confirm-submit
     python score_bin_repeat_runner.py status
     python score_bin_repeat_runner.py process
+    python score_bin_repeat_runner.py advance --max-batches 5 --confirm-submit
 """
 
 #%%
@@ -25,6 +26,7 @@ import json
 import os
 import sqlite3
 import sys
+import time
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -34,7 +36,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 import config
 from modules.batch_processor import BatchProcessor
 from modules.queries_db import insert_query_result
-from modules.utils import token_size
+from modules.utils import extract_score_from_unstructured_response, token_size
 
 
 #%%
@@ -80,6 +82,8 @@ TRACKER_COLUMNS = [
     "total_failed",
     "inserted_rows",
     "skipped_existing_rows",
+    "invalid_response_rows",
+    "missing_output_ids",
 ]
 TRACKER_TEXT_COLUMNS = [
     "sample_sha256",
@@ -414,6 +418,8 @@ def create_batch(sample, tracker, checksum):
         "total_failed": pd.NA,
         "inserted_rows": pd.NA,
         "skipped_existing_rows": pd.NA,
+        "invalid_response_rows": pd.NA,
+        "missing_output_ids": pd.NA,
     }
     tracker.loc[len(tracker), TRACKER_COLUMNS] = [
         row[column] for column in TRACKER_COLUMNS
@@ -598,6 +604,14 @@ def process_completed_batches(tracker):
                 failed_output_lines += 1
                 continue
 
+            parsed_score = extract_score_from_unstructured_response(content)
+            if parsed_score is None or not 0 <= parsed_score <= 100:
+                print(
+                    f"Skipping invalid score response for transcript {transcriptid}"
+                )
+                failed_output_lines += 1
+                continue
+
             insert_query_result(
                 prompt_name=PROMPT_NAME,
                 transcriptid=transcriptid,
@@ -617,11 +631,13 @@ def process_completed_batches(tracker):
 
         tracker.loc[index, "saved_to_db"] = True
         tracker.loc[index, "processed_at"] = utc_now()
+        missing_output = len(expected_id_set - seen_ids)
         tracker.loc[index, "inserted_rows"] = inserted
         tracker.loc[index, "skipped_existing_rows"] = skipped_existing
+        tracker.loc[index, "invalid_response_rows"] = failed_output_lines
+        tracker.loc[index, "missing_output_ids"] = missing_output
         save_tracker(tracker)
 
-        missing_output = len(expected_id_set - seen_ids)
         print(f"Inserted rows: {inserted:,}")
         print(f"Skipped rows already at phase target: {skipped_existing:,}")
         print(f"Malformed or failed output lines: {failed_output_lines:,}")
@@ -636,6 +652,123 @@ def process_completed_batches(tracker):
 
 
 #%%
+def advance_batches(
+    sample,
+    tracker,
+    checksum,
+    max_batches,
+    poll_minutes,
+    confirm_submit,
+):
+    """Complete a bounded number of batches, polling conservatively between checks."""
+    if not confirm_submit:
+        raise ValueError(
+            "Advance requires --confirm-submit because it submits paid LLM batches"
+        )
+    if max_batches <= 0:
+        raise ValueError("--max-batches must be positive")
+    if poll_minutes <= 0:
+        raise ValueError("--poll-minutes must be positive")
+
+    completed_in_run = 0
+    poll_seconds = poll_minutes * 60
+    print(
+        f"Starting bounded advance: up to {max_batches} completed batches, "
+        f"checking every {poll_minutes:g} minutes"
+    )
+
+    while completed_in_run < max_batches:
+        tracker = refresh_status(tracker)
+
+        stopped = tracker[
+            tracker["status"].isin(["failed", "expired", "cancelled", "canceled"])
+            & ~tracker["saved_to_db"].apply(is_true)
+        ]
+        if not stopped.empty:
+            print("Stopping because a batch entered a failure or cancellation state:")
+            print_tracker(stopped)
+            return tracker
+
+        completed = tracker[
+            tracker["status"].eq("completed")
+            & ~tracker["saved_to_db"].apply(is_true)
+        ]
+        if not completed.empty:
+            api_failures = pd.to_numeric(
+                completed["total_failed"], errors="coerce"
+            ).fillna(0)
+            if api_failures.gt(0).any():
+                print(
+                    "Stopping before import because OpenAI reports failed requests. "
+                    "Inspect and process this batch manually."
+                )
+                print_tracker(completed)
+                return tracker
+
+            batch_numbers = set(
+                pd.to_numeric(completed["batch_number"], errors="raise").astype(int)
+            )
+            tracker = process_completed_batches(tracker)
+            processed = tracker[
+                pd.to_numeric(tracker["batch_number"], errors="coerce").isin(
+                    batch_numbers
+                )
+            ]
+            invalid_rows = pd.to_numeric(
+                processed["invalid_response_rows"], errors="coerce"
+            ).fillna(0)
+            missing_ids = pd.to_numeric(
+                processed["missing_output_ids"], errors="coerce"
+            ).fillna(0)
+            if invalid_rows.gt(0).any() or missing_ids.gt(0).any():
+                print(
+                    "Stopping because imported output had invalid responses or "
+                    "missing transcript IDs."
+                )
+                print_tracker(processed)
+                return tracker
+
+            completed_in_run += len(batch_numbers)
+            print(
+                f"Completed {completed_in_run}/{max_batches} batches in this run."
+            )
+            if completed_in_run >= max_batches:
+                break
+            continue
+
+        live = tracker[tracker["status"].isin(LIVE_STATUSES)]
+        if not live.empty:
+            print_tracker(live)
+            print(
+                f"No action needed. Waiting {poll_minutes:g} minutes before "
+                "checking again..."
+            )
+            time.sleep(poll_seconds)
+            continue
+
+        created = tracker[tracker["status"].eq("created")]
+        if created.empty:
+            progress = calculate_plan(sample)
+            if int(progress["remaining_queries"].sum()) == 0:
+                print("All sampled transcripts have reached eleven queries.")
+                break
+            tracker = create_batch(sample, tracker, checksum)
+
+        tracker = submit_batch(tracker, confirm_submit=True)
+        print(
+            f"Batch submitted. Waiting {poll_minutes:g} minutes before the "
+            "first status check..."
+        )
+        time.sleep(poll_seconds)
+
+    print(
+        f"Bounded advance finished after completing {completed_in_run} batch(es)."
+    )
+    print_plan(calculate_plan(sample))
+    return tracker
+
+
+#%%
 def parse_args():
     """Parse runner arguments."""
     parser = argparse.ArgumentParser(
@@ -643,13 +776,25 @@ def parse_args():
     )
     parser.add_argument(
         "operation",
-        choices=["plan", "create", "submit", "status", "process"],
+        choices=["plan", "create", "submit", "status", "process", "advance"],
         help="Operation to perform.",
     )
     parser.add_argument(
         "--confirm-submit",
         action="store_true",
-        help="Required confirmation for the paid submit operation.",
+        help="Required confirmation for operations that submit paid batches.",
+    )
+    parser.add_argument(
+        "--max-batches",
+        type=int,
+        default=5,
+        help="Maximum batches to complete during advance (default: 5).",
+    )
+    parser.add_argument(
+        "--poll-minutes",
+        type=float,
+        default=10.0,
+        help="Minutes between status checks during advance (default: 10).",
     )
     return parser.parse_args()
 
@@ -685,6 +830,16 @@ def main():
         elif args.operation == "process":
             tracker = refresh_status(tracker)
             tracker = process_completed_batches(tracker)
+            print_tracker(tracker)
+        elif args.operation == "advance":
+            tracker = advance_batches(
+                sample=sample,
+                tracker=tracker,
+                checksum=checksum,
+                max_batches=args.max_batches,
+                poll_minutes=args.poll_minutes,
+                confirm_submit=args.confirm_submit,
+            )
             print_tracker(tracker)
 
 
