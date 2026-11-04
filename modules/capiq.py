@@ -51,17 +51,16 @@ def get_connection():
 
 
 def disconnect():
-    """
-    Closes the WRDS connection if open.
-    """
+    """Close and clear the cached WRDS connection if one is open."""
     global _conn
-    if _conn is not None:
+    connection = _conn
+    _conn = None
+    if connection is not None:
         try:
-            _conn.close()
-            _conn = None
+            connection.close()
             print("WRDS connection closed.")
         except Exception as e:
-            print(f"Failed to close WRDS connection: {e}")
+            print(f"Failed to close WRDS connection cleanly: {e}")
 
 
 def ciqtranscriptcomponenttype():

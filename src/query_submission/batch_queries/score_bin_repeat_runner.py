@@ -30,10 +30,12 @@ import time
 from datetime import datetime, timezone
 
 import pandas as pd
+from sqlalchemy.exc import OperationalError
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 import config
+import modules.capiq as capiq
 from modules.batch_processor import BatchProcessor
 from modules.queries_db import insert_query_result
 from modules.utils import extract_score_from_unstructured_response, token_size
@@ -47,6 +49,8 @@ MAX_RESPONSE_TOKENS = 500
 TARGET_RUNS = 11
 MAX_REQUESTS_PER_BATCH = 500
 MAX_TOKENS_PER_BATCH_FILE = 8_000_000
+WRDS_MAX_ATTEMPTS = 3
+WRDS_RETRY_SECONDS = 60
 
 SAMPLE_PATH = os.path.join(
     config.DATA_DIR,
@@ -328,6 +332,33 @@ def unresolved_batches(tracker):
     ]
 
 
+def create_batch_input_with_wrds_retry(processor, request_ids, output_path):
+    """Create a batch file, reconnecting after transient WRDS failures."""
+    for attempt in range(1, WRDS_MAX_ATTEMPTS + 1):
+        try:
+            return processor.create_batch_input_file(
+                prompt_name=PROMPT_NAME,
+                transcriptids=request_ids,
+                output_path=output_path,
+            )
+        except OperationalError as error:
+            capiq.disconnect()
+            if attempt >= WRDS_MAX_ATTEMPTS:
+                print(
+                    f"WRDS operation failed after {WRDS_MAX_ATTEMPTS} attempts."
+                )
+                raise
+            print(
+                f"Transient WRDS error on attempt {attempt}/{WRDS_MAX_ATTEMPTS}: "
+                f"{error.orig if getattr(error, 'orig', None) else error}"
+            )
+            print(
+                f"Cleared the stale connection. Retrying in "
+                f"{WRDS_RETRY_SECONDS} seconds..."
+            )
+            time.sleep(WRDS_RETRY_SECONDS)
+
+
 def create_batch(sample, tracker, checksum):
     """Create the next phase-balanced batch input file without submitting it."""
     pending = unresolved_batches(tracker)
@@ -378,9 +409,9 @@ def create_batch(sample, tracker, checksum):
         temperature=TEMPERATURE,
         max_tokens=MAX_RESPONSE_TOKENS,
     )
-    processor.create_batch_input_file(
-        prompt_name=PROMPT_NAME,
-        transcriptids=request_ids,
+    create_batch_input_with_wrds_retry(
+        processor=processor,
+        request_ids=request_ids,
         output_path=output_path,
     )
 
