@@ -471,12 +471,13 @@ rule score_histogram_figures:
 
 rule scatter_scores_figure:
     """
-    Generate scatter plot comparing original LLM scores to mean scores from 11 queries.
-    Outputs both 1x1 and 16x9 formats in PNG and PDF.
+    Generate Figure 4 by comparing original LLM scores to eleven-query means.
+    Combines the original flagged sample with the below-threshold repetition sample.
     """
     input:
-        "data/datasets/main_analysis_dataset.feather",
-        "data/datasets/top_transcripts_data.csv"
+        "data/datasets/top_transcripts_data.csv",
+        "data/intermediaries/score_bin_repeat_sample.csv",
+        "data/datasets/queries.sqlite"
     output:
         scatter_16x9="data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf"
     shell:
