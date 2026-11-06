@@ -8,16 +8,16 @@ Eligible transcripts must not have been included in the original human audit. Sa
 
 ## Proposed allocations
 
-| Stratum | Approximate population | 100-audit proposal | 200-audit proposal |
-|---|---:|---:|---:|
-| Originally flagged but not validated | 3,760 | 40 | 80 |
-| Original score 70--74 | 3,270 | 25 | 50 |
-| Original score 65--69 | 4,233 | 20 | 35 |
-| Original score 50--64 | 7,289 | 10 | 20 |
-| Original score 0--49 | 479,439 | 5 | 15 |
-| **Total** | **497,991** | **100** | **200** |
+| Stratum | Approximate population | Audits |
+|---|---:|---:|
+| Originally flagged but not validated | 3,760 | 80 |
+| Original score 70--74 | 3,270 | 50 |
+| Original score 65--69 | 4,233 | 35 |
+| Original score 50--64 | 7,289 | 20 |
+| Original score 0--49 | 479,439 | 15 |
+| **Total** | **497,991** | **200** |
 
-Broader strata are used below 65 because dividing the small audit budget among every five-point bucket would produce uninformative sample sizes. The 200-transcript design is preferable because true positives are likely to be rare, even near the threshold.
+Broader strata are used below 65 because dividing the audit budget among every five-point bucket would produce uninformative sample sizes. Most audits are concentrated near the threshold because true positives are likely to be rare at lower scores.
 
 ## Estimation
 
