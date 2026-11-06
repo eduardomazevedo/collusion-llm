@@ -83,6 +83,7 @@ rule all:
         "data/outputs/figures/original_score_entire_sample_16x9.pdf",
         "data/outputs/figures/mean_score_validated_samples_16x9.pdf",
         "data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf",
+        "data/outputs/tables/projected_full_sample_llm_validation.csv",
         "data/constants/.populated"
 
 rule download_replication_data:
@@ -482,6 +483,21 @@ rule scatter_scores_figure:
         scatter_16x9="data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf"
     shell:
         f"{PYTHON_CMD} src/post_query/analysis/fig_scatter_scores.py"
+
+rule projected_full_sample_llm_validation:
+    """
+    Estimate eleven-query validation probabilities by original-score bucket and
+    project the number of validated transcripts in the full sample.
+    """
+    input:
+        "data/intermediaries/original_score.csv",
+        "data/intermediaries/score_bin_repeat_sample.csv",
+        "data/datasets/top_transcripts_data.csv",
+        "data/datasets/queries.sqlite"
+    output:
+        "data/outputs/tables/projected_full_sample_llm_validation.csv"
+    shell:
+        f"{PYTHON_CMD} src/post_query/analysis/project_full_sample_validation.py"
 
 rule quoted_excerpt_labels:
     """
