@@ -3,7 +3,20 @@
 
 This appendix estimates the probability that a transcript contains collusive content conditional on not being LLM-validated by our procedure. To do so, we audit additional transcripts that were not originally flagged by the LLM. The key challenge is that transcripts containing collusive content are rare, so a simple random audit would likely identify few such transcripts and yield an extremely noisy estimate. We therefore use a stratified audit that concentrates human review among transcripts most likely to contain collusive content.
 
-To design the stratified audit, we performed additional LLM queries to estimate the probability of validation conditional on the original LLM score. We selected 500 random transcripts from each five-point bin of the original LLM score below 75 and queried each transcript ten additional times. This lets us calculate the probability that a transcript in each bin would have an average score across all 11 queries above 75, that is, the probability that it would be LLM validated. The estimated validation probability declines sharply below an original score of 75. The probability is \data{projected_full_sample_llm_validation/score_buckets/score_75_79/validation_probability_pct_percentage0} for original scores in $[75,80)$, \data{projected_full_sample_llm_validation/score_buckets/score_70_74/validation_probability_pct_percentage0} in $[70,75)$, and \data{projected_full_sample_llm_validation/score_buckets/score_65_69/validation_probability_pct_percentage0} in $[65,70)$. No transcript in a lower-score bin had an average score of at least 75, yielding a point estimate of zero for those bins.
+To design the stratified audit, we performed additional LLM queries to estimate the probability of validation conditional on the original LLM score. We selected 500 random transcripts from each five-point bin of the original LLM score below 75 and queried each transcript ten additional times. This lets us calculate the probability that a transcript in each bin would have an average score across all 11 queries above 75, that is, the probability that it would be LLM validated. The estimated validation probability declines sharply below an original score of 75. The probability is \data{projected_full_sample_llm_validation/score_buckets/score_75_79/validation_probability_pct_percentage0} for original scores in $[75,80)$, \data{projected_full_sample_llm_validation/score_buckets/score_70_74/validation_probability_pct_percentage0} in $[70,75)$, and \data{projected_full_sample_llm_validation/score_buckets/score_65_69/validation_probability_pct_percentage0} in $[65,70)$. No transcript in a lower-score bin had an average score of at least 75, yielding a point estimate of zero for those bins. Figure~\ref{fig:si_scatter_scores_original_vs_mean} summarizes these repeated-query results.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{../data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf}
+    \caption{Original LLM Score and Mean Score Across Repeated Queries}
+    \label{fig:si_scatter_scores_original_vs_mean}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} Each small point represents a transcript. The sample combines the original LLM-flagged validation sample with 500 randomly selected transcripts from each five-point original-score bin below 75. Large points report mean scores within five-point bins; bars show 95\% confidence intervals. Dashed lines mark the original flagging and validation thresholds of 75, and the dotted line is the 45-degree line.
+    \end{minipage}
+\end{figure}
+\FloatBarrier
 
 Based on these results, we designed our audit strata as follows. We divide the non-validated transcripts into the five strata in Table~\ref{tab:false_negative_audit_strata}. We allocate more audits to strata with higher original scores and thus a higher expected probability of collusive content. Within each stratum, transcripts are sampled at random.
 
@@ -13,7 +26,7 @@ Based on these results, we designed our audit strata as follows. We divide the n
     \label{tab:false_negative_audit_strata}
     \begin{tabular}{lrr}
         \toprule
-        Stratum & Approx. population & Audits \\
+        Stratum & Transcripts & Audits \\
         \midrule
         Originally flagged but not validated & 3,760 & 80 \\
         Original score 70--74 & 3,270 & 50 \\
