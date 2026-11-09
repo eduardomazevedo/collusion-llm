@@ -495,7 +495,8 @@ rule projected_full_sample_llm_validation:
         "data/datasets/top_transcripts_data.csv",
         "data/datasets/queries.sqlite"
     output:
-        "data/outputs/tables/projected_full_sample_llm_validation.csv"
+        csv="data/outputs/tables/projected_full_sample_llm_validation.csv",
+        yaml="data/yaml/projected_full_sample_llm_validation.yaml"
     shell:
         f"{PYTHON_CMD} src/post_query/analysis/project_full_sample_validation.py"
 
@@ -525,6 +526,7 @@ rule populate_constants:
         "data/yaml/benchmarking.yaml",
         "data/yaml/audit.yaml",
         "data/yaml/quoted_excerpt_labels.yaml",
+        "data/yaml/projected_full_sample_llm_validation.yaml",
         "data/outputs/tables/segment_tag_rates_llm.csv"
     output:
         "data/constants/.populated"

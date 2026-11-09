@@ -9,6 +9,7 @@ Outputs:
 - data/outputs/tables/projected_full_sample_llm_validation.csv
 - data/outputs/tables/projected_full_sample_llm_validation.tex
 - data/outputs/tables/projected_full_sample_llm_validation.txt
+- data/yaml/projected_full_sample_llm_validation.yaml
 """
 
 #%%
@@ -19,6 +20,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../.."))
 
@@ -36,6 +38,8 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 CSV_PATH = OUTPUT_DIR / "projected_full_sample_llm_validation.csv"
 TEX_PATH = OUTPUT_DIR / "projected_full_sample_llm_validation.tex"
 TXT_PATH = OUTPUT_DIR / "projected_full_sample_llm_validation.txt"
+YAML_PATH = Path("data/yaml/projected_full_sample_llm_validation.yaml")
+YAML_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 #%%
 print("Loading below-threshold repetition sample...")
@@ -285,6 +289,30 @@ TXT_PATH.write_text(
     f"among {full_sample_total:,} total transcripts.\n"
 )
 
+bucket_stats = {}
+for row in table.itertuples(index=False):
+    bucket_stats[f"score_{row.score_bucket}_{row.score_bucket + BIN_WIDTH - 1}"] = {
+        "repetition_sample_n": int(row.repetition_sample_n),
+        "llm_validated_n": int(row.llm_validated_n),
+        "validation_probability_pct": float(100 * row.validation_probability),
+        "full_sample_n": int(row.full_sample_n),
+    }
+
+with open(YAML_PATH, "w") as yaml_file:
+    yaml.safe_dump(
+        {
+            "additional_queries": 10,
+            "validation_threshold": VALIDATION_THRESHOLD,
+            "bin_width": BIN_WIDTH,
+            "score_buckets": bucket_stats,
+            "projected_validated_total": projected_total_rounded,
+            "full_sample_total": full_sample_total,
+        },
+        yaml_file,
+        sort_keys=False,
+    )
+
 print(f"Saved: {CSV_PATH}")
 print(f"Saved: {TEX_PATH}")
 print(f"Saved: {TXT_PATH}")
+print(f"Saved: {YAML_PATH}")

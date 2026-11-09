@@ -1,0 +1,42 @@
+% !TeX root = online_appendix.tex
+\section{Estimating the False Negative Rate}\label{sec:si_false_negative_rate}
+
+This appendix estimates the probability that a transcript contains collusive content conditional on not being LLM-validated by our procedure. To do so, we audit additional transcripts that were not originally flagged by the LLM. The key challenge is that transcripts containing collusive content are rare, so a simple random audit would likely identify few such transcripts and yield an extremely noisy estimate. We therefore use a stratified audit that concentrates human review among transcripts most likely to contain collusive content.
+
+To design the stratified audit, we performed additional LLM queries to estimate the probability of validation conditional on the original LLM score. We selected 500 random transcripts from each five-point bin of the original LLM score below 75 and queried each transcript ten additional times. This lets us calculate the probability that a transcript in each bin would have an average score across all 11 queries above 75, that is, the probability that it would be LLM validated. The estimated validation probability declines sharply below an original score of 75. The probability is \data{projected_full_sample_llm_validation/score_buckets/score_75_79/validation_probability_pct_percentage0} for original scores in $[75,80)$, \data{projected_full_sample_llm_validation/score_buckets/score_70_74/validation_probability_pct_percentage0} in $[70,75)$, and \data{projected_full_sample_llm_validation/score_buckets/score_65_69/validation_probability_pct_percentage0} in $[65,70)$. No transcript in a lower-score bin had an average score of at least 75, yielding a point estimate of zero for those bins.
+
+Based on these results, we designed our audit strata as follows. We divide the non-validated transcripts into the five strata in Table~\ref{tab:false_negative_audit_strata}. We allocate more audits to strata with higher original scores and thus a higher expected probability of collusive content. Within each stratum, transcripts are sampled at random.
+
+\begin{table}[ht]
+    \centering
+    \caption{False Negative Audit Strata}
+    \label{tab:false_negative_audit_strata}
+    \begin{tabular}{lrr}
+        \toprule
+        Stratum & Approx. population & Audits \\
+        \midrule
+        Originally flagged but not validated & 3,760 & 80 \\
+        Original score 70--74 & 3,270 & 50 \\
+        Original score 65--69 & 4,233 & 35 \\
+        Original score 50--64 & 7,289 & 20 \\
+        Original score 0--49 & 479,439 & 15 \\
+        \midrule
+        Total & 497,991 & 200 \\
+        \bottomrule
+    \end{tabular}
+    \begin{minipage}{\textwidth}
+        \vspace{1em}
+        \footnotesize
+        \textit{Notes:} The population consists of transcripts that were not LLM-validated. ``Originally flagged but not validated'' denotes transcripts with an original score of at least 75 whose average score after validation was below 75.
+    \end{minipage}
+\end{table}
+
+Let $N_h$ and $n_h$ denote the population and audit sample sizes in stratum $h$, and let $C_h$ denote the number of audited transcripts judged to contain collusive content. We estimate the probability of collusive content among non-validated transcripts as
+\[
+    \widehat{p}_{\mathrm{FN}}
+    = \sum_h \frac{N_h}{N}\frac{C_h}{n_h},
+    \qquad N=\sum_h N_h.
+\]
+The population weights correct for the deliberate oversampling of higher-score strata.
+
+\textbf{TODO after audit:} Report stratum-level outcomes, the weighted estimate and its uncertainty, and the implied number of missed collusive transcripts.
