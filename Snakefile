@@ -31,6 +31,20 @@ if root != workflow_basedir:
 
 PYTHON_CMD = 'PYTHONPATH="{workflow.basedir}:${{PYTHONPATH:-}}" python'
 
+INTERNAL_SCORE_BUCKET_HISTOGRAM_DIR = (
+    "data/outputs/internal/mean_score_histograms_by_initial_bucket"
+)
+INTERNAL_SCORE_BUCKET_HISTOGRAM_OUTPUTS = [
+    f"{INTERNAL_SCORE_BUCKET_HISTOGRAM_DIR}/mean_score_initial_{lower}_{lower + 5}_{aspect}.{extension}"
+    for lower in range(50, 85, 5)
+    for aspect in ["1x1", "16x9"]
+    for extension in ["png", "pdf"]
+] + [
+    f"{INTERNAL_SCORE_BUCKET_HISTOGRAM_DIR}/mean_score_histograms_all_initial_buckets_portrait.png",
+    f"{INTERNAL_SCORE_BUCKET_HISTOGRAM_DIR}/mean_score_histograms_all_initial_buckets_portrait.pdf",
+    f"{INTERNAL_SCORE_BUCKET_HISTOGRAM_DIR}/mean_score_histograms_by_initial_bucket.txt",
+]
+
 rule all:
     input:
         "data/datasets/queries.sqlite",
@@ -83,6 +97,7 @@ rule all:
         "data/outputs/figures/original_score_entire_sample_16x9.pdf",
         "data/outputs/figures/mean_score_validated_samples_16x9.pdf",
         "data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf",
+        f"{INTERNAL_SCORE_BUCKET_HISTOGRAM_DIR}/mean_score_histograms_all_initial_buckets_portrait.pdf",
         "data/outputs/tables/projected_full_sample_llm_validation.csv",
         "data/constants/.populated"
 
@@ -483,6 +498,20 @@ rule scatter_scores_figure:
         scatter_16x9="data/outputs/figures/scatter_scores_original_vs_mean_16x9.pdf"
     shell:
         f"{PYTHON_CMD} src/post_query/analysis/fig_scatter_scores.py"
+
+rule internal_score_bucket_histograms:
+    """
+    Generate internal histograms of eleven-query mean scores conditional on
+    five-point initial-score buckets from [50, 55) through [80, 85).
+    """
+    input:
+        "data/intermediaries/score_bin_repeat_sample.csv",
+        "data/datasets/top_transcripts_data.csv",
+        "data/datasets/queries.sqlite"
+    output:
+        INTERNAL_SCORE_BUCKET_HISTOGRAM_OUTPUTS
+    shell:
+        f"{PYTHON_CMD} src/post_query/analysis/internal/fig_mean_score_histograms_by_initial_bucket.py"
 
 rule projected_full_sample_llm_validation:
     """
