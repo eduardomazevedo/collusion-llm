@@ -66,6 +66,10 @@ rule all:
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
         "data/yaml/audit.yaml",
+        "data/yaml/false_negative_rate.yaml",
+        "data/outputs/tables/false_negative_rate_estimates.csv",
+        "data/outputs/tables/false_negative_rate_estimates.tex",
+        "data/outputs/tables/false_negative_rate_estimates.txt",
         "data/datasets/ask_airline_year.csv",
         "data/outputs/figures/ask_by_airline_2011_2016_16x9.pdf",
         "data/outputs/tables/detailed_industry_results.csv",
@@ -440,6 +444,21 @@ rule audit_analysis:
     shell:
         f"{PYTHON_CMD} src/post_query/analysis/audit_analysis.py"
 
+rule false_negative_rate_analysis:
+    """
+    Estimate stratum-level and aggregate false-negative rates from the expert audit.
+    """
+    input:
+        sample="assets/false_negative_audit_sample.csv",
+        results="assets/false_negative_audit_results.csv"
+    output:
+        csv="data/outputs/tables/false_negative_rate_estimates.csv",
+        tex="data/outputs/tables/false_negative_rate_estimates.tex",
+        txt="data/outputs/tables/false_negative_rate_estimates.txt",
+        yaml="data/yaml/false_negative_rate.yaml"
+    shell:
+        f"{PYTHON_CMD} src/post_query/analysis/false_negative_rate_analysis.py"
+
 rule summary_stats_dataset:
     """
     Generate publication-ready summary statistics table for dataset characteristics.
@@ -554,6 +573,7 @@ rule populate_constants:
         "data/yaml/correlates_collusive_communication.yaml",
         "data/yaml/benchmarking.yaml",
         "data/yaml/audit.yaml",
+        "data/yaml/false_negative_rate.yaml",
         "data/yaml/quoted_excerpt_labels.yaml",
         "data/yaml/projected_full_sample_llm_validation.yaml",
         "data/outputs/tables/segment_tag_rates_llm.csv"
